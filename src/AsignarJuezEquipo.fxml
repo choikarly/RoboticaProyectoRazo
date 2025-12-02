@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ScrollBar layoutX="720.0" orientation="VERTICAL" prefHeight="589.0" prefWidth="6.0" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="50.0" layoutY="57.0" text="Mis Equipos">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <AnchorPane layoutX="10.0" layoutY="95.0" prefHeight="487.0" prefWidth="714.0" visible="false">
+         <children>
+            <TableView layoutX="32.0" layoutY="8.0" prefHeight="154.0" prefWidth="668.0">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </children>
+      </AnchorPane>
+      <Label id="lbl_alertaMisEquipos" layoutX="184.0" layoutY="279.0" text="Aún no tienes ningún equipo a tu cargo" textFill="#a99b9b">
+         <font>
+            <Font name="System Italic" size="20.0" />
+         </font>
+      </Label>
+      <Button layoutX="563.0" layoutY="62.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="122.0" style="-fx-background-radius: 15; -fx-background-color: #274c77;" text="CREAR EQUIPO" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+   </children>
+</AnchorPane>

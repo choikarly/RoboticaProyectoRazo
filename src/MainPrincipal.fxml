@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="MainPrincipalController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="942.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainPrincipalController">
+   <children>
+      <Pane layoutX="-6.0" layoutY="-5.0" prefHeight="598.0" prefWidth="216.0" style="-fx-background-color: #274C77;">
+         <children>
+            <Button fx:id="btn_cerrar_sesion" layoutX="48.0" layoutY="533.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: #E7ECEF; -fx-background-radius: 15;" text="Cerrar Sesion" textFill="#666060">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <StackPane layoutX="19.0" layoutY="38.0" prefHeight="149.0" prefWidth="177.0">
+               <children>
+                  <Circle fill="#6096ba" radius="66.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+                  <Label fx:id="lbl_inicial" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="64.0" />
+                     </font>
+                  </Label>
+               </children>
+            </StackPane>
+            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="187.0" prefHeight="273.0" prefWidth="201.0">
+               <children>
+                  <Button fx:id="btn_infopersonalDocente" layoutX="1.0" layoutY="50.0" mnemonicParsing="false" onAction="#btn_infoPersonalDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Info. Personal" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btn_eventos_Docente" layoutY="179.0" mnemonicParsing="false" onAction="#btn_EventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btn_MisEquiposDocente" layoutX="1.0" layoutY="113.0" mnemonicParsing="false" onAction="#btn_MisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Label fx:id="lbl_rol" layoutX="64.0" layoutY="5.0" text="Docente" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold Italic" size="19.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="191.0" prefHeight="321.0" prefWidth="201.0" visible="false">
+               <children>
+                  <Button fx:id="btn_infopersonal_partcipante1" layoutY="59.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Jueces" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btn_mis_equipos1" layoutX="1.0" layoutY="124.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Equipos" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btn_calificacion1" layoutY="188.0" mnemonicParsing="false" prefHeight="62.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Label fx:id="lbl_rol11" layoutX="67.0" text="ADMIN" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold Italic" size="19.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+         </children>
+      </Pane>
+      <AnchorPane fx:id="PanelContenedor" layoutX="210.0" prefHeight="589.0" prefWidth="734.0" />
+   </children>
+</AnchorPane>

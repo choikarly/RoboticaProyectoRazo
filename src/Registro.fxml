@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="942.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegistroController">
+   <children>
+      <Pane layoutY="-56.0" prefHeight="456.0" prefWidth="757.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Button id="btn_Registro" fx:id="btnRegistrarse" layoutX="381.0" layoutY="454.0" mnemonicParsing="false" onAction="#btnRegistrarse" prefHeight="54.0" prefWidth="181.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="REGISTRARSE" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Button>
+            <Label id="lbl_tituloRegistro" contentDisplay="CENTER" layoutX="361.0" layoutY="79.0" prefHeight="84.0" prefWidth="222.0" text="Registro" textAlignment="CENTER">
+               <font>
+                  <Font name="Calibri Bold" size="64.0" />
+               </font>
+            </Label>
+            <TextField id="txt_NombreCompleto" fx:id="txt_nombrecompleto" focusTraversable="false" layoutX="97.0" layoutY="181.0" prefHeight="40.0" prefWidth="770.0" promptText="Nombre Completo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <DatePicker id="dtpk_FechaNac" fx:id="fecha_nacimiento_date" editable="true" layoutX="97.0" layoutY="344.0" prefHeight="40.0" prefWidth="369.0" promptText="Fecha de Nacimiento" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+            <PasswordField fx:id="txt_contra_oculta" layoutX="490.0" layoutY="234.0" prefHeight="40.0" prefWidth="369.0" promptText="CONTRASEÑA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </PasswordField>
+            <TextField id="txt_Contra" fx:id="txt_contra" layoutX="486.0" layoutY="234.0" prefHeight="40.0" prefWidth="382.0" promptText="Contraseña" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <ToggleButton fx:id="btn_ver" layoutX="791.0" layoutY="239.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" style="-fx-background-radius: 20;" text="VER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </ToggleButton>
+            <TextField id="txt_Usuario" fx:id="txt_usuario" layoutX="97.0" layoutY="234.0" prefHeight="40.0" prefWidth="369.0" promptText="Usuario" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <TextField id="txt_especialidad" fx:id="txt_especialidad" focusTraversable="false" layoutX="100.0" layoutY="395.0" prefHeight="40.0" prefWidth="770.0" promptText="Especialidad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <ComboBox id="cb_escuelaProcedencia" fx:id="EscuelaProcedenciaComboBox" layoutX="97.0" layoutY="288.0" prefHeight="40.0" prefWidth="770.0" promptText="Escuela Procedencia" style="-fx-background-color: #e7ecef; -fx-background-radius: 15; -fx-text-fill: #7d8995;" />
+            <ComboBox id="cb_sexo" fx:id="sexoComboBox" layoutX="486.0" layoutY="344.0" prefHeight="40.0" prefWidth="382.0" promptText="Sexo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" visibleRowCount="15" />
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

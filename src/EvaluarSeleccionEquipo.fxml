@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="315.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="38.0" layoutY="40.0" text="Selecciona el equipo a calificar:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <ComboBox layoutX="34.0" layoutY="90.0" prefHeight="41.0" prefWidth="432.0" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <Button layoutX="164.0" layoutY="214.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="172.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="CONTINUAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
