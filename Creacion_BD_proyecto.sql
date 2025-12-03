@@ -2,8 +2,6 @@
 
 create user 'administrador_concursos'@'localhost' identified by '12345';
 grant all on concurso_robotica.* to 'administrador_concursos'@'localhost';
-set global log_bin_trust_function_creators = 1;
-grant create routine on concurso_robotica.* to 'administrador_concursos'@'localhost';
 
 -- Crear la base de datos
 
@@ -21,14 +19,18 @@ create table ciudad(
     nombre 		varchar(80) not null
 );
 
-create table escuela(
-	id_escuela	int primary key auto_increment,
+create table sede(
+	id_sede		int primary key auto_increment,
 	nombre		varchar(80) not null,
 	fk_ciudad	int not null,
-    foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE,
+    foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+create table escuela(
+	id_escuela	int primary key,
+    foreign key (id_escuela) references sede (id_sede),
     fk_nivel	int not null,
-    foreign key (fk_nivel) references categoria(id_categoria),
-    constraint uk_escuela_ciudad_nivel unique (nombre, fk_ciudad, fk_nivel)
+    foreign key (fk_nivel) references categoria(id_categoria)
 );
 
 create table evento(
@@ -217,21 +219,24 @@ insert into ciudad(nombre) values ("Tampico");
 insert into ciudad(nombre) values ("Madero");
 insert into ciudad(nombre) values ("Altamira");
 
--- Dar de alta escuelas
-
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Instituto Tecnológico de Ciudad Madero (ITCM)", 2, 4);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Universidad Autonoma de Tamaulipas (UAT)", 1, 4);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Centro de Bachillerato Tecnológico Industrial y de Servicio N.103(CBTis 103)", 2, 3);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Escuela Secundaria N.3 Club de Leones", 1, 2);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Universidad Tecnologica de Altamira (UT Altamira)", 3, 4);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Escuela Primaria Justo Sierra", 1, 1);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Colegio Arboledas A.C", 3, 1);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Centro de Estudios Tecnológico Industrial y de Servicio N.109 (CEBtis 109)", 2, 2);
-insert into escuela(nombre, fk_ciudad, fk_nivel) values ("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2);
-
 -- Procesos almacenados
+drop procedure if exists ingresar_sede;
+delimiter //
+create procedure ingresar_sede (
+		p_nombre varchar(80),
+        p_fk_ciudad int,
+	out mensaje varchar(50)
+)
+begin
+	if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
+		set mensaje = "Ya existe este registro de sede";
+	else
+		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
+        set mensaje = "Se ingreso la sede correctamente";
+    end if;
+end
+// delimiter ;
 
-/*
 drop procedure if exists ingresar_escuela;
 delimiter //
 create procedure ingresar_escuela (
@@ -241,15 +246,28 @@ create procedure ingresar_escuela (
 	out mensaje varchar(50)
 )
 begin
-	if exists (select * from escuela where nombre = p_nombre and fk_ciudad = p_fk_ciudad and fk_nivel = p_fk_nivel) then
+	if exists (select * from escuela join sede on id_escuela = id_sede
+    where nombre = p_nombre and fk_ciudad = p_fk_ciudad and fk_nivel = p_fk_nivel) then
 		set mensaje = "Ya existe este registro de escuela";
 	else
-		insert into escuela (nombre, fk_ciudad, fk_nivel) values (p_nombre, p_fk_ciudad, p_fk_nivel);
+		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
+        insert into escuela (id_escuela, fk_nivel) values (last_insert_id(), p_fk_nivel);
         set mensaje = "Se ingreso la escuela correctamente";
     end if;
 end
 // delimiter ;
-*/
+
+-- Dar de alta escuelas
+set @mensaje = '0';
+CALL ingresar_escuela("Instituto Tecnológico de Ciudad Madero (ITCM)", 2, 4, @mensaje);
+CALL ingresar_escuela("Universidad Autonoma de Tamaulipas (UAT)", 1, 4, @mensaje);
+CALL ingresar_escuela("Centro de Bachillerato Tecnológico Industrial y de Servicio N.103(CBTis 103)", 2, 3, @mensaje);
+CALL ingresar_escuela("Escuela Secundaria N.3 Club de Leones", 1, 2, @mensaje);
+CALL ingresar_escuela("Universidad Tecnologica de Altamira (UT Altamira)", 3, 4, @mensaje);
+CALL ingresar_escuela("Escuela Primaria Justo Sierra", 1, 1, @mensaje);
+CALL ingresar_escuela("Colegio Arboledas A.C", 3, 1, @mensaje);
+CALL ingresar_escuela("Centro de Estudios Tecnológico Industrial y de Servicio N.109 (CEBtis 109)", 2, 3, @mensaje);
+CALL ingresar_escuela("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2, @mensaje);
 
 drop procedure if exists registrar_competidor;
 delimiter //
@@ -343,15 +361,16 @@ drop function if exists grado_admin;
 delimiter //
 create function grado_admin(
 	f_id_usuario int
-) returns tinyint
+) returns int
+reads sql data
 begin
-	declare nivel tinyint;
+	declare v_nivel int;
 	if exists (select * from administrador where id_administrador = f_id_usuario) then
-		select grado into @nivel from administrador where id_administrador = f_id_usuario;
+		select grado into v_nivel from administrador where id_administrador = f_id_usuario;
     else
-		set @nivel = -1;
+		set v_nivel = -1;
     end if;
-    return @nivel;
+    return v_nivel;
 end
 // delimiter ;
 
