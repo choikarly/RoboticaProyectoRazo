@@ -2,8 +2,6 @@
 
 create user 'administrador_concursos'@'localhost' identified by '12345';
 grant all on concurso_robotica.* to 'administrador_concursos'@'localhost';
-set global log_bin_trust_function_creators = 1;
-grant create routine on concurso_robotica.* to 'administrador_concursos'@'localhost';
 
 -- Crear la base de datos
 
