@@ -31,6 +31,23 @@ public class MainEventosController {
         }
     }
 
+    @FXML
+    void btnEvaluar(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("EvaluarSeleccionEquipo.fxml"));
+            Parent root = loader.load();
 
+            Stage stagePaso = new Stage();
+            stagePaso.setScene(new Scene(root));
+            stagePaso.setTitle("Selecciona Equipo");
+
+            // Esto obliga al usuario a terminar aquí antes de volver a Eventos
+            stagePaso.initModality(Modality.APPLICATION_MODAL);
+            stagePaso.show();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

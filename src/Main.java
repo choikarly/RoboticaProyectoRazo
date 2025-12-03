@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.sql.*;
 import java.sql.Date;
@@ -23,7 +24,7 @@ public class Main extends Application {
 
     }
 
-    private static Connection getConexion() throws SQLException {
+    public static Connection getConexion() throws SQLException {
         return DriverManager.getConnection(URL_BASEDATOS, USUARIO_BD, CLAVE_BD);
     }
 
@@ -64,7 +65,7 @@ public class Main extends Application {
         }
         return true;
     }
-    public static boolean registrarDocente(String nombre, String usuario, String clave, Date fecha_nacimiento,
+    public static String registrarDocente(String nombre, String usuario, String clave, Date fecha_nacimiento,
                                            int escuela, String sexo, String especialidad) {
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL registrar_docente(?, ?, ?, ?, ?, ?, ?, ?)}")) {
@@ -79,13 +80,18 @@ public class Main extends Application {
             cs.execute();
             String mensaje = cs.getString(8);
             System.out.println(mensaje);
-            if (!mensaje.equals("Se registro al docente correctamente"))
-                return false;
+            if (mensaje.contains("Se registro al docente correctamente")) {
+                return "Se registro al docente correctamente";
+            } else {
+                return mensaje;
+            }
         } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) {
+                return "DUPLICADO";
+            }
             System.err.println("\nError en la comunicación con la base de datos: " + e.getMessage());
-            return false;
+            return "ERROR" + e.getMessage();
         }
-        return true;
     }
 
     public static int iniciarSesion(String nombre_usuario, String clave){
@@ -151,4 +157,6 @@ public class Main extends Application {
         }
         return true;
     }
+
+
 }

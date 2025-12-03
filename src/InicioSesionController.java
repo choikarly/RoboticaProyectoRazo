@@ -21,7 +21,7 @@ public class InicioSesionController {
 
 
     @FXML
-    private void abrirVentanaRegistro(ActionEvent event) throws IOException {
+    void abrirVentanaRegistro(ActionEvent event) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("Registro.fxml"));
         Scene scene = new Scene(root);
 

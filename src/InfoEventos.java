@@ -9,7 +9,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
 
-
 public class InfoEventos {
     @FXML
     void btnContinuar(ActionEvent event) {
@@ -34,5 +33,4 @@ public class InfoEventos {
             e.printStackTrace();
         }
     }
-
 }
