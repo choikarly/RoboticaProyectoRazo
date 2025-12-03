@@ -32,6 +32,7 @@ public class InicioSesionController {
         Stage newStage = new Stage();
         newStage.setTitle("Formulario de Registro");
         newStage.setScene(scene);
+        newStage.setResizable(false);
         newStage.show();
     }
 
@@ -84,6 +85,7 @@ public class InicioSesionController {
                     Stage stageNuevo = new Stage();
                     stageNuevo.setScene(new Scene(root));
                     stageNuevo.setTitle("Concurso Robotica"); // Ponle el título que quieras
+                    stageNuevo.setResizable(false);
                     stageNuevo.show();
 
                 } catch (IOException e) {

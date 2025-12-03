@@ -80,11 +80,7 @@ public class Main extends Application {
             cs.execute();
             String mensaje = cs.getString(8);
             System.out.println(mensaje);
-            if (mensaje.contains("Se registro al docente correctamente")) {
-                return "Se registro al docente correctamente";
-            } else {
-                return mensaje;
-            }
+            return mensaje;
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062) {
                 return "DUPLICADO";

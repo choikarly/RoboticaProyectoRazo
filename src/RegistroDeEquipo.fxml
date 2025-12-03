@@ -9,13 +9,13 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="376.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegistroDeEquipo">
    <children>
-      <TextField layoutX="36.0" layoutY="64.0" prefHeight="30.0" prefWidth="406.0" promptText="NOMBRE DEL EQUIPO" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+      <TextField fx:id="txtnombreEquipo" layoutX="36.0" layoutY="64.0" prefHeight="30.0" prefWidth="406.0" promptText="NOMBRE DEL EQUIPO" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
          <font>
             <Font size="17.0" />
          </font>
       </TextField>
-      <ComboBox layoutX="449.0" layoutY="63.0" prefHeight="38.0" prefWidth="406.0" promptText="ESCUELA PROCEDENCIA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
-      <TextField layoutX="36.0" layoutY="164.0" prefHeight="14.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
+      <ComboBox fx:id="cbEscuelasFiltradas" layoutX="449.0" layoutY="63.0" prefHeight="38.0" prefWidth="406.0" promptText="ESCUELA PROCEDENCIA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <TextField fx:id="txtNumCtrlUno" layoutX="36.0" layoutY="164.0" prefHeight="14.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
          <font>
             <Font size="17.0" />
          </font>
@@ -30,27 +30,27 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField layoutX="35.0" layoutY="209.0" prefHeight="30.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
+      <TextField fx:id="txtNumCtrlDos" layoutX="35.0" layoutY="209.0" prefHeight="30.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
          <font>
             <Font size="17.0" />
          </font>
       </TextField>
-      <TextField layoutX="36.0" layoutY="255.0" prefHeight="30.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
+      <TextField fx:id="txtNumCtrlTres" layoutX="36.0" layoutY="255.0" prefHeight="30.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
          <font>
             <Font size="17.0" />
          </font>
       </TextField>
-      <Label layoutX="199.0" layoutY="209.0" prefHeight="38.0" prefWidth="664.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Integrante 2" textFill="#c1c1c1">
+      <Label fx:id="txtIntegranteDos" layoutX="199.0" layoutY="209.0" prefHeight="38.0" prefWidth="664.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Integrante 2" textFill="#c1c1c1">
          <font>
             <Font size="17.0" />
          </font>
       </Label>
-      <Label layoutX="199.0" layoutY="256.0" prefHeight="38.0" prefWidth="664.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Integrante 3" textFill="#c1c1c1">
+      <Label fx:id="txtIntegranteTres" layoutX="199.0" layoutY="256.0" prefHeight="38.0" prefWidth="664.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Integrante 3" textFill="#c1c1c1">
          <font>
             <Font size="17.0" />
          </font>
       </Label>
-      <Label layoutX="199.0" layoutY="164.0" prefHeight="38.0" prefWidth="664.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Integrante 1" textFill="#c1c1c1">
+      <Label fx:id="txtIntegranteUno" layoutX="199.0" layoutY="164.0" prefHeight="38.0" prefWidth="664.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Integrante 1" textFill="#c1c1c1">
          <font>
             <Font size="17.0" />
          </font>

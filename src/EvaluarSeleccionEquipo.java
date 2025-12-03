@@ -17,7 +17,7 @@ public class EvaluarSeleccionEquipo {
             Stage stageActual = (Stage) source.getScene().getWindow();
             stageActual.close();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainEvaluacion.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("EvaluarCriterioProgramacion.fxml"));
             Parent root = loader.load();
 
             Stage stagePaso = new Stage();
@@ -25,6 +25,7 @@ public class EvaluarSeleccionEquipo {
             stagePaso.setTitle("Evaluacion");
 
             stagePaso.initModality(Modality.APPLICATION_MODAL);
+            stagePaso.setResizable(false);
             stagePaso.show();
 
         } catch (Exception e) {

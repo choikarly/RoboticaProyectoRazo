@@ -98,6 +98,7 @@ public class RegistroController implements Initializable {
                             Stage stageNuevo = new Stage();
                             stageNuevo.setScene(new Scene(root));
                             stageNuevo.setTitle("Inicio de Sesion");
+                            stageNuevo.setResizable(false);
                             stageNuevo.show();
                             System.out.println("Guardando usuario: " + usuarioNuevo);
                             break;
@@ -115,7 +116,7 @@ public class RegistroController implements Initializable {
             }
         }
     }
-    private void cargarEscuelasDesdeBD() {
+    public void cargarEscuelasDesdeBD() {
         String sql = "SELECT id_escuela, nombre FROM escuela";
 
         try (Connection conn = Main.getConexion();
@@ -146,7 +147,7 @@ public class RegistroController implements Initializable {
         txt_nombrecompleto.requestFocus();
     }
 
-    private void mostrarAlertaError(String titulo, String encabezado, String contenido) {
+    public void mostrarAlertaError(String titulo, String encabezado, String contenido) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
         alert.setHeaderText(encabezado);

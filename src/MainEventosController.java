@@ -24,6 +24,7 @@ public class MainEventosController {
 
             // Esto obliga al usuario a terminar aquí antes de volver a Eventos
             stagePaso1.initModality(Modality.APPLICATION_MODAL);
+            stagePaso1.setResizable(false);
             stagePaso1.show();
 
         } catch (IOException e) {
@@ -43,6 +44,7 @@ public class MainEventosController {
 
             // Esto obliga al usuario a terminar aquí antes de volver a Eventos
             stagePaso.initModality(Modality.APPLICATION_MODAL);
+            stagePaso.setResizable(false);
             stagePaso.show();
 
         } catch (Exception e) {
