@@ -42,7 +42,7 @@ public class Main extends Application {
         }
     }
 
-    public static boolean registrarCompetidor( String nombre, Date fecha_nacimiento, int escuela,
+    public static int registrarCompetidor( String nombre, Date fecha_nacimiento, int escuela,
                                                String sexo, String carrera, int semestre, int num_control) {
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL registrar_competidor(?, ?, ?, ?, ?, ?, ?, ?)}")) {
@@ -56,16 +56,29 @@ public class Main extends Application {
             cs.registerOutParameter(8, Types.VARCHAR);
             cs.execute();
             String mensaje = cs.getString(8);
-            System.out.println(mensaje);
-            if (!mensaje.equals("Se registro al participante correctamente"))
-                return false;
+
+            System.out.println("Mensaje BD: " + mensaje); // Debug
+            if (mensaje != null) {
+                // Caso 1: ÉXITO
+                if (mensaje.contains("Se registro al participante correctamente")) {
+                    return 1;
+                }
+                // Caso 2: DUPLICADO (Si tu SP lo controla y manda mensaje en vez de error)
+                else if (mensaje.contains("El numero de control ya esta registrado")) {
+                    return -1;
+                }
+            }
+            return -2;
+
         } catch (SQLException e) {
-            System.err.println("\nError en la comunicación con la base de datos: " + e.getMessage());
-            return false;
+            if (e.getErrorCode() == 1062) {
+                return -1;
+            }
+            System.err.println("\nError SQL: " + e.getMessage());
+            return -2; // Error General
         }
-        return true;
     }
-    public static String registrarDocente(String nombre, String usuario, String clave, Date fecha_nacimiento,
+    public static int registrarDocente(String nombre, String usuario, String clave, Date fecha_nacimiento,
                                            int escuela, String sexo, String especialidad) {
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL registrar_docente(?, ?, ?, ?, ?, ?, ?, ?)}")) {
@@ -80,18 +93,31 @@ public class Main extends Application {
             cs.execute();
             String mensaje = cs.getString(8);
             System.out.println(mensaje);
-            return mensaje;
+
+            System.out.println("Mensaje BD: " + mensaje); // Debug
+            if (mensaje != null) {
+                // Caso 1: ÉXITO
+                if (mensaje.contains("Se registro al docente correctamente")) {
+                    return 1;
+                }
+                // Caso 2: DUPLICADO (Si tu SP lo controla y manda mensaje en vez de error)
+                else if (mensaje.contains("El usuario ya esta registrado")) {
+                    return -1;
+                }
+            }
+            return -2;
+
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062) {
-                return "DUPLICADO";
+                return -1;
             }
-            System.err.println("\nError en la comunicación con la base de datos: " + e.getMessage());
-            return "ERROR" + e.getMessage();
+            System.err.println("\nError SQL: " + e.getMessage());
+            return -2; // Error General
         }
     }
 
-    public static int iniciarSesion(String nombre_usuario, String clave){
-        int id_usuario;
+    public static int[] iniciarSesion(String nombre_usuario, String clave){
+        int id_usuario, grado;
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL inicio_sesion(?, ?, ?, ?)}")) {
             cs.setString(1, nombre_usuario);
@@ -99,19 +125,19 @@ public class Main extends Application {
             cs.registerOutParameter(3, Types.INTEGER);
             cs.registerOutParameter(4, Types.INTEGER);
             cs.execute();
-            int grado = cs.getInt(3);
+            grado = cs.getInt(3);
             id_usuario = cs.getInt(4);
             if(id_usuario == -1)
                 System.out.println("Nombre de usuario o contraseña incorrecto");
             else
                 System.out.println("Se inicio sesion correctamente");
-            if(grado > 0)
+            if(grado >= 0)
                 System.out.println("¡Bienvenido administrador!");
         } catch (SQLException e) {
             System.err.println("\nError en la comunicación con la base de datos: " + e.getMessage());
-            return -2;
+            return new int[]{-2, -1};
         }
-        return id_usuario;
+        return new int[]{id_usuario, grado};
     }
 
 

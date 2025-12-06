@@ -44,10 +44,8 @@ public class RegistroController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         cargarEscuelasDesdeBD();
         sexoComboBox.getItems().addAll("H", "M");
-        // ==============================================================================================================
 
         txt_contra.textProperty().bindBidirectional(txt_contra_oculta.textProperty());
-        // 2. SINCRONIZAR LA VISIBILIDAD CON EL BOTÓN
         txt_contra.visibleProperty().bind(btn_ver.selectedProperty());
         txt_contra_oculta.visibleProperty().bind(btn_ver.selectedProperty().not());
 
@@ -78,41 +76,60 @@ public class RegistroController implements Initializable {
             java.sql.Date fechaParaBD = java.sql.Date.valueOf(fecha_nacimiento_date.getValue());
             int idEscuelaParaBD = mapaEscuelas.get(escuelaProcedencia);
 
-            if(Main.registrarDocente(nombreCompleto, usuarioNuevo, passwordIngresado, fechaParaBD, idEscuelaParaBD, sexo, especialidad).equals("OK")) {
-                try {
-                    System.out.println("HOLAAAAAA");
-                    String resultado = Main.registrarDocente(nombreCompleto, usuarioNuevo, passwordIngresado, fechaParaBD, idEscuelaParaBD, sexo, especialidad);
-                    System.out.println("DEBUG: Recibí [" + resultado + "]");
-                    switch (resultado) {
-                        case "Se registro al docente correctamente":
-                            mostrarAlertaExito("Éxito",
-                                    "Registro Completado",
-                                    "Cierra esta pestaña para ir al inicio de sesion");
-                            Node source = (Node) event.getSource();
-                            Stage stageActual = (Stage) source.getScene().getWindow();
-                            stageActual.close();
+            int codigoResultado = Main.registrarDocente(
+                    nombreCompleto,
+                    usuarioNuevo,
+                    passwordIngresado,
+                    fechaParaBD,
+                    idEscuelaParaBD,
+                    sexo,
+                    especialidad
+            );
+            // 2. EVALUAR EL NÚMERO
+            switch (codigoResultado) {
+                case 1:
+                    // ÉXITO
+                    mostrarAlertaExito(
+                            "Éxito",
+                            "Registro Completado",
+                            "Cierra esta ventana para ir al Inicio de Sesion");
+                    limpiarCampos();
+                    Node source = (Node) event.getSource();
+                    Stage stageActual = (Stage) source.getScene().getWindow();
+                    stageActual.close();
 
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
-                            Parent root = loader.load();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
+                    Parent root = loader.load();
 
-                            Stage stageNuevo = new Stage();
-                            stageNuevo.setScene(new Scene(root));
-                            stageNuevo.setTitle("Inicio de Sesion");
-                            stageNuevo.setResizable(false);
-                            stageNuevo.show();
-                            System.out.println("Guardando usuario: " + usuarioNuevo);
-                            break;
+                    Stage stageNuevo = new Stage();
+                    stageNuevo.setScene(new Scene(root));
+                    stageNuevo.setTitle("Inicio de Sesion");
+                    stageNuevo.setResizable(false);
+                    stageNuevo.show();
+                    break;
 
-                        case "DUPLICADO":
-                            mostrarAlertaError("Atención", "Usuario Ya Registrado",
-                                    "El número de control " + " ya existe en el sistema.\n" +
-                                            "Los campos se limpiarán para un nuevo intento.");
-                            limpiarCampos();
-                            break;
-                    }
-                } catch (IOException e){
+                case -1:
+                    // DUPLICADO
+                    mostrarAlertaError(
+                            "Atención",
+                            "Usuario Duplicado",
+                            "Ese usuario o ID ya existe en el sistema.");
+                    break;
 
-                }
+                case -2:
+                    // ERROR GENERAL
+                    mostrarAlertaError(
+                            "Error",
+                            "Fallo del Sistema",
+                            "Hubo un error al intentar guardar en la base de datos.");
+                    break;
+
+                default:
+                    mostrarAlertaError(
+                            "Error",
+                            "Fallo del Sistema",
+                            "Hubo un error al intentar guardar en la base de datos.");
+                    break;
             }
         }
     }

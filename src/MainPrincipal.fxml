@@ -12,7 +12,7 @@
    <children>
       <Pane layoutX="-6.0" layoutY="-5.0" prefHeight="598.0" prefWidth="216.0" style="-fx-background-color: #274C77;">
          <children>
-            <Button fx:id="btn_cerrar_sesion" layoutX="48.0" layoutY="533.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: #E7ECEF; -fx-background-radius: 15;" text="Cerrar Sesion" textFill="#666060">
+            <Button fx:id="btn_cerrar_sesion" layoutX="48.0" layoutY="533.0" mnemonicParsing="false" onAction="#btnCerrarSesion" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: #E7ECEF; -fx-background-radius: 15;" text="Cerrar Sesion" textFill="#666060">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -27,19 +27,14 @@
                   </Label>
                </children>
             </StackPane>
-            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="187.0" prefHeight="273.0" prefWidth="201.0">
+            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="187.0" prefHeight="203.0" prefWidth="201.0">
                <children>
-                  <Button fx:id="btn_infopersonalDocente" layoutX="1.0" layoutY="50.0" mnemonicParsing="false" onAction="#btn_infoPersonalDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Info. Personal" textFill="WHITE">
+                  <Button fx:id="btn_eventos_Docente" layoutY="144.0" mnemonicParsing="false" onAction="#btn_EventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-                  <Button fx:id="btn_eventos_Docente" layoutY="179.0" mnemonicParsing="false" onAction="#btn_EventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
-                     <font>
-                        <Font size="22.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="btn_MisEquiposDocente" layoutX="1.0" layoutY="113.0" mnemonicParsing="false" onAction="#btn_MisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
+                  <Button fx:id="btn_MisEquiposDocente" layoutX="1.0" layoutY="70.0" mnemonicParsing="false" onAction="#btn_MisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>

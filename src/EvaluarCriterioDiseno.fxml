@@ -1,6 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" />
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="477.0" prefWidth="1118.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="60.0" layoutY="28.0" prefHeight="50.0" prefWidth="205.0" text="Evaluación del equipo:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblNombreEquipo" layoutX="282.0" layoutY="42.0" text="NAME_EQUIPO">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="60.0" layoutY="76.0" prefHeight="39.0" prefWidth="246.0" text="CRITERIO DISEÑO">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Separator layoutX="141.0" layoutY="131.0" prefHeight="0.0" prefWidth="938.0" />
+      <Label layoutX="78.0" layoutY="116.0" prefHeight="27.0" prefWidth="58.0" text="Bitácora" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="chbregistro_fechas" layoutX="74.0" layoutY="150.0" mnemonicParsing="false" text="Registro de Fechas.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox layoutX="689.0" layoutY="150.0" mnemonicParsing="false" text="Diagramas e Imágenes.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbjustificacion_cambios_prototipos" layoutX="74.0" layoutY="186.0" mnemonicParsing="false" text="Justificación de cambio en Prototipos.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbvideo_animación" layoutX="74.0" layoutY="258.0" mnemonicParsing="false" text="Video y animación.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbpresentación" layoutX="435.0" layoutY="186.0" mnemonicParsing="false" text="Presentación.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbortografia_redacción" layoutX="435.0" layoutY="150.0" mnemonicParsing="false" text="Ortografía y Redacción.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <Separator layoutX="177.0" layoutY="238.0" prefHeight="3.0" prefWidth="902.0" />
+      <Label layoutX="78.0" layoutY="223.0" prefHeight="27.0" prefWidth="98.0" text="Medio Digital" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="chbdiseno_modelado_software" layoutX="359.0" layoutY="258.0" mnemonicParsing="false" text="Diseño y Modelado en software Autodesk Inventor.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbanalisis_elementos" layoutX="74.0" layoutY="299.0" mnemonicParsing="false" text="Análisis de elementos.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbacorde_simulacion_calculos" layoutX="359.0" layoutY="299.0" mnemonicParsing="false" text="Está acorde la simulación con los cálculos obtenidos.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbrestricciones_movimiento" layoutX="359.0" layoutY="339.0" mnemonicParsing="false" text="Restricciones de movimeintos (Rotación y Traslación de partes).">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbmodelo_acorde_robot" layoutX="74.0" layoutY="381.0" mnemonicParsing="false" text="El modelo es acorde con el robot.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <CheckBox fx:id="chbensamble_prototipo" layoutX="74.0" layoutY="339.0" mnemonicParsing="false" text="Ensamble del prototipo.">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </CheckBox>
+      <Button fx:id="btnSigCriterio" layoutX="908.0" layoutY="394.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="185.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="SIG. CRITERIO" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

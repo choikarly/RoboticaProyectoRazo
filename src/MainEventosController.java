@@ -5,51 +5,76 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class MainEventosController {
     @FXML
-    void btnRegistrarEquiposInfoEvento(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventos.fxml"));
-            Parent root = loader.load();
+    private VBox vboxContenedorEventos;
+    @FXML
+    private Label lblMnesajeEventosDisponibles;
 
-            // 2. Crear el escenario (Stage) nuevo
-            Stage stagePaso1 = new Stage();
-            stagePaso1.setScene(new Scene(root));
-            stagePaso1.setTitle("Informacion Evento");
+    @FXML
+    public void initialize() {
+        cargarEventos();
+    }
 
-            // Esto obliga al usuario a terminar aquí antes de volver a Eventos
-            stagePaso1.initModality(Modality.APPLICATION_MODAL);
-            stagePaso1.setResizable(false);
-            stagePaso1.show();
+    private void cargarEventos() {
+        // 1. Limpiamos la lista por si acaso
+        vboxContenedorEventos.getChildren().clear();
+        vboxContenedorEventos.setVisible(false);
+        vboxContenedorEventos.setManaged(false);
 
-        } catch (IOException e) {
+        String sql = "SELECT nombre, fecha FROM evento";
+
+        try (Connection con = Main.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            boolean hayEventos = false;
+
+            while (rs.next()) {
+                hayEventos = true;
+                String nombre = rs.getString("nombre");
+                //String sede = rs.getString("sede");
+                String fecha = rs.getString("fecha"); // O rs.getDate().toString()
+
+                // 3. Cargar el "Molde" (ItemEvento.fxml)
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEvento.fxml"));
+                AnchorPane panelEvento = loader.load();
+
+                // 4. Obtener el controlador del molde para pasarle los datos
+                PlantillaEvento controller = loader.getController();
+                controller.setDatos(nombre, fecha);
+                vboxContenedorEventos.getChildren().add(panelEvento);
+
+                // (Opcional) Agregar espacio entre elementos
+                vboxContenedorEventos.setSpacing(10);
+
+                if (hayEventos) {
+                    vboxContenedorEventos.setVisible(true);
+                    vboxContenedorEventos.setManaged(true);
+
+                    lblMnesajeEventosDisponibles.setVisible(false);
+                    lblMnesajeEventosDisponibles.setManaged(false);
+
+                } else {
+                    vboxContenedorEventos.setVisible(false);
+                    vboxContenedorEventos.setManaged(false);
+
+                    lblMnesajeEventosDisponibles.setVisible(true);
+                    lblMnesajeEventosDisponibles.setManaged(true);
+                }
+            }
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
-
-    @FXML
-    void btnEvaluar(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("EvaluarSeleccionEquipo.fxml"));
-            Parent root = loader.load();
-
-            Stage stagePaso = new Stage();
-            stagePaso.setScene(new Scene(root));
-            stagePaso.setTitle("Selecciona Equipo");
-
-            // Esto obliga al usuario a terminar aquí antes de volver a Eventos
-            stagePaso.initModality(Modality.APPLICATION_MODAL);
-            stagePaso.setResizable(false);
-            stagePaso.show();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

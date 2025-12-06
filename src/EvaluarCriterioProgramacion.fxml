@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="718.0" prefWidth="1118.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="50.0" layoutY="30.0" prefHeight="50.0" prefWidth="205.0" text="Evaluación del equipo:">
@@ -15,12 +14,12 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <Label layoutX="272.0" layoutY="44.0" text="NAME_EQUIPO">
+      <Label fx:id="lblNombreEquipo" layoutX="272.0" layoutY="44.0" text="NAME_EQUIPO">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <CheckBox layoutX="65.0" layoutY="151.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="291.0" text="Software de programación RobotC.  ">
+      <CheckBox fx:id="chbsoft_prog" layoutX="65.0" layoutY="151.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="291.0" text="Software de programación RobotC.  ">
          <font>
             <Font size="16.0" />
          </font>
@@ -30,87 +29,87 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <CheckBox layoutX="64.0" layoutY="488.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="300.0" text="Habilidad de manipulación del jostick.">
+      <CheckBox fx:id="chbcalibración" layoutX="64.0" layoutY="488.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="300.0" text="Habilidad de manipulación del jostick.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="380.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="354.0" text="Declaración, uso y Depuración de Sensores.">
+      <CheckBox fx:id="chbsensores" layoutX="65.0" layoutY="380.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="354.0" text="Declaración, uso y Depuración de Sensores.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="499.0" layoutY="151.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="278.0" text="Rutinas de Depuración de Código.">
+      <CheckBox fx:id="chbdepuracion" layoutX="499.0" layoutY="151.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="278.0" text="Rutinas de Depuración de Código.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="345.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="551.0" text="Vinculación las acciones del robot con el código en el modo autónomo.">
+      <CheckBox fx:id="chbvinculación_acciones" layoutX="65.0" layoutY="345.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="551.0" text="Vinculación las acciones del robot con el código en el modo autónomo.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="235.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="425.0" text="Conocimiento de las estructuras y funciones aplicadas. ">
+      <CheckBox fx:id="chbconocimiento_estr_func" layoutX="65.0" layoutY="235.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="425.0" text="Conocimiento de las estructuras y funciones aplicadas. ">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="452.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="278.0" text="Vinculo entre el Jostick y el Robot.">
+      <CheckBox fx:id="chbvinculo_jostick" layoutX="65.0" layoutY="452.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="278.0" text="Vinculo entre el Jostick y el Robot.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="556.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="307.0" text="Realizar una Demostración de 15min.">
+      <CheckBox fx:id="chbdemostración_15min" layoutX="65.0" layoutY="556.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="307.0" text="Realizar una Demostración de 15min.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="191.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="377.0" text="Justificación de las secuencias de programación">
+      <CheckBox fx:id="chbjust_prog" layoutX="65.0" layoutY="191.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="377.0" text="Justificación de las secuencias de programación">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="64.0" layoutY="597.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="378.0" text="Explicación de la rutina del modo autónomo.">
+      <CheckBox fx:id="chbexplicacion_rutina" layoutX="64.0" layoutY="597.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="378.0" text="Explicación de la rutina del modo autónomo.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="455.0" layoutY="556.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="500.0" text="Demostrar que el equipo cumple con el objetivo en modo driver.">
+      <CheckBox fx:id="chbdemostracion_objetivo" layoutX="455.0" layoutY="556.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="500.0" text="Demostrar que el equipo cumple con el objetivo en modo driver.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="456.0" layoutY="597.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="476.0" text="No presentar inconvenientes mientras la ejecución de la rutina.">
+      <CheckBox fx:id="chbno_inconvenientes" layoutX="456.0" layoutY="597.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="476.0" text="No presentar inconvenientes mientras la ejecución de la rutina.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="397.0" layoutY="488.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="411.0" text="Documentación de código en la pantalla modo driver.">
+      <CheckBox fx:id="chbdocumentación_codigo" layoutX="397.0" layoutY="488.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="411.0" text="Documentación de código en la pantalla modo driver.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="65.0" layoutY="308.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="483.0" text="Documentacion del código en la plantilla del modo Autónomo. ">
+      <CheckBox fx:id="chbdocumentacion" layoutX="65.0" layoutY="308.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="483.0" text="Documentacion del código en la plantilla del modo Autónomo. ">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="499.0" layoutY="235.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="411.0" text="Creación de código modular (Compacto) y eficiente.">
+      <CheckBox fx:id="chbcodigo_modular_efi" layoutX="499.0" layoutY="235.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="411.0" text="Creación de código modular (Compacto) y eficiente.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="832.0" layoutY="151.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="234.0" text="Complejidad del programa.">
+      <CheckBox fx:id="chbcomplejidad" layoutX="832.0" layoutY="151.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="234.0" text="Complejidad del programa.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="499.0" layoutY="191.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="175.0" text="Uso de funciones.">
+      <CheckBox fx:id="chbuso_func" layoutX="499.0" layoutY="191.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="175.0" text="Uso de funciones.">
          <font>
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <CheckBox layoutX="397.0" layoutY="452.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="378.0" text="Respuesta del dispositivo en función al mando.">
+      <CheckBox fx:id="chbrespuesta_dispositivo" layoutX="397.0" layoutY="452.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="378.0" text="Respuesta del dispositivo en función al mando.">
          <font>
             <Font size="16.0" />
          </font>
@@ -139,7 +138,7 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="910.0" layoutY="644.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="185.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="SIG. CRITERIO" textFill="WHITE">
+      <Button fx:id="btnSigCriterio" layoutX="910.0" layoutY="644.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="185.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="SIG. CRITERIO" textFill="WHITE">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>

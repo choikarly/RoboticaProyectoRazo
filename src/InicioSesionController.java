@@ -38,19 +38,17 @@ public class InicioSesionController {
 
     @FXML
     public void initialize() {
-        // 1. SINCRONIZAR EL TEXTO
         txt_contra_visible.textProperty().bindBidirectional(txt_contra_oculta.textProperty());
 
-        // 2. SINCRONIZAR LA VISIBILIDAD CON EL BOTÓN
         txt_contra_visible.visibleProperty().bind(btn_ver.selectedProperty());
         txt_contra_oculta.visibleProperty().bind(btn_ver.selectedProperty().not());
 
         // 3. Opcional: Cambiar el texto del botón según el estado
         btn_ver.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                btn_ver.setText("Ocultar"); // O cambia el ícono a ojo cerrado
+                btn_ver.setText("Ocultar");
             } else {
-                btn_ver.setText("Ver");     // O cambia el ícono a ojo abierto
+                btn_ver.setText("Ver");
             }
         });
     }
@@ -67,32 +65,61 @@ public class InicioSesionController {
                     "LLene todos los campos que se solicitan."
             );
         } else {
-            if(Main.iniciarSesion(usuarioIngresado, passwordIngresado) > 0){
-                try {
-                    Node source = (Node) event.getSource();
-                    Stage stageActual = (Stage) source.getScene().getWindow();
-                    stageActual.close();
+            int[] resultados = Main.iniciarSesion(usuarioIngresado, passwordIngresado);
+            if(Main.iniciarSesion(usuarioIngresado, passwordIngresado)[0] > 0){
+                if(Main.iniciarSesion(usuarioIngresado, passwordIngresado)[1] >= 0){
+                    try{
+                        Node source = (Node) event.getSource();
+                        Stage stageActual = (Stage) source.getScene().getWindow();
+                        stageActual.close();
 
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPrincipal.fxml"));
-                    Parent root = loader.load();
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPrincipal.fxml"));
+                        Parent root = loader.load();
 
-                    // 3. --- EL PASO CLAVE: Obtener el controlador del Dashboard ---
-                    MainPrincipalController dashboardController = loader.getController();
+                        MainPrincipalController dashboardController = loader.getController();
+                        dashboardController.setInicialUsuario(usuarioIngresado);
 
-                    // 4. --- PASAR EL DATO: Le enviamos el usuario que acaba de escribir ---
-                    dashboardController.setInicialUsuario(usuarioIngresado);
+                        // Obtenemos el controlador y le pasamos el GRADO (resultados[1])
+                        MainPrincipalController mainController = loader.getController();
+                        mainController.configurarPermisos(resultados[1]);
 
-                    Stage stageNuevo = new Stage();
-                    stageNuevo.setScene(new Scene(root));
-                    stageNuevo.setTitle("Concurso Robotica"); // Ponle el título que quieras
-                    stageNuevo.setResizable(false);
-                    stageNuevo.show();
+                        Stage stageNuevo = new Stage();
+                        stageNuevo.setScene(new Scene(root));
+                        stageNuevo.setTitle("Concurso Robotica");
+                        stageNuevo.setResizable(false);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    mostrarAlerta("Error",
-                            "Fallo al abrir ventana",
-                            "No se pudo cargar la vista: " + e.getMessage());
+                        stageNuevo.show();
+
+                    }catch(IOException e){
+                        e.printStackTrace();
+                        mostrarAlerta("Error",
+                                "Fallo al abrir ventana",
+                                "No se pudo cargar la vista: " + e.getMessage());
+                    }
+                }else {
+                    try {
+                        Node source = (Node) event.getSource();
+                        Stage stageActual = (Stage) source.getScene().getWindow();
+                        stageActual.close();
+
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPrincipal.fxml"));
+                        Parent root = loader.load();
+
+                        MainPrincipalController dashboardController = loader.getController();
+                        dashboardController.setInicialUsuario(usuarioIngresado);
+
+                        Stage stageNuevo = new Stage();
+                        stageNuevo.setScene(new Scene(root));
+                        stageNuevo.setTitle("Concurso Robotica");
+                        stageNuevo.setResizable(false);
+                        stageNuevo.show();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        mostrarAlerta("Error",
+                                "Fallo al abrir ventana",
+                                "No se pudo cargar la vista: " + e.getMessage());
+                    }
                 }
             }else{
                 mostrarAlerta(
@@ -111,6 +138,6 @@ public class InicioSesionController {
         alert.setTitle(titulo);
         alert.setHeaderText(encabezado);
         alert.setContentText(contenido);
-        alert.showAndWait(); // Muestra la alerta y espera a que el usuario la cierre
+        alert.showAndWait();
     }
 }
