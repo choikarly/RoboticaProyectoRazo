@@ -30,7 +30,7 @@ public class InfoEventos implements Initializable {
 
     @FXML
     void btnContinuar(ActionEvent event) {
-        try {
+        /*try {
             String nombreCategoria = cbCategoria.getValue();
 
             if (nombreCategoria == null) {
@@ -65,7 +65,7 @@ public class InfoEventos implements Initializable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void cargarCategoriasDesdeBD() {
