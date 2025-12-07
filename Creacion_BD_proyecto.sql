@@ -225,11 +225,11 @@ delimiter //
 create procedure ingresar_sede (
 		p_nombre varchar(80),
         p_fk_ciudad int,
-	out mensaje varchar(50)
+	out aviso tinyint
 )
 begin
 	if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
-		set mensaje = "Ya existe este registro de sede";
+		set avis = -1; -- Sede existente en esa 
 	else
 		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
         set mensaje = "Se ingreso la sede correctamente";
@@ -243,7 +243,7 @@ create procedure ingresar_escuela (
 		p_nombre varchar(80),
         p_fk_ciudad int,
         p_fk_nivel int,
-	out mensaje varchar(50)
+	out aviso tinyint
 )
 begin
 	if exists (select * from escuela join sede on id_escuela = id_sede
@@ -279,15 +279,15 @@ create procedure registrar_competidor(
     p_carrera varchar(40),
     p_semestre tinyint,
     p_num_control int,
-    out mensaje varchar(180)
+    out aviso tinyint
 )
 begin
 	if exists (select * from participante where num_control = p_num_control and fk_escuela = p_escuela) then
-		set mensaje = concat("El numero de control ",p_usuario," ya esta registrado");
+		set aviso = -1; -- Ese numero de contro ya existe en esa escuela
     else
 		insert into participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
 			values (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo,  p_carrera, p_semestre, p_num_control);
-        set mensaje = "Se registro al participante correctamente";
+        set aviso = 1; -- Se registro correctamente 
 	end if;
 end
 // delimiter ;
@@ -326,43 +326,22 @@ set @mensaje = "0";
 call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "12345678", "1980-08-21", 1, "H", "Redes de computadoras", @mensaje);
 select @mensaje;
 
-/*
-drop procedure sp_inscribir_equipo_completo;
-DELIMITER //
-CREATE PROCEDURE sp_inscribir_equipo_completo(
-    IN p_fk_equipo INT,
-    IN p_fk_coach INT,
-    IN p_fk_evento INT,
-    IN p_fk_categoria INT,
-    IN p_id_participante_1 INT,
-    IN p_id_participante_2 INT,
-    IN p_id_participante_3 INT
-)
-BEGIN
-    INSERT INTO inscripcion_equipo (fk_equipo, fk_coach, fk_evento, fk_categoria) VALUES (p_fk_equipo, p_fk_coach, p_fk_evento, p_fk_categoria);
-    INSERT INTO integrante_inscripcion (fk_participante, fk_equipo, fk_evento) VALUES (p_id_participante_1, p_fk_equipo, p_fk_evento);
-    INSERT INTO integrante_inscripcion (fk_participante, fk_equipo, fk_evento) VALUES (p_id_participante_2, p_fk_equipo, p_fk_evento);
-    INSERT INTO integrante_inscripcion (fk_participante, fk_equipo, fk_evento) VALUES (p_id_participante_3, p_fk_equipo, p_fk_evento);
-    COMMIT;
-END
-// DELIMITER ; */
-
 drop procedure if exists crear_evento;
 delimiter //
 create procedure crear_evento(
 	p_nombre_evento varchar(40),
     p_fecha date,
 	p_fk_sede_escuela int,
-    out mensaje varchar(50)
+    out aviso tinyint
 )
 begin
 	if exists (select * from evento where fecha like p_fecha and fk_sede_escuela like p_fk_sede_escuela) then
-		set mensaje = "Ya existe un evento en esa sede el mismo dia";
+		set aviso = -1; -- Ya existe un evento en esa sede ese mismo dia
 	elseif exists (select * from evento where nombre like p_nombre_evento) then
-		set mensaje = concat("Ya existe un evento con el nombre ",p_nombre_evento);
+		set aviso = 0; -- Ya existe un evento con ese mismo nombre
     else
 		insert into evento (nombre, fecha, fk_sede_escuela) values (p_nombre_evento, p_fecha, p_fk_sede_escuela);
-        set mensaje = "Alta exitosa";
+        set aviso = 1; -- Se creo correctamente el equipo
 	end if;
 end
 // delimiter ;
@@ -411,7 +390,6 @@ begin
 end
 // delimiter ;
 
-
 drop procedure if exists retornar_ciudades;
 delimiter //
 create procedure retornar_ciudades()
@@ -432,7 +410,7 @@ drop procedure if exists retornar_docentes;
 delimiter //
 create procedure retornar_docentes()
 begin
-	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+	select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
     join escuela on id_escuela = fk_escuela
     join sede on id_escuela = id_sede;
 end
@@ -442,7 +420,7 @@ drop procedure if exists retornar_coach;
 delimiter //
 create procedure retornar_coach()
 begin
-	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+	select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
     join inscripcion_equipo on id_docente = fk_coach
     join escuela on id_escuela = fk_escuela
     join sede on id_escuela = id_sede;
@@ -453,7 +431,7 @@ drop procedure if exists retornar_juez;
 delimiter //
 create procedure retornar_juez()
 begin
-	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+	select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
     join asignacion_juez on id_docente = fk_juez
     join escuela on id_escuela = fk_escuela
     join sede on id_escuela = id_sede;
@@ -464,7 +442,7 @@ drop procedure if exists retornar_coach_juez;
 delimiter //
 create procedure retornar_coach_juez()
 begin
-	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+	select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
     join asignacion_juez on id_docente = fk_juez
     join inscripcion_equipo on id_docente = fk_coach
     join escuela on id_escuela = fk_escuela
@@ -495,6 +473,65 @@ begin
     join evento on fk_evento = id_evento
     join categoria on fk_categoria = id_categoria
     where fk_coach = p_id_coach;
+end
+// delimiter ;
+
+drop procedure if exists crear_equipo;
+delimiter //
+create procedure crear_equipo(
+	p_nombre varchar(80),
+    p_fk_escuela int,
+    out p_id_equipo int
+)
+begin
+	if exists (select * from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela) then
+		set p_id_equipo = (select id_equipo from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela);
+    else
+		insert into equipo (nombre, fk_escuela) values (p_nombre, p_fk_escuela);
+        set p_id_equipo = last_insert_id();
+	end if;
+end
+// delimiter ;
+
+drop procedure if exists registrar_equipo;
+delimiter //
+create procedure registrar_equipo(
+	p_fk_coach int,
+	p_fk_equipo int,
+    p_fk_evento int,
+    p_fk_categoria int,
+    p_fk_participante1 int,
+    p_fk_participante2 int,
+    p_fk_participante3 int,
+    out aviso tinyint
+)
+begin
+	if exists (select * from registrar_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
+		set aviso = -1; -- El equipo ya esta registrado en este evento
+	else
+		insert into registrar_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
+        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
+        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
+        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
+    end if;
+end
+// delimiter ;
+
+drop procedure if exists retornar_participante;
+delimiter //
+create procedure retornar_participante(
+	p_num_control int,
+    p_fk_escuela int,
+    out p_id_participante int,
+    out p_nombre varchar(80)
+)
+begin
+	if exists (select * from participante where num_control = p_num_control and fk_escuela = p_fk_escuela) then
+		select id_participante, nombre into p_id_participante, p_nombre from participante where num_control = p_num_control and fk_escuela = p_fk_escuela;
+	else
+		set p_id_participante = -1;
+		set p_nombre = "";
+    end if;
 end
 // delimiter ;
 
