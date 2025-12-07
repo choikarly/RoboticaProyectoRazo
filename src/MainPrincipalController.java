@@ -40,8 +40,9 @@ public class MainPrincipalController {
         try {
             // Cargar el archivo FXML hijo
             Parent vista = FXMLLoader.load(getClass().getResource(nombreArchivoFxml));
-            PanelContenedor.getChildren().removeAll();
+            PanelContenedor.getChildren().clear();
             PanelContenedor.getChildren().setAll(vista);
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error al cargar la vista: " + nombreArchivoFxml);
@@ -69,14 +70,37 @@ public class MainPrincipalController {
     }
 
     @FXML
-    void btn_MisEquiposDocente(ActionEvent event)  throws IOException{
+    void btnMisEquiposDocente(ActionEvent event) throws IOException{
         cambiarVista("MainMisEquipos.fxml");
     }
 
     @FXML
-    void btn_EventosDocente(ActionEvent event)  throws IOException{
+    void btnEventosDocente(ActionEvent event)  throws IOException{
         cambiarVista("MainEventos.fxml");
     }
+
+
+    @FXML
+    void btnMainDocentesAdmin(ActionEvent event) throws IOException{
+        cambiarVista("MainDocentesAdmin.fxml");
+    }
+
+    @FXML
+    void btnMainEquiposAdmin(ActionEvent event) throws IOException{
+        cambiarVista("MainEquiposAdmin.fxml");
+    }
+
+    @FXML
+    void btnMainEventosAdmin(ActionEvent event) throws IOException{
+        cambiarVista("MainEventosAdmin.fxml");
+    }
+/*
+    @FXML
+    void btnMainEscuelasAdmin(ActionEvent event){
+        cambiarVista("MainEventos.fxml");
+    }
+*/
+
 
     @FXML
     void btnCerrarSesion(ActionEvent event) {

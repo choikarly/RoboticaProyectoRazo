@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -40,11 +41,11 @@ public class RegistroController implements Initializable {
     @FXML
     private TextField txt_especialidad;
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        cargarEscuelasDesdeBD();
+        cargarEscuelas();
         sexoComboBox.getItems().addAll("H", "M");
-
         txt_contra.textProperty().bindBidirectional(txt_contra_oculta.textProperty());
         txt_contra.visibleProperty().bind(btn_ver.selectedProperty());
         txt_contra_oculta.visibleProperty().bind(btn_ver.selectedProperty().not());
@@ -58,6 +59,28 @@ public class RegistroController implements Initializable {
         });
     }
 
+    private void cargarEscuelas() {
+        // 1. Traemos la lista de la Base de Datos
+        List<Map<String, Object>> listaBD = Main.retornarEscuelas();
+
+        // 2. Limpiamos por si acaso
+        EscuelaProcedenciaComboBox.getItems().clear();
+        mapaEscuelas.clear();
+
+        // 3. Llenamos el ComboBox y el Mapa al mismo tiempo
+        for (Map<String, Object> fila : listaBD) {
+            String nombre = (String) fila.get("nombre");
+            int id = (int) fila.get("id_escuela");
+
+            // Agregamos visualmente al ComboBox
+            EscuelaProcedenciaComboBox.getItems().add(nombre);
+
+            // Guardamos logicamente en el Mapa
+            mapaEscuelas.put(nombre, id);
+        }
+    }
+
+
     @FXML
     void btnRegistrarse(ActionEvent event) throws IOException {
         // 1. Extraer los datos de texto
@@ -66,92 +89,76 @@ public class RegistroController implements Initializable {
         String passwordIngresado = txt_contra_oculta.getText();
         String especialidad = txt_especialidad.getText();
         String sexo = sexoComboBox.getSelectionModel().getSelectedItem();
-        String escuelaProcedencia =  EscuelaProcedenciaComboBox.getValue();
+        String escuelaProcedencia = EscuelaProcedenciaComboBox.getValue();
 
-        if (fecha_nacimiento_date.getValue() == null || EscuelaProcedenciaComboBox.getValue() == null || sexoComboBox.getValue() == null || nombreCompleto.isEmpty() || usuarioNuevo.isEmpty() || passwordIngresado.isEmpty() || especialidad.isEmpty()) {
-            mostrarAlertaError("ERROR",
-                    "Campos Vacíos",
-                    "Por favor llena todos los campos de texto.");
+        // VALIDACIÓN
+        if (fecha_nacimiento_date.getValue() == null ||
+                EscuelaProcedenciaComboBox.getValue() == null ||
+                sexoComboBox.getValue() == null ||
+                nombreCompleto.isEmpty() ||
+                usuarioNuevo.isEmpty() ||
+                passwordIngresado.isEmpty() ||
+                especialidad.isEmpty()) {
+
+            mostrarAlertaError("ERROR", "Campos Vacíos", "Por favor llena todos los campos de texto.");
+
         } else {
+            // Conversión de datos
             java.sql.Date fechaParaBD = java.sql.Date.valueOf(fecha_nacimiento_date.getValue());
-            int idEscuelaParaBD = mapaEscuelas.get(escuelaProcedencia);
 
-            int codigoResultado = Main.registrarDocente(
-                    nombreCompleto,
-                    usuarioNuevo,
-                    passwordIngresado,
-                    fechaParaBD,
-                    idEscuelaParaBD,
-                    sexo,
-                    especialidad
-            );
-            // 2. EVALUAR EL NÚMERO
-            switch (codigoResultado) {
-                case 1:
-                    // ÉXITO
-                    mostrarAlertaExito(
-                            "Éxito",
-                            "Registro Completado",
-                            "Cierra esta ventana para ir al Inicio de Sesion");
-                    limpiarCampos();
-                    Node source = (Node) event.getSource();
-                    Stage stageActual = (Stage) source.getScene().getWindow();
-                    stageActual.close();
+            // --- AQUÍ ES DONDE OCURRÍA EL ERROR ---
+            // Ahora es seguro porque 'mapaEscuelas' ya se llenó en el initialize
+            if (mapaEscuelas.containsKey(escuelaProcedencia)) {
 
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
-                    Parent root = loader.load();
+                int idEscuelaParaBD = mapaEscuelas.get(escuelaProcedencia);
 
-                    Stage stageNuevo = new Stage();
-                    stageNuevo.setScene(new Scene(root));
-                    stageNuevo.setTitle("Inicio de Sesion");
-                    stageNuevo.setResizable(false);
-                    stageNuevo.show();
-                    break;
+                // Llamada al Main
+                int codigoResultado = Main.registrarDocente(
+                        nombreCompleto,
+                        usuarioNuevo,
+                        passwordIngresado,
+                        fechaParaBD,
+                        idEscuelaParaBD,
+                        sexo,
+                        especialidad
+                );
 
-                case -1:
-                    // DUPLICADO
-                    mostrarAlertaError(
-                            "Atención",
-                            "Usuario Duplicado",
-                            "Ese usuario o ID ya existe en el sistema.");
-                    break;
+                // Evaluar resultado
+                switch (codigoResultado) {
+                    case 1: // ÉXITO
+                        mostrarAlertaExito("Éxito", "Registro Completado", "Cierra esta ventana para ir al Inicio de Sesion");
 
-                case -2:
-                    // ERROR GENERAL
-                    mostrarAlertaError(
-                            "Error",
-                            "Fallo del Sistema",
-                            "Hubo un error al intentar guardar en la base de datos.");
-                    break;
+                        // Cerrar ventana actual y abrir login
+                        Node source = (Node) event.getSource();
+                        Stage stageActual = (Stage) source.getScene().getWindow();
+                        stageActual.close();
 
-                default:
-                    mostrarAlertaError(
-                            "Error",
-                            "Fallo del Sistema",
-                            "Hubo un error al intentar guardar en la base de datos.");
-                    break;
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
+                        Parent root = loader.load();
+                        Stage stageNuevo = new Stage();
+                        stageNuevo.setScene(new Scene(root));
+                        stageNuevo.setTitle("Inicio de Sesion");
+                        stageNuevo.setResizable(false);
+                        stageNuevo.show();
+                        break;
+
+                    case -1: // DUPLICADO
+                        mostrarAlertaError("Atención", "Usuario Duplicado", "Ese usuario ya existe en el sistema.");
+                        break;
+
+                    default: // ERROR
+                        mostrarAlertaError("Error", "Fallo del Sistema", "Hubo un error al intentar guardar en la BD.");
+                        break;
+                }
+            } else {
+                // Caso rarísimo donde seleccionó algo que no tiene ID
+                mostrarAlertaError("Error", "Escuela Inválida", "La escuela seleccionada no es válida.");
             }
         }
     }
-    public void cargarEscuelasDesdeBD() {
-        String sql = "SELECT id_escuela, nombre FROM escuela";
 
-        try (Connection conn = Main.getConexion();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            // Limpiamos por si acaso
-            EscuelaProcedenciaComboBox.getItems().clear();
-            mapaEscuelas.clear();
-            while (rs.next()) {
-                int id = rs.getInt("id_escuela");
-                String nombre = rs.getString("nombre");
-                EscuelaProcedenciaComboBox.getItems().add(nombre);
-                mapaEscuelas.put(nombre, id);
-            }
-        } catch (SQLException e) {
-            mostrarAlertaError("Error", "Error al cargar escuelas", e.getMessage());
-        }
-    }
+
+
     private void limpiarCampos() {
         txt_nombrecompleto.setText("");
         txt_usuario.setText("");

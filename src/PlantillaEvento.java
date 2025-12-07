@@ -16,9 +16,9 @@ public class PlantillaEvento {
     @FXML private Label lblSede;
     @FXML private Label lblFecha;
 
-    public void setDatos(String nombre, String fecha) {
+    public void setDatos(String nombre, String sede,String fecha) {
         lblNombreEvento.setText(nombre);
-        //lblSede.setText(sede);
+        lblSede.setText(sede);
         lblFecha.setText(fecha);
     }
 

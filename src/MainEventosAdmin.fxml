@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainPrincipalController">
+   <children>
+      <Label layoutX="43.0" layoutY="44.0" prefHeight="36.0" prefWidth="253.0" text="Eventos Activos">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <Button layoutX="526.0" layoutY="44.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="184.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="AGREGAR EVENTO" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Button>
+      <AnchorPane id="eventosParticipados" fx:id="paneContenedorListaEventosParticipados" layoutX="41.0" layoutY="103.0" prefHeight="464.0" prefWidth="678.0" style="-fx-background-color: #FFFFFF;">
+         <children>
+            <ScrollPane prefHeight="464.0" prefWidth="678.0" style="-fx-background-color: #FFFFFF;">
+               <content>
+                  <VBox fx:id="vboxContenedorEventosActvosAdmin" prefHeight="462.0" prefWidth="660.0" style="-fx-background-color: #FFFFFF;" />
+               </content>
+            </ScrollPane>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

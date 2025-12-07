@@ -6,6 +6,10 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.sql.*;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Main extends Application {
     private static final String CONTROLADOR = "com.mysql.cj.jdbc.Driver";
@@ -179,6 +183,62 @@ public class Main extends Application {
         }
         return true;
     }
+
+    public static List<Map<String, Object>> retornarEscuelas() {
+        List<Map<String, Object>> listaEscuelas = new ArrayList<>();
+
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_escuelas()}")) {
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> escuela = new HashMap<>();
+
+                    // Guardamos los datos tal cual vienen de la consulta
+                    escuela.put("id_escuela", rs.getInt("id_escuela"));
+                    escuela.put("nombre", rs.getString("nombre"));
+                    escuela.put("fk_ciudad", rs.getInt("fk_ciudad"));
+                    escuela.put("fk_nivel", rs.getInt("fk_nivel")); // getObject por si es int o string
+                    listaEscuelas.add(escuela);
+                }
+            }
+            System.out.println("Escuelas encontradas: " + listaEscuelas.size()); // Debug
+        } catch (SQLException e) {
+            System.err.println("\nError al obtener escuelas: " + e.getMessage());
+            // En caso de error devolvemos la lista vacía para no romper el programa
+        }
+        return listaEscuelas;
+    }
+
+    public static List<Map<String, Object>> retornarEventos() {
+        List<Map<String, Object>> listaEventos = new ArrayList<>();
+
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_eventos()}")) {
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+
+                    // Guardamos las columnas exactas que devuelve tu SELECT
+                    fila.put("nombre", rs.getString("nombre"));
+                    fila.put("sede", rs.getString("sede")); // Es el alias que usaste en el SQL
+                    fila.put("fecha", rs.getDate("fecha"));
+
+                    listaEventos.add(fila);
+                }
+            }
+            System.out.println("Eventos recuperados: " + listaEventos.size()); // Debug
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener eventos: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return listaEventos;
+    }
+
+
+
 
 
 }

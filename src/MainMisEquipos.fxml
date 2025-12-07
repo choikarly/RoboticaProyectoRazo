@@ -28,5 +28,6 @@
             <Font name="System Italic" size="20.0" />
          </font>
       </Label>
+      <Label layoutX="224.0" layoutY="168.0" prefHeight="74.0" prefWidth="484.0" text="mostra equipos de coach solamente, nombre, nivel ,escuela?, evento nombre" />
    </children>
 </AnchorPane>

@@ -42,16 +42,6 @@
             <Font size="19.0" />
          </font>
       </TextField>
-      <Label fx:id="txtIntegranteDos" layoutX="199.0" layoutY="291.0" prefHeight="38.0" prefWidth="516.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Nombre del Integrante 2" textFill="#c1c1c1">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </Label>
-      <Label fx:id="txtIntegranteTres" layoutX="199.0" layoutY="421.0" prefHeight="38.0" prefWidth="516.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Nombre del Integrante 3" textFill="#c1c1c1">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </Label>
       <Button fx:id="btnGuardar" layoutX="818.0" layoutY="531.0" mnemonicParsing="false" onAction="#btnGuardar" prefHeight="50.0" prefWidth="167.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="GUARDAR" textFill="WHITE">
          <font>
             <Font name="System Bold" size="17.0" />
@@ -60,21 +50,6 @@
       <DatePicker fx:id="dateUno" layoutX="731.0" layoutY="164.0" prefHeight="38.0" prefWidth="240.0" style="-fx-background-radius: 15;" />
       <DatePicker fx:id="dateTres" layoutX="735.0" layoutY="421.0" prefHeight="38.0" prefWidth="240.0" style="-fx-background-radius: 15;" />
       <DatePicker fx:id="dateDos" layoutX="735.0" layoutY="292.0" prefHeight="38.0" prefWidth="240.0" style="-fx-background-radius: 15;" />
-      <Label fx:id="txtCarreraUno" layoutX="199.0" layoutY="213.0" prefHeight="38.0" prefWidth="516.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Nombre de la Carrera/Especialidad" textFill="#c1c1c1">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </Label>
-      <Label fx:id="txtCarreraDos" layoutX="199.0" layoutY="341.0" prefHeight="38.0" prefWidth="516.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Nombre de la Carrera/Especialidad" textFill="#c1c1c1">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </Label>
-      <Label fx:id="txtCarreraTres" layoutX="199.0" layoutY="471.0" prefHeight="38.0" prefWidth="516.0" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" text="   Nombre de la Carrera/Especialidad" textFill="#c1c1c1">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </Label>
       <ComboBox fx:id="semestreComboBoxUno" layoutX="36.0" layoutY="213.0" prefHeight="38.0" prefWidth="150.0" promptText="Semestre" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" visibleRowCount="15" />
       <ComboBox id="cb_sexo" fx:id="sexoComboBoxUno" layoutX="731.0" layoutY="212.0" prefHeight="40.0" prefWidth="240.0" promptText="Sexo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" visibleRowCount="15" />
       <Separator layoutX="32.0" layoutY="271.0" prefHeight="4.0" prefWidth="956.0" />
@@ -84,6 +59,31 @@
       <ComboBox fx:id="semestreComboBoxTres" layoutX="35.0" layoutY="470.0" prefHeight="38.0" prefWidth="150.0" promptText="Semestre" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" />
       <ComboBox id="cb_sexo" fx:id="sexoComboBoxTres" layoutX="731.0" layoutY="469.0" prefHeight="40.0" prefWidth="240.0" promptText="Sexo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" visibleRowCount="15" />
       <TextField fx:id="txtIntegranteUno" layoutX="199.0" layoutY="162.0" prefHeight="41.0" prefWidth="516.0" promptText="Nombre del Integrante 1" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtCarreraUno" layoutX="199.0" layoutY="212.0" prefHeight="38.0" prefWidth="516.0" promptText="Nombre de la Carrera/Especialidad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtIntegranteDos" layoutX="199.0" layoutY="290.0" prefHeight="41.0" prefWidth="516.0" promptText="Nombre del Integrante 2" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtCarreraDos" layoutX="199.0" layoutY="338.0" prefHeight="41.0" prefWidth="516.0" promptText="Nombre de la Carrera/Especialidad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtIntegranteTres" layoutX="199.0" layoutY="420.0" prefHeight="38.0" prefWidth="516.0" promptText="Nombre del Integrante 3" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtCarreraTres" layoutX="199.0" layoutY="468.0" prefHeight="26.0" prefWidth="516.0" promptText="Nombre de la Carrera/Especialidad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
          <font>
             <Font size="19.0" />
          </font>

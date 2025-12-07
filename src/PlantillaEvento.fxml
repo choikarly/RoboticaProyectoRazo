@@ -6,14 +6,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEvento" prefHeight="114.0" prefWidth="649.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEvento">
+<AnchorPane fx:id="panelEvento" prefHeight="114.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEvento">
    <children>
       <Label fx:id="lblNombreEvento" layoutX="23.0" layoutY="14.0" prefHeight="43.0" prefWidth="508.0" text="Nombre del Evento" textFill="WHITE">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>
       </Label>
-      <Button fx:id="btnRegistrarEquiposInfoEvento" layoutX="521.0" layoutY="34.0" mnemonicParsing="false" onAction="#btnRegistrarEquiposInfoEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Registrarse" textFill="WHITE">
+      <Button fx:id="btnRegistrarEquiposInfoEvento" layoutX="509.0" layoutY="34.0" mnemonicParsing="false" onAction="#btnRegistrarEquiposInfoEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Registrarse" textFill="WHITE">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -34,7 +34,7 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblFecha" layoutX="307.0" layoutY="65.0" prefHeight="36.0" prefWidth="198.0" text="Label" textFill="WHITE">
+      <Label fx:id="lblFecha" layoutX="307.0" layoutY="65.0" prefHeight="36.0" prefWidth="182.0" text="Label" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>

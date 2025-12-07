@@ -20,7 +20,7 @@
          </font>
       </Label>
       <Separator layoutX="40.0" layoutY="272.0" prefHeight="8.0" prefWidth="668.0" />
-      <Label prefHeight="18.0" prefWidth="246.0" text="nombre-eventoparticipado-masinfo" />
+      <Label layoutX="79.0" layoutY="14.0" prefHeight="18.0" prefWidth="246.0" text="nombre- lugar/fecha-masinfo" />
       <Label id="lbl_alertaEventosParticipados" layoutX="192.0" layoutY="145.0" text="No has participado en ningún evento aún:(" textFill="#a99b9b" visible="false">
          <font>
             <Font name="System Italic" size="20.0" />
@@ -36,14 +36,14 @@
          </children></AnchorPane>
       <AnchorPane id="eventosDisponibles" fx:id="paneContenedorListaEventos" layoutX="37.0" layoutY="327.0" prefHeight="250.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;">
          <children>
-            <ScrollPane prefHeight="250.0" prefWidth="677.0" style="-fx-background-color: #FFFFFF;">
+            <ScrollPane fitToWidth="true" prefHeight="250.0" prefWidth="677.0" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <content>
-                  <VBox fx:id="vboxContenedorEventos" prefHeight="248.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;" />
+                  <VBox fx:id="vboxContenedorEventos" prefHeight="248.0" prefWidth="564.0" style="-fx-background-color: #FFFFFF;" />
                </content>
             </ScrollPane>
          </children>
       </AnchorPane>
-      <Label id="lbl_alertaEventosDisponibles" fx:id="lblMnesajeEventosDisponibles" layoutX="152.0" layoutY="414.0" text="No tenemos eventos disponibles por el momento:(" textFill="#b4b0b0">
+      <Label id="lbl_alertaEventosDisponibles" fx:id="lblMnesajeEventosDisponibles" layoutX="152.0" layoutY="414.0" text="No tenemos eventos disponibles por el momento:(" textFill="#b4b0b0" visible="false">
          <font>
             <Font name="System Italic" size="20.0" />
          </font>

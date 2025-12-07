@@ -12,7 +12,7 @@
    <children>
       <Pane layoutX="-6.0" layoutY="-5.0" prefHeight="598.0" prefWidth="216.0" style="-fx-background-color: #274C77;">
          <children>
-            <Button fx:id="btn_cerrar_sesion" layoutX="48.0" layoutY="533.0" mnemonicParsing="false" onAction="#btnCerrarSesion" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: #E7ECEF; -fx-background-radius: 15;" text="Cerrar Sesion" textFill="#666060">
+            <Button fx:id="btnCerrarSesion" layoutX="48.0" layoutY="533.0" mnemonicParsing="false" onAction="#btnCerrarSesion" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: #E7ECEF; -fx-background-radius: 15;" text="Cerrar Sesion" textFill="#666060">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -29,12 +29,12 @@
             </StackPane>
             <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="187.0" prefHeight="203.0" prefWidth="201.0">
                <children>
-                  <Button fx:id="btn_eventos_Docente" layoutY="144.0" mnemonicParsing="false" onAction="#btn_EventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
+                  <Button fx:id="btn_eventos_Docente" layoutY="144.0" mnemonicParsing="false" onAction="#btnEventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-                  <Button fx:id="btn_MisEquiposDocente" layoutX="1.0" layoutY="70.0" mnemonicParsing="false" onAction="#btn_MisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
+                  <Button fx:id="btnMisEquiposDocente" layoutX="1.0" layoutY="70.0" mnemonicParsing="false" onAction="#btnMisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
@@ -46,19 +46,19 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="191.0" prefHeight="321.0" prefWidth="201.0" visible="false">
+            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="191.0" prefHeight="325.0" prefWidth="206.0" visible="false">
                <children>
-                  <Button fx:id="btn_infopersonal_partcipante1" layoutY="59.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Jueces" textFill="WHITE">
+                  <Button fx:id="btnMainDocentesAdmin" layoutY="38.0" mnemonicParsing="false" onAction="#btnMainDocentesAdmin" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Docentes" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-                  <Button fx:id="btn_mis_equipos1" layoutX="1.0" layoutY="124.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Equipos" textFill="WHITE">
+                  <Button fx:id="btnMainEquiposAdmin" layoutX="1.0" layoutY="95.0" mnemonicParsing="false" onAction="#btnMainEquiposAdmin" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Equipos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-                  <Button fx:id="btn_calificacion1" layoutY="188.0" mnemonicParsing="false" prefHeight="62.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
+                  <Button fx:id="btnMainEventosAdmin" layoutX="2.0" layoutY="153.0" mnemonicParsing="false" onAction="#btnMainEventosAdmin" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
@@ -68,6 +68,11 @@
                         <Font name="System Bold Italic" size="19.0" />
                      </font>
                   </Label>
+                  <Button fx:id="btnMainEscuelasAdmin" layoutY="207.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="206.0" style="-fx-background-color: #274C77;" text="Escuelas" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
          </children>

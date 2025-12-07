@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 
 public class MainEventosController {
@@ -28,53 +30,60 @@ public class MainEventosController {
     }
 
     private void cargarEventos() {
-        // 1. Limpiamos la lista por si acaso
+        // 1. Limpiamos la vista actual
         vboxContenedorEventos.getChildren().clear();
-        vboxContenedorEventos.setVisible(false);
-        vboxContenedorEventos.setManaged(false);
 
-        String sql = "SELECT nombre, fecha FROM evento";
+        // 2. Llamamos a tu función estática del Main (que usa el SP retornar_eventos)
+        List<Map<String, Object>> listaEventos = Main.retornarEventos();
 
-        try (Connection con = Main.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            boolean hayEventos = false;
+        // 3. Verificamos si hay resultados
+        if (listaEventos.isEmpty()) {
+            // CASO VACÍO: Ocultamos contenedor, mostramos mensaje
+            vboxContenedorEventos.setVisible(false);
+            vboxContenedorEventos.setManaged(false);
 
-            while (rs.next()) {
-                hayEventos = true;
-                String nombre = rs.getString("nombre");
-                //String sede = rs.getString("sede");
-                String fecha = rs.getString("fecha"); // O rs.getDate().toString()
+            lblMnesajeEventosDisponibles.setVisible(true);
+            lblMnesajeEventosDisponibles.setManaged(true);
+        } else {
+            // CASO CON DATOS: Mostramos contenedor, ocultamos mensaje
+            vboxContenedorEventos.setVisible(true);
+            vboxContenedorEventos.setManaged(true);
+            vboxContenedorEventos.setSpacing(10); // Espacio entre tarjetas
 
-                // 3. Cargar el "Molde" (ItemEvento.fxml)
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEvento.fxml"));
-                AnchorPane panelEvento = loader.load();
+            lblMnesajeEventosDisponibles.setVisible(false);
+            lblMnesajeEventosDisponibles.setManaged(false);
 
-                // 4. Obtener el controlador del molde para pasarle los datos
-                PlantillaEvento controller = loader.getController();
-                controller.setDatos(nombre, fecha);
-                vboxContenedorEventos.getChildren().add(panelEvento);
+            // 4. Recorremos la lista y creamos las tarjetas
+            try {
+                for (Map<String, Object> fila : listaEventos) {
 
-                // (Opcional) Agregar espacio entre elementos
-                vboxContenedorEventos.setSpacing(10);
+                    // Extraemos los datos del Mapa
+                    String nombre = (String) fila.get("nombre");
+                    String sede = (String) fila.get("sede"); // ¡Ahora ya tienes la sede disponible!
+                    // Convertimos la fecha a String. Si es null, ponemos cadena vacía para que no explote
+                    String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "";
 
-                if (hayEventos) {
-                    vboxContenedorEventos.setVisible(true);
-                    vboxContenedorEventos.setManaged(true);
+                    // Cargar el "Molde" (PlantillaEvento.fxml)
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEvento.fxml"));
+                    AnchorPane panelEvento = loader.load();
 
-                    lblMnesajeEventosDisponibles.setVisible(false);
-                    lblMnesajeEventosDisponibles.setManaged(false);
+                    // Obtener el controlador del molde
+                    PlantillaEvento controller = loader.getController();
+                    controller.setDatos(nombre,sede, fecha);
 
-                } else {
-                    vboxContenedorEventos.setVisible(false);
-                    vboxContenedorEventos.setManaged(false);
+                    // FORZAR ALTURA MINIMA (Solo para probar si es problema de colapso)
+                    panelEvento.setMinHeight(100);
+                    panelEvento.setPrefHeight(100);
 
-                    lblMnesajeEventosDisponibles.setVisible(true);
-                    lblMnesajeEventosDisponibles.setManaged(true);
+
+                    // Agregamos la tarjeta al VBox
+                    vboxContenedorEventos.getChildren().add(panelEvento);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error al cargar la plantilla FXML");
             }
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
         }
     }
 }
+
