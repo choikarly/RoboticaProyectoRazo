@@ -28,7 +28,7 @@ create table sede(
 
 create table escuela(
 	id_escuela	int primary key,
-    foreign key (id_escuela) references sede (id_sede),
+    foreign key (id_escuela) references sede(id_sede),
     fk_nivel	int not null,
     foreign key (fk_nivel) references categoria(id_categoria)
 );
@@ -37,9 +37,9 @@ create table evento(
 	id_evento	int primary key auto_increment,
 	nombre		varchar(40) not null unique,
 	fecha		date,
-	fk_sede_escuela	int, 
-    constraint uk_fecha_sede unique (fecha, fk_sede_escuela),
-	foreign key (fk_sede_escuela) references escuela(id_escuela) ON DELETE SET NULL ON UPDATE CASCADE
+	fk_sede 	int, 
+    constraint uk_fecha_sede unique (fecha, fk_sede),
+	foreign key (fk_sede) references sede(id_sede) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 create table categoria_evento (
@@ -414,7 +414,7 @@ drop procedure if exists retornar_escuelas;
 delimiter //
 create procedure retornar_escuelas()
 begin
-	select * from escuela;
+	select id_escuela, nombre, ciudad, nivel from sede join ciudad on id_ciudad = id_sede;
 end
 // delimiter ;
 
