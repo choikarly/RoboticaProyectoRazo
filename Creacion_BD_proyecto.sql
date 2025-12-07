@@ -80,8 +80,8 @@ create table participante(
 	sexo				enum("H","M") not null,
     fk_escuela 			int not null,
 	foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
-	carrera 		varchar (50) not null,
-	semestre 		tinyint not null,
+	carrera 		varchar (50),
+	semestre 		tinyint,
 	num_control 	int not null,
     constraint uk_escuela_num_control unique (fk_escuela, num_control)
 );
@@ -302,19 +302,29 @@ create procedure registrar_docente(
     p_escuela int,
     p_sexo enum("H","M"),
     p_especialidad varchar(40),
-    out mensaje varchar(100)
+    out aviso tinyint
 )
 begin
-	if exists (select * from usuario where nombre_usuario like p_usuario) then
-		set mensaje = concat("El usuario ",p_usuario," ya esta registrado");
-    else
-		insert into usuario (nombre_usuario, clave) values (p_usuario, p_clave);
-		insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
-			values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
-        set mensaje = "Se registro al docente correctamente";
+	declare v_edad INT;
+    set v_edad = TIMESTAMPDIFF(YEAR, p_fecha_nacimiento, CURDATE());
+	if v_edad >= 18 then
+		if exists (select * from usuario where nombre_usuario = p_usuario) then
+			set aviso = 0; -- Nombre de usuario existente
+		else
+			insert into usuario (nombre_usuario, clave) values (p_usuario, p_clave);
+			insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
+				values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
+			set aviso = 1; -- Se registro correctamente el docente
+		end if;
+	else
+		set aviso = -1; -- Menor de edad (no puede ser docente);
 	end if;
 end
 // delimiter ;
+
+set @mensaje = "0";
+call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "12345678", "1980-08-21", 1, "H", "Redes de computadoras", @mensaje);
+select @mensaje;
 
 /*
 drop procedure sp_inscribir_equipo_completo;
@@ -414,7 +424,77 @@ drop procedure if exists retornar_escuelas;
 delimiter //
 create procedure retornar_escuelas()
 begin
-	select id_escuela, nombre, ciudad, nivel from sede join ciudad on id_ciudad = id_sede;
+	select id_escuela, nombre, fk_ciudad, fk_nivel from sede join escuela on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_docentes;
+delimiter //
+create procedure retornar_docentes()
+begin
+	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_coach;
+delimiter //
+create procedure retornar_coach()
+begin
+	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+    join inscripcion_equipo on id_docente = fk_coach
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_juez;
+delimiter //
+create procedure retornar_juez()
+begin
+	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+    join asignacion_juez on id_docente = fk_juez
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_coach_juez;
+delimiter //
+create procedure retornar_coach_juez()
+begin
+	select distinct docente.nombre, sede.nombre as escuela, especialidad from docente
+    join asignacion_juez on id_docente = fk_juez
+    join inscripcion_equipo on id_docente = fk_coach
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_eventos;
+delimiter //
+create procedure retornar_eventos()
+begin
+	select evento.nombre, sede.nombre as sede, fecha from evento
+    join sede on fk_sede = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_equipos_coach;
+delimiter //
+create procedure retornar_equipos_coach(
+	p_id_coach int
+)
+begin
+	select equipo.nombre as equipo, sede.nombre as escuela, evento.nombre as evento, categoria.nombre as categoria 
+    from inscripcion_equipo
+    join equipo on id_equipo = fk_equipo
+    join escuela on fk_escuela = id_escuela
+    join sede on id_escuela = id_sede
+    join evento on fk_evento = id_evento
+    join categoria on fk_categoria = id_categoria
+    where fk_coach = p_id_coach;
 end
 // delimiter ;
 
