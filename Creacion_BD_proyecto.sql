@@ -10,200 +10,201 @@ create schema concurso_robotica;
 use concurso_robotica;
 
 create table categoria(
-	id_categoria	int primary key auto_increment,
-	nombre			varchar(20) not null
+    id_categoria    int primary key auto_increment,
+    nombre          varchar(20) not null
 );
 
 create table ciudad(
-	id_ciudad 	int primary key auto_increment,
-    nombre 		varchar(80) not null
+    id_ciudad       int primary key auto_increment,
+    nombre          varchar(80) not null
 );
 
 create table sede(
-	id_sede		int primary key auto_increment,
-	nombre		varchar(80) not null,
-	fk_ciudad	int not null,
+    id_sede     int primary key auto_increment,
+    nombre      varchar(80) not null,
+    fk_ciudad   int not null,
     foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 create table escuela(
-	id_escuela	int primary key,
+    id_escuela  int primary key,
     foreign key (id_escuela) references sede(id_sede),
-    fk_nivel	int not null,
+    fk_nivel    int not null,
     foreign key (fk_nivel) references categoria(id_categoria)
 );
 
 create table evento(
-	id_evento	int primary key auto_increment,
-	nombre		varchar(40) not null unique,
-	fecha		date,
-	fk_sede 	int, 
+    id_evento   int primary key auto_increment,
+    nombre      varchar(40) not null unique,
+    fecha       date,
+    fk_sede     int, 
     constraint uk_fecha_sede unique (fecha, fk_sede),
-	foreign key (fk_sede) references sede(id_sede) ON DELETE SET NULL ON UPDATE CASCADE
+    foreign key (fk_sede) references sede(id_sede) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 create table categoria_evento (
-	fk_evento		int not null,
-	fk_categoria	int not null,
-	constraint id_categoria_evento primary key (fk_evento, fk_categoria),
-	foreign key (fk_evento) references evento(id_evento) ON DELETE RESTRICT ON UPDATE CASCADE,
-	foreign key (fk_categoria) references categoria(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    fk_evento       int not null,
+    fk_categoria    int not null,
+    constraint id_categoria_evento primary key (fk_evento, fk_categoria),
+    foreign key (fk_evento) references evento(id_evento) ON DELETE RESTRICT ON UPDATE CASCADE,
+    foreign key (fk_categoria) references categoria(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
 );
-	
+
 create table usuario(
-	id_usuario 		int primary key auto_increment,
-	nombre_usuario	varchar(80) not null unique,
-	clave 			varchar(225) not null
+    id_usuario      int primary key auto_increment,
+    nombre_usuario  varchar(80) not null unique,
+    clave           varchar(225) not null
 );
 
 create table administrador(
-	id_administrador 	int not null,
+    id_administrador    int not null,
     foreign key (id_administrador) references usuario (id_usuario) ON DELETE RESTRICT ON UPDATE CASCADE,
-    grado 				int default 0
+    grado               int default 0
 );
 
 create table docente(
-	id_docente 		int primary key,
-	foreign key (id_docente) references usuario(id_usuario) ON DELETE RESTRICT ON UPDATE CASCADE,
-	nombre				varchar(80) not null,
-	fecha_nacimiento 	date not null,
-	sexo				enum("H","M") not null,
-	fk_escuela 			int not null,
-	foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
-	especialidad 	varchar(40) not null
+    id_docente      int primary key,
+    foreign key (id_docente) references usuario(id_usuario) ON DELETE RESTRICT ON UPDATE CASCADE,
+    nombre              varchar(80) not null,
+    fecha_nacimiento    date not null,
+    sexo                enum("H","M") not null,
+    fk_escuela          int not null,
+    foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
+    especialidad    varchar(40) not null
 );
 
 create table participante(
-	id_participante	int primary key auto_increment,
-	nombre				varchar(80) not null,
-	fecha_nacimiento 	date not null,
-	sexo				enum("H","M") not null,
-    fk_escuela 			int not null,
-	foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
-	carrera 		varchar (50),
-	semestre 		tinyint,
-	num_control 	int not null,
+    id_participante int primary key auto_increment,
+    nombre              varchar(80) not null,
+    fecha_nacimiento    date not null,
+    sexo                enum("H","M") not null,
+    fk_escuela          int not null,
+    foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
+    carrera         varchar (50),
+    semestre        tinyint,
+    num_control     int not null,
     constraint uk_escuela_num_control unique (fk_escuela, num_control)
 );
 
 create table equipo(
-	id_equipo		int primary key auto_increment,
-	nombre			varchar(80) not null,
-	fk_escuela		int not null,
-	foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
+    id_equipo       int primary key auto_increment,
+    nombre          varchar(80) not null,
+    fk_escuela      int not null,
+    foreign key (fk_escuela) references escuela(id_escuela) ON DELETE RESTRICT ON UPDATE CASCADE,
     constraint uk_nombre_escuela unique (nombre, fk_escuela)
 );
 
 create table inscripcion_equipo (
-	fk_coach		int not null,
-	foreign key (fk_coach) references docente(id_docente) ON DELETE RESTRICT ON UPDATE CASCADE,
-	fk_equipo		int not null,
-	foreign key (fk_equipo) references equipo(id_equipo) ON DELETE CASCADE ON UPDATE CASCADE,
-	fk_evento		int not null,
-	constraint id_inscripcion_equipo primary key (fk_equipo, fk_evento),
-	fk_categoria	int not null,
+    fk_coach        int not null,
+    foreign key (fk_coach) references docente(id_docente) ON DELETE RESTRICT ON UPDATE CASCADE,
+    fk_equipo       int not null,
+    foreign key (fk_equipo) references equipo(id_equipo) ON DELETE CASCADE ON UPDATE CASCADE,
+    fk_evento       int not null,
+    constraint id_inscripcion_equipo primary key (fk_equipo, fk_evento),
+    fk_categoria    int not null,
     constraint uk_inscripcion_completa unique (fk_equipo, fk_evento, fk_categoria),
-	foreign key (fk_evento, fk_categoria) references categoria_evento(fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    foreign key (fk_evento, fk_categoria) references categoria_evento(fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 create table integrante_inscripcion (
-	fk_participante	int not null,
-	foreign key (fk_participante) references participante(id_participante) ON DELETE CASCADE ON UPDATE CASCADE,
-	fk_evento		int not null,
-	constraint id_integrante_inscripcion primary key (fk_participante, fk_evento),
-	fk_equipo		int not null,
-	foreign key (fk_equipo, fk_evento) references inscripcion_equipo(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
+    fk_participante int not null,
+    foreign key (fk_participante) references participante(id_participante) ON DELETE CASCADE ON UPDATE CASCADE,
+    fk_evento       int not null,
+    constraint id_integrante_inscripcion primary key (fk_participante, fk_evento),
+    fk_equipo       int not null,
+    foreign key (fk_equipo, fk_evento) references inscripcion_equipo(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table asignacion_juez (
-	fk_juez			int not null,
-	foreign key (fk_juez) references docente(id_docente) ON DELETE CASCADE ON UPDATE CASCADE,
-	fk_evento		int not null,
-	constraint id_asignacion_juez primary key (fk_juez, fk_evento),
-	fk_categoria	int not null,
+    fk_juez         int not null,
+    foreign key (fk_juez) references docente(id_docente) ON DELETE CASCADE ON UPDATE CASCADE,
+    fk_evento       int not null,
+    constraint id_asignacion_juez primary key (fk_juez, fk_evento),
+    fk_categoria    int not null,
     constraint uk_asignacion_completa unique (fk_juez, fk_evento, fk_categoria),
-	foreign key (fk_evento, fk_categoria) references categoria_evento(fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    foreign key (fk_evento, fk_categoria) references categoria_evento(fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 create table criterios_evaluacion(
-	puntos_totales			int default -1,
-	fk_equipo				int not null,
-	fk_evento				int not null,
-	fk_categoria			int not null,
+    puntos_totales          int default -1,
+    fk_equipo               int not null,
+    fk_evento               int not null,
+    fk_categoria            int not null,
     constraint id_criterios_evaluacion primary key (fk_equipo, fk_evento),
-	foreign key (fk_equipo, fk_evento, fk_categoria) references inscripcion_equipo(fk_equipo, fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    foreign key (fk_equipo, fk_evento, fk_categoria) references inscripcion_equipo(fk_equipo, fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- NOTA: He dejado boolean. Si necesitas puntaje numérico, cambia boolean por INT.
 create table criterio_prog(
-	fk_equipo					int not null,
-	fk_evento					int not null,
-	soft_prog					boolean not null,
-	uso_func					boolean not null,
-	complejidad					boolean not null,
-	just_prog					boolean not null,
-	conocimiento_estr_func		boolean not null,
-	depuracion					boolean not null,
-	codigo_modular_efi 			boolean not null,
-	documentacion				boolean not null,
-	vinculación_acciones		boolean not null,
-	sensores					boolean not null,
-	vinculo_jostick				boolean not null,
-	calibración					boolean not null,
-	respuesta_dispositivo		boolean not null,
-	documentación_codigo		boolean not null,
-	demostración_15min			boolean not null,
-	no_inconvenientes			boolean not null,
-	demostracion_objetivo		boolean not null,
-	explicacion_rutina			boolean not null,
-	constraint id_criterio_prog PRIMARY KEY (fk_equipo, fk_evento),
-	FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
+    fk_equipo                   int not null,
+    fk_evento                   int not null,
+    soft_prog                   boolean not null,
+    uso_func                    boolean not null,
+    complejidad                 boolean not null,
+    just_prog                   boolean not null,
+    conocimiento_estr_func      boolean not null,
+    depuracion                  boolean not null,
+    codigo_modular_efi          boolean not null,
+    documentacion               boolean not null,
+    vinculación_acciones        boolean not null,
+    sensores                    boolean not null,
+    vinculo_jostick             boolean not null,
+    calibración                 boolean not null,
+    respuesta_dispositivo       boolean not null,
+    documentación_codigo        boolean not null,
+    demostración_15min          boolean not null,
+    no_inconvenientes           boolean not null,
+    demostracion_objetivo       boolean not null,
+    explicacion_rutina          boolean not null,
+    constraint id_criterio_prog PRIMARY KEY (fk_equipo, fk_evento),
+    FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table criterio_dis(
-	fk_equipo					int not null,
-	fk_evento					int not null,
-	registro_fechas						boolean not null,
-	justificacion_cambios_prototipos	boolean not null,
-	ortografia_redacción				boolean not null,
-	presentación						boolean not null,
-	video_animación						boolean not null,
-	diseno_modelado_software			boolean not null,
-	analisis_elementos					boolean not null,
-	ensamble_prototipo					boolean not null,
-	modelo_acorde_robot					boolean not null,
-	acorde_simulacion_calculos			boolean not null, 
-	restricciones_movimiento			boolean not null,
-	constraint id_criterio_disc PRIMARY KEY (fk_equipo, fk_evento),
-	FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
-);			
+    fk_equipo                   int not null,
+    fk_evento                   int not null,
+    registro_fechas                     boolean not null,
+    justificacion_cambios_prototipos    boolean not null,
+    ortografia_redacción                boolean not null,
+    presentación                        boolean not null,
+    video_animación                     boolean not null,
+    diseno_modelado_software            boolean not null,
+    analisis_elementos                  boolean not null,
+    ensamble_prototipo                  boolean not null,
+    modelo_acorde_robot                 boolean not null,
+    acorde_simulacion_calculos          boolean not null, 
+    restricciones_movimiento            boolean not null,
+    constraint id_criterio_disc PRIMARY KEY (fk_equipo, fk_evento),
+    FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
+);          
 
 create table criterio_const(
-	fk_equipo									int not null,
-	fk_evento									int not null,
-	prototipo_estetico							boolean not null,
-	estructuras_estables						boolean not null,
-	uso_sistemas_transmision					boolean not null,
-	uso_sensores								boolean not null,
-	cableado_adecuado							boolean not null,
-	calculo_implementacion_sistema_neumático	boolean not null,
-	conocimiento_alcance						boolean not null,
-	implementación_marca_vex					boolean not null,
-	uso_procesador_cortexm3						boolean not null,
-	analisis_Estruc								boolean not null,
-	relacion_velocidades						boolean not null,
-	tren_engranes								boolean not null,
-	centro_gravedad								boolean not null,
-	sis_transmicion								boolean not null,
-	potencia									boolean not null,
-	torque										boolean not null,
-	velocidad									boolean not null,
-	constraint id_criterio_const PRIMARY KEY (fk_equipo, fk_evento),
-	FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
+    fk_equipo                                   int not null,
+    fk_evento                                   int not null,
+    prototipo_estetico                          boolean not null,
+    estructuras_estables                        boolean not null,
+    uso_sistemas_transmision                    boolean not null,
+    uso_sensores                                boolean not null,
+    cableado_adecuado                           boolean not null,
+    calculo_implementacion_sistema_neumático    boolean not null,
+    conocimiento_alcance                        boolean not null,
+    implementación_marca_vex                    boolean not null,
+    uso_procesador_cortexm3                     boolean not null,
+    analisis_Estruc                             boolean not null,
+    relacion_velocidades                        boolean not null,
+    tren_engranes                               boolean not null,
+    centro_gravedad                             boolean not null,
+    sis_transmicion                             boolean not null,
+    potencia                                    boolean not null,
+    torque                                      boolean not null,
+    velocidad                                   boolean not null,
+    constraint id_criterio_const PRIMARY KEY (fk_equipo, fk_evento),
+    FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Creacion del admin
 
-insert into usuario(nombre_usuario, clave) values ("admin", 1029384756);
+insert into usuario(nombre_usuario, clave) values ("admin", "1029384756");
 insert into administrador(id_administrador, grado) values (last_insert_id(), 3);
 
 -- Creacion de categorias
@@ -229,10 +230,10 @@ create procedure ingresar_sede (
 )
 begin
 	if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
-		set avis = -1; -- Sede existente en esa 
+		set aviso = -1; -- Sede existente en esa 
 	else
 		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
-        set mensaje = "Se ingreso la sede correctamente";
+        set aviso = 1; -- Se ingreso la sede correctamente
     end if;
 end
 // delimiter ;
@@ -248,17 +249,17 @@ create procedure ingresar_escuela (
 begin
 	if exists (select * from escuela join sede on id_escuela = id_sede
     where nombre = p_nombre and fk_ciudad = p_fk_ciudad and fk_nivel = p_fk_nivel) then
-		set mensaje = "Ya existe este registro de escuela";
+		set aviso = -1; -- Sede existente en esa 
 	else
 		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
         insert into escuela (id_escuela, fk_nivel) values (last_insert_id(), p_fk_nivel);
-        set mensaje = "Se ingreso la escuela correctamente";
+        set aviso = 1; -- Se ingreso la sede correctamente
     end if;
 end
 // delimiter ;
 
 -- Dar de alta escuelas
-set @mensaje = '0';
+set @mensaje = 0;
 CALL ingresar_escuela("Instituto Tecnológico de Ciudad Madero (ITCM)", 2, 4, @mensaje);
 CALL ingresar_escuela("Universidad Autonoma de Tamaulipas (UAT)", 1, 4, @mensaje);
 CALL ingresar_escuela("Centro de Bachillerato Tecnológico Industrial y de Servicio N.103(CBTis 103)", 2, 3, @mensaje);
@@ -272,7 +273,7 @@ CALL ingresar_escuela("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2, @me
 drop procedure if exists registrar_competidor;
 delimiter //
 create procedure registrar_competidor(
-	p_nombre varchar(80),
+    p_nombre varchar(80),
     p_fecha_nacimiento date,
     p_escuela int,
     p_sexo enum("H","M"),
@@ -282,20 +283,20 @@ create procedure registrar_competidor(
     out aviso tinyint
 )
 begin
-	if exists (select * from participante where num_control = p_num_control and fk_escuela = p_escuela) then
-		set aviso = -1; -- Ese numero de contro ya existe en esa escuela
+    if exists (select * from participante where num_control = p_num_control and fk_escuela = p_escuela) then
+        set aviso = -1; -- Ya existe el registro de ese numero de control en esa escuela
     else
-		insert into participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
-			values (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo,  p_carrera, p_semestre, p_num_control);
-        set aviso = 1; -- Se registro correctamente 
-	end if;
+        insert into participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
+            values (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo,  p_carrera, p_semestre, p_num_control);
+        set aviso = 1; -- Registro exitoso
+    end if;
 end
 // delimiter ;
 
 drop procedure if exists registrar_docente;
 delimiter //
 create procedure registrar_docente(
-	p_nombre varchar(80),
+    p_nombre varchar(80),
     p_usuario varchar(80),
     p_clave varchar(225),
     p_fecha_nacimiento date,
@@ -305,20 +306,20 @@ create procedure registrar_docente(
     out aviso tinyint
 )
 begin
-	declare v_edad INT;
+    declare v_edad INT;
     set v_edad = TIMESTAMPDIFF(YEAR, p_fecha_nacimiento, CURDATE());
-	if v_edad >= 18 then
-		if exists (select * from usuario where nombre_usuario = p_usuario) then
-			set aviso = 0; -- Nombre de usuario existente
+    if v_edad >= 18 then
+        if exists (select * from usuario where nombre_usuario = p_usuario) then
+            set aviso = 0;-- Nombre de usuario existente
 		else
-			insert into usuario (nombre_usuario, clave) values (p_usuario, p_clave);
-			insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
-				values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
-			set aviso = 1; -- Se registro correctamente el docente
-		end if;
-	else
-		set aviso = -1; -- Menor de edad (no puede ser docente);
-	end if;
+            insert into usuario (nombre_usuario, clave) values (p_usuario, p_clave);
+            insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
+                values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
+            set aviso = 1; -- Se registro correctamente
+        end if;
+    else
+        set aviso = -1; -- Menor de edad (no puede ser docente)
+    end if;
 end
 // delimiter ;
 
@@ -331,16 +332,16 @@ delimiter //
 create procedure crear_evento(
 	p_nombre_evento varchar(40),
     p_fecha date,
-	p_fk_sede_escuela int,
+	p_fk_sede int,
     out aviso tinyint
 )
 begin
-	if exists (select * from evento where fecha like p_fecha and fk_sede_escuela like p_fk_sede_escuela) then
+	if exists (select * from evento where fecha like p_fecha and fk_sede like p_fk_sede) then
 		set aviso = -1; -- Ya existe un evento en esa sede ese mismo dia
 	elseif exists (select * from evento where nombre like p_nombre_evento) then
 		set aviso = 0; -- Ya existe un evento con ese mismo nombre
     else
-		insert into evento (nombre, fecha, fk_sede_escuela) values (p_nombre_evento, p_fecha, p_fk_sede_escuela);
+		insert into evento (nombre, fecha, fk_sede) values (p_nombre_evento, p_fecha, p_fk_sede);
         set aviso = 1; -- Se creo correctamente el equipo
 	end if;
 end
@@ -506,7 +507,7 @@ create procedure registrar_equipo(
     out aviso tinyint
 )
 begin
-	if exists (select * from registrar_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
+	if exists (select * from inscripcion_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
 		set aviso = -1; -- El equipo ya esta registrado en este evento
 	else
 		insert into registrar_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
@@ -534,4 +535,36 @@ begin
     end if;
 end
 // delimiter ;
+
+DROP PROCEDURE IF EXISTS retornar_eventos_participados;
+DELIMITER //
+CREATE PROCEDURE retornar_eventos_participados(
+    p_id_usuario INT
+)
+BEGIN
+    -- 1. EVENTOS DONDE ES COACH
+    SELECT DISTINCT 
+        e.nombre, 
+        e.fecha, 
+        s.nombre as sede, 
+        'COACH' as mi_rol
+    FROM evento e
+    JOIN sede s ON e.fk_sede = s.id_sede
+    JOIN inscripcion_equipo ie ON ie.fk_evento = e.id_evento
+    WHERE ie.fk_coach = p_id_usuario
+
+    UNION
+
+    -- 2. EVENTOS DONDE ES JUEZ
+    SELECT DISTINCT 
+        e.nombre, 
+        e.fecha, 
+        s.nombre as sede, 
+        'JUEZ' as mi_rol
+    FROM evento e
+    JOIN sede s ON e.fk_sede = s.id_sede
+    JOIN asignacion_juez aj ON aj.fk_evento = e.id_evento
+    WHERE aj.fk_juez = p_id_usuario;
+END
+// DELIMITER ;
 
