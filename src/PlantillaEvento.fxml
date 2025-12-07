@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEvento" prefHeight="114.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEvento">
+<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEvento">
    <children>
-      <Label fx:id="lblNombreEvento" layoutX="23.0" layoutY="14.0" prefHeight="43.0" prefWidth="508.0" text="Nombre del Evento" textFill="WHITE">
+      <Label fx:id="lblNombreEvento" layoutX="23.0" layoutY="10.0" prefHeight="43.0" prefWidth="508.0" text="Nombre del Evento" textFill="WHITE">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>
@@ -18,23 +18,23 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Button>
-      <Separator layoutX="19.0" layoutY="57.0" prefHeight="2.0" prefWidth="482.0" style="-fx-background-color: #FFFFFF;" />
-      <Label layoutX="23.0" layoutY="69.0" text="SEDE:" textFill="WHITE">
+      <Separator layoutX="19.0" layoutY="53.0" prefHeight="2.0" prefWidth="482.0" style="-fx-background-color: #FFFFFF;" />
+      <Label layoutX="23.0" layoutY="66.0" text="SEDE:" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblSede" layoutX="76.0" layoutY="65.0" prefHeight="36.0" prefWidth="151.0" text="Label" textFill="WHITE">
+      <Label fx:id="lblSede" layoutX="76.0" layoutY="62.0" prefHeight="36.0" prefWidth="426.0" text="Label" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label layoutX="242.0" layoutY="69.0" text="FECHA:" textFill="WHITE">
+      <Label layoutX="22.0" layoutY="98.0" text="FECHA:" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblFecha" layoutX="307.0" layoutY="65.0" prefHeight="36.0" prefWidth="182.0" text="Label" textFill="WHITE">
+      <Label fx:id="lblFecha" layoutX="82.0" layoutY="98.0" prefHeight="27.0" prefWidth="194.0" text="Label" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>

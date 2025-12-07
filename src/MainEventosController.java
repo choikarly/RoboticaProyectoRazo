@@ -72,8 +72,7 @@ public class MainEventosController {
                     controller.setDatos(nombre,sede, fecha);
 
                     // FORZAR ALTURA MINIMA (Solo para probar si es problema de colapso)
-                    panelEvento.setMinHeight(100);
-                    panelEvento.setPrefHeight(100);
+
 
 
                     // Agregamos la tarjeta al VBox

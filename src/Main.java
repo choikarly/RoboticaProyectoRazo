@@ -237,7 +237,32 @@ public class Main extends Application {
         return listaEventos;
     }
 
+    public static List<Map<String, Object>> retornarCategorias() {
+        List<Map<String, Object>> listaCategorias = new ArrayList<>();
 
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_categorias()}")) {
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+
+                    // Guardamos las columnas de la tabla 'categoria'
+                    fila.put("id_categoria", rs.getInt("id_categoria"));
+                    fila.put("nombre", rs.getString("nombre"));
+
+                    listaCategorias.add(fila);
+                }
+            }
+            System.out.println("Categorías recuperadas: " + listaCategorias.size()); // Debug
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener categorías: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return listaCategorias;
+    }
 
 
 

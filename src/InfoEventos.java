@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -30,7 +31,7 @@ public class InfoEventos implements Initializable {
 
     @FXML
     void btnContinuar(ActionEvent event) {
-        /*try {
+        try {
             String nombreCategoria = cbCategoria.getValue();
 
             if (nombreCategoria == null) {
@@ -65,27 +66,24 @@ public class InfoEventos implements Initializable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     private void cargarCategoriasDesdeBD() {
-        String sql = "SELECT id_categoria, nombre FROM categoria";
+        List<Map<String, Object>> lista = Main.retornarCategorias();
 
-        try (Connection con = Main.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        cbCategoria.getItems().clear();
+        mapaCategorias.clear();
 
-            cbCategoria.getItems().clear();
-            mapaCategorias.clear();
+        for (Map<String, Object> fila : lista) {
+            // Extraemos los datos haciendo casting
+            String nombre = (String) fila.get("nombre");
+            int id = (int) fila.get("id_categoria");
 
-            while (rs.next()) {
-                int id = rs.getInt("id_categoria");
-                String nombre = rs.getString("nombre");
-                cbCategoria.getItems().add(nombre);
-                mapaCategorias.put(nombre, id);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al cargar categorías: " + e.getMessage());
+            cbCategoria.getItems().add(nombre);
+
+            // Llenamos el Mapa (Lógico para saber el ID después)
+            mapaCategorias.put(nombre, id);
         }
     }
 
