@@ -37,11 +37,9 @@ public class Main extends Application {
         try {
             launch(args);
             Class.forName(CONTROLADOR);
-            System.out.println("Driver de MySQL cargado correctamente.");
-            //menuPrincipal();
         } catch (ClassNotFoundException e) {
-            System.err.println("Error: No se encontró el driver de la base de datos.");
-            System.err.println("Asegúrate de que el archivo .jar de MySQL Connector/J esté en tu classpath.");
+            System.err.println("Error: No se encontró el driver de la base de datos.\n" +
+                    "Asegúrate de que el archivo .jar de MySQL Connector/J esté en tu classpath.");
         } catch (Exception e) {
             System.err.println("Ocurrió un error inesperado: " + e.getMessage());
         }

@@ -41,7 +41,7 @@ create table evento(
                        constraint uk_fecha_sede unique (fecha, fk_sede),
                        foreign key (fk_sede) references sede(id_sede) ON DELETE SET NULL ON UPDATE CASCADE
 );
-INSERT INTO EVENTO VALUES (1,"OtakuVex","2025-12-12",1);
+
 create table categoria_evento (
                                   fk_evento       int not null,
                                   fk_categoria    int not null,
@@ -342,10 +342,14 @@ begin
 		set aviso = 0; -- Ya existe un evento con ese mismo nombre
 else
 		insert into evento (nombre, fecha, fk_sede) values (p_nombre_evento, p_fecha, p_fk_sede);
+        insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
         set aviso = 1; -- Se creo correctamente el equipo
 end if;
 end
 // delimiter ;
+
+set @aviso = 0;
+call crear_evento("OtakuVex","2025-12-12",1, @aviso);
 
 drop function if exists grado_admin;
 delimiter //
