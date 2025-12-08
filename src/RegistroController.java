@@ -126,8 +126,7 @@ public class RegistroController implements Initializable {
                 // Evaluar resultado
                 switch (codigoResultado) {
                     case 1: // ÉXITO
-                        mostrarAlertaExito("Éxito", "Registro Completado", "Cierra esta ventana para ir al Inicio de Sesion");
-
+                        mostrarAlertaExito("Éxito", "Registro Completado", "Se le redirecionara al Inicio de Sesion");
                         // Cerrar ventana actual y abrir login
                         Node source = (Node) event.getSource();
                         Stage stageActual = (Stage) source.getScene().getWindow();
@@ -142,10 +141,15 @@ public class RegistroController implements Initializable {
                         stageNuevo.show();
                         break;
 
-                    case -1: // DUPLICADO
-                        mostrarAlertaError("Atención", "Usuario Duplicado", "Ese usuario ya existe en el sistema.");
+                    case -0: // DUPLICADO
+                        mostrarAlertaError("Registro Fallido", "Usuario Duplicado", "Ese usuario ya existe en el sistema.");
                         break;
 
+                    case -1:
+                        mostrarAlertaError("Registro Fallido", "Edad Insuficiente", "El docente debe ser mayor de edad (18 años) para registrarse.");
+                        break;
+
+                    case -2:
                     default: // ERROR
                         mostrarAlertaError("Error", "Fallo del Sistema", "Hubo un error al intentar guardar en la BD.");
                         break;

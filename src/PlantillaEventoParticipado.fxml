@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEventoParticipado" prefHeight="135.0" prefWidth="657.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEventoParticipado">
+<AnchorPane fx:id="panelEventoParticipado" prefHeight="160.0" prefWidth="657.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEventoParticipado">
    <children>
       <Label fx:id="lblNombreEvento" layoutX="23.0" layoutY="14.0" prefHeight="43.0" prefWidth="508.0" text="Nombre del Evento" textFill="WHITE">
          <font>
@@ -14,6 +14,7 @@
          </font>
       </Label>
       <Separator layoutX="19.0" layoutY="57.0" prefHeight="2.0" prefWidth="482.0" style="-fx-background-color: #FFFFFF;" />
+
       <Label layoutX="23.0" layoutY="69.0" text="SEDE:" textFill="WHITE">
          <font>
             <Font size="18.0" />
@@ -24,6 +25,7 @@
             <Font size="18.0" />
          </font>
       </Label>
+
       <Label layoutX="22.0" layoutY="95.0" text="ROL:" textFill="WHITE">
          <font>
             <Font size="18.0" />
@@ -34,6 +36,18 @@
             <Font size="18.0" />
          </font>
       </Label>
+
+      <Label layoutX="22.0" layoutY="122.0" text="FECHA:" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblFecha" layoutX="90.0" layoutY="122.0" prefHeight="27.0" prefWidth="222.0" text="Label" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+
       <Button fx:id="btnMasInfoEvento" layoutX="520.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnMasInfoEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Más Info." textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="18.0" />

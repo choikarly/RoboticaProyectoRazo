@@ -14,10 +14,11 @@ import java.util.Optional;
 
 public class MainPrincipalController {
     @FXML
+    private Label lblNombreCompleto;
+    @FXML
     private Label lbl_inicial;
     @FXML
     private AnchorPane PanelContenedor;
-
     @FXML
     private AnchorPane AdminOptionsContainer;
     @FXML
@@ -25,6 +26,14 @@ public class MainPrincipalController {
 
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setResizable(false);
+    }
+
+    public void setNombreCompleto(String nombre) {
+        if (lblNombreCompleto != null) {
+            // Usamos una verificación de seguridad: si 'nombre' es null, usamos un espacio
+            String nombreSeguro = (nombre != null) ? nombre : "";
+            lblNombreCompleto.setText(nombreSeguro);
+        }
     }
 
     public void setInicialUsuario(String nombreCompleto) {

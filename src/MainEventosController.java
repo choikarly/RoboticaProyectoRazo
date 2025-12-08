@@ -10,13 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-
 
 public class MainEventosController {
     @FXML
@@ -29,11 +24,12 @@ public class MainEventosController {
     @FXML
     private Label lblMensajeEventiParticipado;
 
+    // Estos botones parecen ser para uso global o referencia,
+    // pero recuerda que cada plantilla tiene sus propios botones.
     @FXML
     private Button btnEvaluarEvento;
     @FXML
     private Button btnMasInfoEvento;
-
 
     @FXML
     public void initialize() {
@@ -43,14 +39,11 @@ public class MainEventosController {
 
     private void cargarEventosDelDocente() {
         vboxContenedorEventosParticipados.getChildren().clear();
-        // 1. Obtener ID del usuario actual
         int idUsuario = Main.usuaioActual;
         System.out.println("Cargando eventos para el usuario ID " + idUsuario);
 
-        // 2. Llamar a la función
         List<Map<String, Object>> lista = Main.retornarEventosParticipados(idUsuario);
 
-        // 3. Validar si está vacío
         if (lista.isEmpty()) {
             vboxContenedorEventosParticipados.setVisible(false);
             vboxContenedorEventosParticipados.setManaged(false);
@@ -68,46 +61,26 @@ public class MainEventosController {
 
             try {
                 for (Map<String, Object> fila : lista) {
-
-                    // Extraer datos
                     String nombre = (String) fila.get("nombre");
                     String sede = (String) fila.get("sede");
                     String rol = (String) fila.get("mi_rol");
-
-                    // Manejo seguro de fecha (puede ser null)
                     String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Pendiente";
 
-                    // Cargar Plantilla
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEvento.fxml"));
+                    // --- CORRECCIÓN AQUÍ ---
+                    // Antes tenías "PlantillaEvento.fxml", debe ser "PlantillaEventoParticipado.fxml"
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEventoParticipado.fxml"));
                     AnchorPane panelEventoParticipado = loader.load();
 
-                    // Pasar datos al controlador de la plantilla
-                    // Nota: Asegúrate que tu PlantillaEventoController tenga setDatos(nombre, sede, fecha)
+                    // Ahora sí coincide el FXML con su clase controladora
                     PlantillaEventoParticipado controller = loader.getController();
                     controller.setDatosEventoParticipado(nombre, sede, fecha);
 
-                    // --- CAMBIO DE COLOR SEGÚN ROL ---
-                    if ("COACH".equals(rol)) {
-                        // VERDE: Evento donde voy como Coach
-                        // Ocultar el botón (Desaparece y no ocupa espacio)
-                        btnEvaluarEvento.setVisible(false);
-                        btnEvaluarEvento.setManaged(false);
-
-                        // Mostrar el botón (Aparece y recupera su espacio)
-                        btnMasInfoEvento.setVisible(true);
-                        btnMasInfoEvento.setManaged(true);
-                        //panelEventoParticipado.setStyle("-fx-border-color: #2ecc71; -fx-border-width: 3; -fx-background-color: #eafaf1;");
-                    } else {
-                        // AZUL: Evento donde voy como Juez
-                        // Ocultar el botón (Desaparece y no ocupa espacio)
-                        btnEvaluarEvento.setVisible(true);
-                        btnEvaluarEvento.setManaged(true);
-
-                        // Mostrar el botón (Aparece y recupera su espacio)
-                        btnMasInfoEvento.setVisible(false);
-                        btnMasInfoEvento.setManaged(false);
-                        //panelEventoParticipado.setStyle("-fx-border-color: #3498db; -fx-border-width: 3; -fx-background-color: #ebf5fb;");
-                    }
+                    // Lógica visual según el rol (Opcional: Esto lo podrías mover adentro de la plantilla si prefieres)
+                    /* Nota: Como btnEvaluarEvento es parte de ESTE controlador principal y no de la plantilla,
+                       estas líneas de abajo no ocultarán los botones DENTRO de la tarjeta.
+                       Si quieres ocultar los botones de la tarjeta, debes crear un método en
+                       PlantillaEventoParticipado.java, ej: controller.configurarBotones(rol);
+                    */
 
                     // Agregar al contenedor
                     vboxContenedorEventosParticipados.getChildren().add(panelEventoParticipado);
@@ -119,50 +92,36 @@ public class MainEventosController {
     }
 
     private void cargarEventos() {
-        // 1. Limpiamos la vista actual
         vboxContenedorEventos.getChildren().clear();
-
-        // 2. Llamamos a tu función estática del Main (que usa el SP retornar_eventos)
         List<Map<String, Object>> listaEventos = Main.retornarEventos();
 
-        // 3. Verificamos si hay resultados
         if (listaEventos.isEmpty()) {
-            // CASO VACÍO: Ocultamos contenedor, mostramos mensaje
             vboxContenedorEventos.setVisible(false);
             vboxContenedorEventos.setManaged(false);
 
             lblMnesajeEventosDisponibles.setVisible(true);
             lblMnesajeEventosDisponibles.setManaged(true);
         } else {
-            // CASO CON DATOS: Mostramos contenedor, ocultamos mensaje
             vboxContenedorEventos.setVisible(true);
             vboxContenedorEventos.setManaged(true);
-            vboxContenedorEventos.setSpacing(10); // Espacio entre tarjetas
+            vboxContenedorEventos.setSpacing(10);
 
             lblMnesajeEventosDisponibles.setVisible(false);
             lblMnesajeEventosDisponibles.setManaged(false);
 
-            // 4. Recorremos la lista y creamos las tarjetas
             try {
                 for (Map<String, Object> fila : listaEventos) {
-
-                    // Extraemos los datos del Mapa
                     String nombre = (String) fila.get("nombre");
-                    String sede = (String) fila.get("sede"); // ¡Ahora ya tienes la sede disponible!
-                    // Convertimos la fecha a String. Si es null, ponemos cadena vacía para que no explote
+                    String sede = (String) fila.get("sede");
                     String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "";
 
-                    // Cargar el "Molde" (PlantillaEvento.fxml)
+                    // Aquí sí usamos la plantilla normal
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEvento.fxml"));
                     AnchorPane panelEvento = loader.load();
 
-                    // Obtener el controlador del molde
                     PlantillaEvento controller = loader.getController();
-                    controller.setDatos(nombre,sede, fecha);
+                    controller.setDatos(nombre, sede, fecha);
 
-                    // FORZAR ALTURA MINIMA (Solo para probar si es problema de colapso)
-
-                    // Agregamos la tarjeta al VBox
                     vboxContenedorEventos.getChildren().add(panelEvento);
                 }
             } catch (IOException e) {
@@ -172,4 +131,3 @@ public class MainEventosController {
         }
     }
 }
-

@@ -134,7 +134,6 @@ create table criterios_evaluacion(
                                      foreign key (fk_equipo, fk_evento, fk_categoria) references inscripcion_equipo(fk_equipo, fk_evento, fk_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- NOTA: He dejado boolean. Si necesitas puntaje numérico, cambia boolean por INT.
 create table criterio_prog(
                               fk_equipo                   int not null,
                               fk_evento                   int not null,
@@ -230,13 +229,16 @@ create procedure ingresar_sede (
 )
 begin
 	if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
-		set aviso = -1; -- Sede existente en esa
+		set aviso = -1; -- Nombre de sede existente en esa ciudad
 else
 		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
         set aviso = 1; -- Se ingreso la sede correctamente
 end if;
 end
 // delimiter ;
+
+set @aviso = 0;
+call ingresar_sede("Espacio Cultural Metropolitano", 1, @aviso);
 
 drop procedure if exists ingresar_escuela;
 delimiter //
@@ -293,6 +295,10 @@ end if;
 end
 // delimiter ;
 
+call registrar_competidor("Adan", "2005-01-14", 2, "H", "Ing. Sistemas Computacionales", 5, 23070402, @aviso);
+call registrar_competidor("Karla", "2005-02-09", 2, "M", "Ing. Sistemas Computacionales", 5, 23070465, @aviso);
+call registrar_competidor("Barbara", "2005-12-04", 2, "M", "Ing. Sistemas Computacionales", 5, 23070456, @aviso);
+
 drop procedure if exists registrar_docente;
 delimiter //
 create procedure registrar_docente(
@@ -324,8 +330,7 @@ end
 // delimiter ;
 
 set @mensaje = "0";
-call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-21", 1, "H", "Redes de computadoras", @mensaje);
-select @mensaje;
+call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-21", 2, "H", "Redes de computadoras", @mensaje);
 
 drop procedure if exists crear_evento;
 delimiter //
@@ -374,16 +379,23 @@ create procedure inicio_sesion(
     p_nombre_usuario	varchar(80),
     p_clave 			varchar(225),
     out p_grado 		tinyint,
-    out p_id_usuario 	int
+    out p_id_usuario 	int,
+    out p_nombre_completo varchar(80)
 )
 begin
 	if exists (select * from usuario where nombre_usuario = p_nombre_usuario and clave = p_clave) then
-select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
-select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
-else
+		select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
+		select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
+		SELECT nombre_usuario INTO p_nombre_completo FROM usuario WHERE id_usuario = p_id_usuario;
+        SELECT nombre INTO @temp_nombre FROM docente WHERE id_docente = p_id_usuario;
+        IF @temp_nombre IS NOT NULL THEN
+            SET p_nombre_completo = @temp_nombre;
+        END IF;
+	else
 		set p_grado = -2;
-        set p_id_usuario = -1;
-end if;
+		set p_id_usuario = -1;
+        set p_nombre_completo = null;
+	end if;
 end
 // delimiter ;
 
@@ -464,19 +476,6 @@ select evento.id_evento,evento.nombre, sede.nombre as sede, fecha from evento
 end
 // delimiter ;
 
-
-
-
-select * from docente;
-INSERT INTO categoria_evento (fk_evento, fk_categoria) VALUES (1, 1);
-INSERT INTO inscripcion_equipo (fk_coach, fk_equipo, fk_evento, fk_categoria)
-VALUES (2, 1, 1, 1);
-
-
-
-
-
-
 drop procedure if exists retornar_equipos_coach;
 delimiter //
 create procedure retornar_equipos_coach(
@@ -511,6 +510,9 @@ end if;
 end
 // delimiter ;
 
+set @id_equipo = 0;
+call crear_equipo("Los Eevees", 2, @id_equipo);
+
 drop procedure if exists registrar_equipo;
 delimiter //
 create procedure registrar_equipo(
@@ -526,15 +528,17 @@ create procedure registrar_equipo(
 begin
 	if exists (select * from inscripcion_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
 		set aviso = -1; -- El equipo ya esta registrado en este evento
-else
+	else
 		insert into inscripcion_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
-insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
-insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
-insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
-set aviso = 1;
-end if;
+		insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
+		insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
+		insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
+		set aviso = 1;
+	end if;
 end
 // delimiter ;
+
+call registrar_equipo(2,1,1,4,1,2,3,@aviso);
 
 drop procedure if exists retornar_participante;
 delimiter //

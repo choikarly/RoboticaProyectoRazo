@@ -17,6 +17,7 @@ public class Main extends Application {
     private static final String USUARIO_BD = "administrador_concursos";
     private static final String CLAVE_BD = "12345";
     public static Integer usuaioActual = -1;
+    public static String nombreCompletoUsuario = "";
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -93,44 +94,28 @@ public class Main extends Application {
             cs.setInt(5, escuela);
             cs.setString(6, sexo);
             cs.setString(7, especialidad);
-            cs.registerOutParameter(8, Types.VARCHAR);
+            cs.registerOutParameter(8, Types.INTEGER);
             cs.execute();
-            String mensaje = cs.getString(8);
-            System.out.println(mensaje);
-
-            System.out.println("Mensaje BD: " + mensaje); // Debug
-            if (mensaje != null) {
-                // Caso 1: ÉXITO
-                if (mensaje.contains("Se registro al docente correctamente")) {
-                    return 1;
-                }
-                // Caso 2: DUPLICADO (Si tu SP lo controla y manda mensaje en vez de error)
-                else if (mensaje.contains("El usuario ya esta registrado")) {
-                    return -1;
-                }
-            }
-            return -2;
-
+            return cs.getInt(8);
         } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) {
-                return -1;
-            }
             System.err.println("\nError SQL: " + e.getMessage());
-            return -2; // Error General
+            return -2; // Error de conexión o SQL
         }
     }
 
     public static int[] iniciarSesion(String nombre_usuario, String clave) {
         int id_usuario, grado;
         try (Connection conn = getConexion();
-             CallableStatement cs = conn.prepareCall("{CALL inicio_sesion(?, ?, ?, ?)}")) {
+             CallableStatement cs = conn.prepareCall("{CALL inicio_sesion(?, ?, ?, ?, ?)}")) {
             cs.setString(1, nombre_usuario);
             cs.setString(2, clave);
             cs.registerOutParameter(3, Types.INTEGER);
             cs.registerOutParameter(4, Types.INTEGER);
+            cs.registerOutParameter(5, Types.VARCHAR);
             cs.execute();
             grado = cs.getInt(3);
             id_usuario = cs.getInt(4);
+            nombreCompletoUsuario = cs.getString(5);
             if (id_usuario == -1)
                 System.out.println("Nombre de usuario o contraseña incorrecto");
             else

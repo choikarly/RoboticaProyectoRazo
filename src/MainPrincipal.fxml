@@ -27,7 +27,13 @@
                   </Label>
                </children>
             </StackPane>
-            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="187.0" prefHeight="203.0" prefWidth="201.0">
+            <Label fx:id="lblNombreCompleto" alignment="CENTER" layoutX="10.0" layoutY="190.0"
+                               prefHeight="30.0" prefWidth="200.0" text="Nombre Usuario" textFill="WHITE" wrapText="true">
+            <font>
+               <Font size="16.0" />
+            </font>
+         </Label>
+            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="220.0" prefHeight="203.0" prefWidth="201.0">
                <children>
                   <Button fx:id="btn_eventos_Docente" layoutY="144.0" mnemonicParsing="false" onAction="#btnEventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
                      <font>
@@ -46,7 +52,7 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="191.0" prefHeight="325.0" prefWidth="206.0" visible="false">
+            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="224.0" prefHeight="325.0" prefWidth="206.0" visible="false">
                <children>
                   <Button fx:id="btnMainDocentesAdmin" layoutY="38.0" mnemonicParsing="false" onAction="#btnMainDocentesAdmin" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Docentes" textFill="WHITE">
                      <font>

@@ -64,69 +64,45 @@ public class InicioSesionController {
                     "Campos sin llenar",
                     "LLene todos los campos que se solicitan."
             );
-        } else {
+        } else{
+            // 1. Llamamos a la BD UNA SOLA VEZ y guardamos el resultado
             int[] resultados = Main.iniciarSesion(usuarioIngresado, passwordIngresado);
-            if(Main.iniciarSesion(usuarioIngresado, passwordIngresado)[0] > 0){
-                if(Main.iniciarSesion(usuarioIngresado, passwordIngresado)[1] >= 0){
-                    try{
-                        Node source = (Node) event.getSource();
-                        Stage stageActual = (Stage) source.getScene().getWindow();
-                        stageActual.close();
+            int idUsuario = resultados[0];
+            int grado = resultados[1];
 
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPrincipal.fxml"));
-                        Parent root = loader.load();
+            // 2. Verificamos si el login fue exitoso (ID > 0 y Grado válido)
+            if (idUsuario > 0 && grado >= -1) {
+                try {
+                    Node source = (Node) event.getSource();
+                    Stage stageActual = (Stage) source.getScene().getWindow();
+                    stageActual.close();
 
-                        MainPrincipalController dashboardController = loader.getController();
-                        dashboardController.setInicialUsuario(usuarioIngresado);
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPrincipal.fxml"));
+                    Parent root = loader.load();
 
-                        // Obtenemos el controlador y le pasamos el GRADO (resultados[1])
-                        MainPrincipalController mainController = loader.getController();
-                        mainController.configurarPermisos(resultados[1]);
+                    // Obtenemos el controlador UNA SOLA VEZ
+                    MainPrincipalController dashboardController = loader.getController();
 
-                        Stage stageNuevo = new Stage();
-                        stageNuevo.setScene(new Scene(root));
-                        stageNuevo.setTitle("Concurso Robotica");
-                        stageNuevo.setResizable(false);
+                    // Configuramos todos los datos
+                    dashboardController.setInicialUsuario(usuarioIngresado);
+                    dashboardController.configurarPermisos(grado);
 
-                        stageNuevo.show();
+                    // Pasamos el nombre que Main ya recuperó de la BD
+                    dashboardController.setNombreCompleto(Main.nombreCompletoUsuario);
 
-                    }catch(IOException e){
-                        e.printStackTrace();
-                        mostrarAlerta("Error",
-                                "Fallo al abrir ventana",
-                                "No se pudo cargar la vista: " + e.getMessage());
-                    }
-                }else {
-                    try {
-                        Node source = (Node) event.getSource();
-                        Stage stageActual = (Stage) source.getScene().getWindow();
-                        stageActual.close();
+                    Stage stageNuevo = new Stage();
+                    stageNuevo.setScene(new Scene(root));
+                    stageNuevo.setTitle("Concurso Robotica");
+                    stageNuevo.setResizable(false);
+                    stageNuevo.show();
 
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPrincipal.fxml"));
-                        Parent root = loader.load();
-
-                        MainPrincipalController dashboardController = loader.getController();
-                        dashboardController.setInicialUsuario(usuarioIngresado);
-
-                        Stage stageNuevo = new Stage();
-                        stageNuevo.setScene(new Scene(root));
-                        stageNuevo.setTitle("Concurso Robotica");
-                        stageNuevo.setResizable(false);
-                        stageNuevo.show();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        mostrarAlerta("Error",
-                                "Fallo al abrir ventana",
-                                "No se pudo cargar la vista: " + e.getMessage());
-                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    mostrarAlerta("Error", "Fallo al abrir ventana", "No se pudo cargar la vista: " + e.getMessage());
                 }
-            }else{
-                mostrarAlerta(
-                        "Error de Acceso",
-                        "Datos Incorrectos",
-                        "El usuario o la contraseña que ingresaste no son válidos."
-                );
+            } else {
+                // Si el ID es -1 o -2, mostramos error
+                mostrarAlerta("Error de Acceso", "Datos Incorrectos", "El usuario o la contraseña que ingresaste no son válidos.");
             }
         }
     }
