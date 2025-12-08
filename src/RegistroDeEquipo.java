@@ -8,11 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -21,8 +18,6 @@ public class RegistroDeEquipo implements Initializable {
 
     @FXML private Label lblNombreEquipo;
     @FXML private Label lblNombreEscuela;
-
-    // ComboBoxes para seleccionar alumnos
     @FXML private ComboBox<AlumnoItem> cbIntegranteUno;
     @FXML private ComboBox<AlumnoItem> cbIntegranteDos;
     @FXML private ComboBox<AlumnoItem> cbIntegranteTres;
@@ -30,36 +25,30 @@ public class RegistroDeEquipo implements Initializable {
     private int idEquipoActual;
     private int idEventoActual;
     private int idEscuelaActual;
-    private int idCategoriaCalculada;
+    private int idCategoriaCalculada; // Aquí guardamos si es Primaria(1), Uni(4), etc.
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Inicialización vacía, esperamos a recibir datos
-    }
+    public void initialize(URL url, ResourceBundle resourceBundle) { }
 
-    public void recibirDatosInscripcion(int idEquipo, int idEvento) {
+    public void recibirDatosInscripcion(int idEquipo, String nombreEquipo, int idEvento) {
         this.idEquipoActual = idEquipo;
         this.idEventoActual = idEvento;
 
-        // 1. Obtener datos del coach y escuela
         int idCoach = Main.usuaioActual;
         this.idEscuelaActual = Main.obtenerIdEscuelaDelDocente(idCoach);
         String nombreEscuela = Main.obtenerNombreEscuela(idCoach);
 
-        // 2. Obtener Categoría (Nivel de la escuela)
+        // Obtenemos el nivel (1=Primaria, 2=Secundaria, etc.)
         this.idCategoriaCalculada = Main.obtenerNivelEscuela(this.idEscuelaActual);
 
-        // 3. Actualizar UI
         if(lblNombreEscuela != null) lblNombreEscuela.setText(nombreEscuela);
-        if(lblNombreEquipo != null) lblNombreEquipo.setText("Equipo ID: " + idEquipo);
+        if(lblNombreEquipo != null) lblNombreEquipo.setText(nombreEquipo);
 
-        // 4. Cargar alumnos en los combos
         cargarAlumnos();
     }
 
     private void cargarAlumnos() {
         List<Map<String, Object>> alumnos = Main.retornarAlumnosPorEscuela(idEscuelaActual);
-
         cbIntegranteUno.getItems().clear();
         cbIntegranteDos.getItems().clear();
         cbIntegranteTres.getItems().clear();
@@ -68,7 +57,6 @@ public class RegistroDeEquipo implements Initializable {
             int id = (int) fila.get("id");
             String nombre = (String) fila.get("nombre");
             AlumnoItem item = new AlumnoItem(id, nombre);
-
             cbIntegranteUno.getItems().add(item);
             cbIntegranteDos.getItems().add(item);
             cbIntegranteTres.getItems().add(item);
@@ -81,7 +69,6 @@ public class RegistroDeEquipo implements Initializable {
             mostrarAlerta("Error", "Selección incompleta", "Debes seleccionar 3 integrantes.");
             return;
         }
-
         int p1 = cbIntegranteUno.getValue().id;
         int p2 = cbIntegranteDos.getValue().id;
         int p3 = cbIntegranteTres.getValue().id;
@@ -108,22 +95,20 @@ public class RegistroDeEquipo implements Initializable {
     void btnNuevoParticipante(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("RegistroParticipante.fxml"));
-            Parent root = loader.load(); // Ahora esto funcionará porque el FXML tiene controller
+            Parent root = loader.load();
 
-            // --- IMPORTANTE: Pasar el ID de la escuela ---
             RegistroParticipante controller = loader.getController();
-            controller.setDatosEscuela(this.idEscuelaActual);
-            // ---------------------------------------------
+
+            // ¡IMPORTANTE! Pasamos el ID de la escuela Y el Nivel (categoría)
+            controller.setDatosEscuela(this.idEscuelaActual, this.idCategoriaCalculada);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Registrar Nuevo Alumno");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
-
             stage.showAndWait();
 
-            // Al volver, recargamos la lista para ver al nuevo alumno
             cargarAlumnos();
 
         } catch (IOException e) {
@@ -147,19 +132,10 @@ public class RegistroDeEquipo implements Initializable {
         alert.showAndWait();
     }
 
-    // Clase auxiliar para que el ComboBox muestre el nombre pero guarde el ID
     public static class AlumnoItem {
         int id;
         String nombre;
-
-        public AlumnoItem(int id, String nombre) {
-            this.id = id;
-            this.nombre = nombre;
-        }
-
-        @Override
-        public String toString() {
-            return nombre;
-        }
+        public AlumnoItem(int id, String nombre) { this.id = id; this.nombre = nombre; }
+        @Override public String toString() { return nombre; }
     }
 }

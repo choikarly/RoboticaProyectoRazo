@@ -272,28 +272,53 @@ CALL ingresar_escuela("Colegio Arboledas A.C", 3, 1, @mensaje);
 CALL ingresar_escuela("Centro de Estudios Tecnológico Industrial y de Servicio N.109 (CEBtis 109)", 2, 3, @mensaje);
 CALL ingresar_escuela("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2, @mensaje);
 
-drop procedure if exists registrar_competidor;
-delimiter //
-create procedure registrar_competidor(
-    p_nombre varchar(80),
-    p_fecha_nacimiento date,
-    p_escuela int,
-    p_sexo enum("H","M"),
-    p_carrera varchar(40),
-    p_semestre tinyint,
-    p_num_control int,
-    out aviso tinyint
-        )
-begin
-    if exists (select * from participante where num_control = p_num_control and fk_escuela = p_escuela) then
-        set aviso = -1; -- Ya existe el registro de ese numero de control en esa escuela
-else
-        insert into participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
-            values (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo,  p_carrera, p_semestre, p_num_control);
-        set aviso = 1; -- Registro exitoso
-end if;
-end
-// delimiter ;
+USE concurso_robotica;
+
+DROP PROCEDURE IF EXISTS registrar_competidor;
+DELIMITER //
+CREATE PROCEDURE registrar_competidor(
+    IN p_nombre VARCHAR(80),
+    IN p_fecha_nacimiento DATE,
+    IN p_escuela INT,
+    IN p_sexo ENUM("H","M"),
+    IN p_carrera VARCHAR(40),
+    IN p_semestre TINYINT,
+    IN p_num_control INT,
+    OUT aviso TINYINT
+)
+BEGIN
+    DECLARE v_nivel INT;
+    DECLARE v_edad INT;
+    DECLARE v_edad_minima INT;
+
+    -- 1. Obtener el nivel de la escuela (1=Primaria, 2=Secundaria, etc.)
+    SELECT fk_nivel INTO v_nivel FROM escuela WHERE id_escuela = p_escuela;
+
+    -- 2. Definir la edad mínima según el nivel
+    CASE v_nivel
+        WHEN 1 THEN SET v_edad_minima = 6;  -- Primaria
+        WHEN 2 THEN SET v_edad_minima = 12; -- Secundaria
+        WHEN 3 THEN SET v_edad_minima = 15; -- Bachillerato
+        WHEN 4 THEN SET v_edad_minima = 17; -- Universidad
+        ELSE SET v_edad_minima = 0;
+    END CASE;
+
+    -- 3. Calcular la edad actual
+    SET v_edad = TIMESTAMPDIFF(YEAR, p_fecha_nacimiento, CURDATE());
+
+    -- 4. Validar
+    IF v_edad < v_edad_minima THEN
+        SET aviso = -3; -- ERROR: Muy joven
+    ELSEIF EXISTS (SELECT * FROM participante WHERE num_control = p_num_control AND fk_escuela = p_escuela) THEN
+        SET aviso = -1; -- ERROR: Duplicado
+    ELSE
+        -- Insertar si cumple la edad
+        INSERT INTO participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
+        VALUES (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_carrera, p_semestre, p_num_control);
+        SET aviso = 1; -- ÉXITO
+    END IF;
+END
+// DELIMITER ;
 
 call registrar_competidor("Adan", "2005-01-14", 2, "H", "Ing. Sistemas Computacionales", 5, 23070402, @aviso);
 call registrar_competidor("Karla", "2005-02-09", 2, "M", "Ing. Sistemas Computacionales", 5, 23070465, @aviso);
@@ -331,6 +356,7 @@ end
 
 set @mensaje = "0";
 call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-21", 2, "H", "Redes de computadoras", @mensaje);
+call registrar_docente("Mauro", "Mau", "12345678", "2005-06-24", 4, "H", "Calador", @mensaje);
 
 drop procedure if exists crear_evento;
 delimiter //
@@ -590,7 +616,6 @@ WHERE aj.fk_juez = p_id_usuario;
 END
 // DELIMITER ;
 
--- ********************* NUEVOS PROCESOS ********************************************
 DROP PROCEDURE IF EXISTS obtener_id_escuela_docente;
 DELIMITER //
 CREATE PROCEDURE obtener_id_escuela_docente(

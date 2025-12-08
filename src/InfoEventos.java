@@ -54,7 +54,7 @@ public class InfoEventos implements Initializable {
 
             // Pasar los datos a RegistroDeEquipo
             RegistroDeEquipo controller = loader.getController();
-            controller.recibirDatosInscripcion(idEquipoSeleccionado, this.idEventoActual);
+            controller.recibirDatosInscripcion(idEquipoSeleccionado, nombreEquipo, this.idEventoActual);
 
             Stage stagePaso2 = new Stage();
             stagePaso2.setScene(new Scene(root));
