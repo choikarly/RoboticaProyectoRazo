@@ -16,6 +16,7 @@ public class PlantillaEvento {
     @FXML private Label lblSede;
     @FXML private Label lblFecha;
 
+
     private String nombreGuardado;
     private String fechaGuardada;
     private String sedeGuardada;
@@ -32,6 +33,7 @@ public class PlantillaEvento {
         lblFecha.setText(fecha);
         if (lblSede != null) lblSede.setText(sede);
     }
+
 
     @FXML
     void btnRegistrarEquiposInfoEvento(ActionEvent event) {

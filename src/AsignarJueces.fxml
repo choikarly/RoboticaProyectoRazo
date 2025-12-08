@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="536.0" prefWidth="787.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AsignarJueces">
+   <children>
+      <Label layoutX="36.0" layoutY="24.0" prefHeight="27.0" prefWidth="74.0" text="Evento">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="38.0" layoutY="223.0" prefHeight="27.0" prefWidth="90.0" text="Jueces">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnAsignarJueces" layoutX="603.0" layoutY="467.0" mnemonicParsing="false" onAction="#btnAsignarJueces" prefHeight="50.0" prefWidth="162.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="ASIGNAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Button>
+      <Separator layoutX="32.0" layoutY="216.0" prefHeight="4.0" prefWidth="738.0" />
+      <Label fx:id="lblSede" layoutX="128.0" layoutY="92.0" prefHeight="26.0" prefWidth="594.0" text="LABEL ESCUELA_ DOCENTE" />
+      <ComboBox fx:id="cbJuezUno" layoutX="36.0" layoutY="262.0" prefHeight="50.0" prefWidth="731.0" promptText="JUEZ UNO" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <Label fx:id="lblNombreEvento" layoutX="128.0" layoutY="60.0" prefHeight="26.0" prefWidth="594.0" text="LABEL NOMBREEQUIPOS_ DOCENTE" />
+      <Label layoutX="46.0" layoutY="60.0" text="NOMBRE:">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="46.0" layoutY="92.0" prefHeight="26.0" prefWidth="74.0" text="SEDE:">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="cbJuezTres" layoutX="35.0" layoutY="402.0" prefHeight="50.0" prefWidth="731.0" promptText="JUEZ TRES" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <ComboBox fx:id="cbJuezDos" layoutX="36.0" layoutY="332.0" prefHeight="50.0" prefWidth="731.0" promptText="JUEZ DOS" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <ComboBox fx:id="cbCategoriaJuez" layoutX="36.0" layoutY="152.0" prefHeight="50.0" prefWidth="731.0" promptText="CATEGORIA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <Label layoutX="46.0" layoutY="123.0" prefHeight="26.0" prefWidth="377.0" text="Selecciona una categoria:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

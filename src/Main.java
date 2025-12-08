@@ -176,29 +176,37 @@ public class Main extends Application {
                     escuela.put("id_escuela", rs.getInt("id_escuela"));
                     escuela.put("nombre", rs.getString("nombre"));
                     escuela.put("fk_ciudad", rs.getInt("fk_ciudad"));
-                    escuela.put("fk_nivel", rs.getInt("fk_nivel"));
+                    escuela.put("fk_nivel", rs.getInt("fk_nivel")); // getObject por si es int o string
                     listaEscuelas.add(escuela);
                 }
             }
-            System.out.println("Escuelas encontradas: " + listaEscuelas.size());
+            System.out.println("Escuelas encontradas: " + listaEscuelas.size()); // Debug
         } catch (SQLException e) {
             System.err.println("\nError al obtener escuelas: " + e.getMessage());
+            // En caso de error devolvemos la lista vacía para no romper el programa
         }
         return listaEscuelas;
     }
 
     public static List<Map<String, Object>> retornarEventos() {
         List<Map<String, Object>> lista = new ArrayList<>();
+
+        // Asegúrate de que el SP en SQL ya incluya 'id_evento' en el SELECT
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_eventos()}");
              ResultSet rs = cs.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, Object> fila = new HashMap<>();
+
+                // --- ESTA ES LA LÍNEA QUE TE FALTA ---
                 fila.put("id_evento", rs.getInt("id_evento"));
+                // -------------------------------------
+
                 fila.put("nombre", rs.getString("nombre"));
                 fila.put("sede", rs.getString("sede"));
-                fila.put("fecha", rs.getDate("fecha"));
+                fila.put("fecha", rs.getDate("fecha")); // O getString, según como lo manejes
+
                 lista.add(fila);
             }
         } catch (SQLException e) {
@@ -216,6 +224,8 @@ public class Main extends Application {
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
+
+                    // Guardamos las columnas de la tabla 'categoria'
                     fila.put("id_categoria", rs.getInt("id_categoria"));
                     fila.put("nombre", rs.getString("nombre"));
 
@@ -237,23 +247,30 @@ public class Main extends Application {
 
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_coach(?)}")) {
+
+            // Pasamos el parámetro de entrada (ID del coach)
             cs.setInt(1, idCoach);
 
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
+
+                    // Usamos los alias exactos que definiste en el SELECT del Procedure
                     fila.put("equipo", rs.getString("equipo"));
                     fila.put("escuela", rs.getString("escuela"));
                     fila.put("evento", rs.getString("evento"));
                     fila.put("categoria", rs.getString("categoria"));
+
                     listaEquipos.add(fila);
                 }
             }
-            System.out.println("Equipos encontrados para el coach " + idCoach + ": " + listaEquipos.size());
+            System.out.println("Equipos encontrados para el coach " + idCoach + ": " + listaEquipos.size()); // Debug
+
         } catch (SQLException e) {
             System.err.println("Error al obtener equipos del coach: " + e.getMessage());
             e.printStackTrace();
         }
+
         return listaEquipos;
     }
 
@@ -262,14 +279,18 @@ public class Main extends Application {
 
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_eventos_participados(?)}")) {
+
             cs.setInt(1, idUsuario);
+
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
+
                     fila.put("nombre", rs.getString("nombre"));
-                    fila.put("fecha", rs.getDate("fecha"));
+                    fila.put("fecha", rs.getDate("fecha")); // Ojo: SQL Date
                     fila.put("sede", rs.getString("sede"));
-                    fila.put("mi_rol", rs.getString("mi_rol"));
+                    fila.put("mi_rol", rs.getString("mi_rol")); // "COACH" o "JUEZ"
+
                     lista.add(fila);
                 }
             }
@@ -281,30 +302,47 @@ public class Main extends Application {
     }
 
     public static int crearEquipo(String nombreEquipo, int idEscuela) {
-        int idEquipo;
+        int idEquipo = -1; // Valor inicial de error
+
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL crear_equipo(?, ?, ?)}")) {
+
+            // 1. Parámetros de ENTRADA (Lo que mandas)
             cs.setString(1, nombreEquipo);
             cs.setInt(2, idEscuela);
+
+            // 2. Parámetro de SALIDA (Lo que esperas recibir: el ID)
             cs.registerOutParameter(3, Types.INTEGER);
+
+            // 3. Ejecutar
             cs.execute();
+
+            // 4. Leer el valor que devolvió la base de datos
             idEquipo = cs.getInt(3);
-            System.out.println("Equipo gestionado correctamente. ID: " + idEquipo);
+
+            System.out.println("Equipo gestionado correctamente. ID: " + idEquipo); // Debug
+
         } catch (SQLException e) {
             System.err.println("Error al crear/buscar equipo: " + e.getMessage());
-            return -2;
+            return -2; // Código de error de base de datos
         }
         return idEquipo;
     }
 
     public static int obtenerIdEscuelaDelDocente(int idDocente) {
         int idEscuela = -1;
+
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL obtener_id_escuela_docente(?, ?)}")) {
+            // 1. Parámetro de entrada: El ID del usuario logueado
             cs.setInt(1, idDocente);
+            // 2. Parámetro de salida: El ID de la escuela que queremos recuperar
             cs.registerOutParameter(2, Types.INTEGER);
+            // 3. Ejecutar
             cs.execute();
+            // 4. Obtener el resultado
             idEscuela = cs.getInt(2);
+
         } catch (SQLException e) {
             System.err.println("Error al obtener escuela del docente: " + e.getMessage());
         }
@@ -313,15 +351,26 @@ public class Main extends Application {
 
     public static String obtenerNombreEscuela(int idDocente) {
         String nombreEscuela = "Desconocida";
+
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL obtener_nombre_escuela_docente(?, ?)}")) {
+
+            // 1. Entrada: ID del docente
             cs.setInt(1, idDocente);
+
+            // 2. Salida: Nombre de la escuela (VARCHAR)
             cs.registerOutParameter(2, Types.VARCHAR);
+
+            // 3. Ejecutar
             cs.execute();
+
+            // 4. Recuperar el texto
             nombreEscuela = cs.getString(2);
+
             if (nombreEscuela == null) {
                 nombreEscuela = "Sin Escuela Asignada";
             }
+
         } catch (SQLException e) {
             System.err.println("Error al obtener nombre de escuela: " + e.getMessage());
         }
@@ -332,7 +381,9 @@ public class Main extends Application {
         List<Map<String, Object>> lista = new ArrayList<>();
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_alumnos_por_escuela(?)}")) {
+
             cs.setInt(1, idEscuela);
+
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
@@ -351,6 +402,7 @@ public class Main extends Application {
         int aviso = -2;
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL registrar_equipo(?, ?, ?, ?, ?, ?, ?, ?)}")) {
+
             cs.setInt(1, coach);
             cs.setInt(2, equipo);
             cs.setInt(3, evento);
@@ -359,6 +411,7 @@ public class Main extends Application {
             cs.setInt(6, p2);
             cs.setInt(7, p3);
             cs.registerOutParameter(8, Types.TINYINT);
+
             cs.execute();
             aviso = cs.getInt(8);
 
@@ -370,12 +423,22 @@ public class Main extends Application {
 
     public static int obtenerEscuelaDeEquipo(int idEquipo) {
         int idEscuela = -1;
+
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL obtener_escuela_equipo(?, ?)}")) {
+
+            // 1. Entrada: ID del Equipo
             cs.setInt(1, idEquipo);
+
+            // 2. Salida: ID de la Escuela
             cs.registerOutParameter(2, Types.INTEGER);
+
+            // 3. Ejecutar
             cs.execute();
+
+            // 4. Recuperar el valor
             idEscuela = cs.getInt(2);
+
         } catch (SQLException e) {
             System.err.println("Error al obtener escuela del equipo: " + e.getMessage());
             e.printStackTrace();
@@ -387,13 +450,16 @@ public class Main extends Application {
         List<Map<String, Object>> lista = new ArrayList<>();
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_docentes_con_roles()}")) {
+
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
                     fila.put("nombre", rs.getString("nombre"));
                     fila.put("escuela", rs.getString("escuela"));
-                    fila.put("es_coach", rs.getInt("es_coach") == 1);
-                    fila.put("es_juez", rs.getInt("es_juez") == 1);
+                    // Recuperamos las "banderas" (flags)
+                    fila.put("es_coach", rs.getInt("es_coach") == 1); // Guardamos como boolean
+                    fila.put("es_juez", rs.getInt("es_juez") == 1);   // Guardamos como boolean
+
                     lista.add(fila);
                 }
             }
@@ -405,10 +471,13 @@ public class Main extends Application {
 
     public static List<Map<String, Object>> retornarEquiposAdminFiltro(int idEvento, int idCategoria) {
         List<Map<String, Object>> lista = new ArrayList<>();
+
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_admin_filtro(?, ?)}")) {
+
             cs.setInt(1, idEvento);
             cs.setInt(2, idCategoria);
+
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
@@ -424,12 +493,15 @@ public class Main extends Application {
         }
         return lista;
     }
+    // Agrega esto en RoboticaProyectoRazo/src/Main.java
 
     public static List<Map<String, Object>> retornarEquiposDocente(int idDocente) {
         List<Map<String, Object>> lista = new ArrayList<>();
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_docente(?)}")) {
+
             cs.setInt(1, idDocente);
+
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
@@ -458,4 +530,5 @@ public class Main extends Application {
         }
         return nivel;
     }
+
 }
