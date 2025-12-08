@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainMisEquipos">
    <children>
       <Label layoutX="50.0" layoutY="57.0" text="Mis Equipos">
          <font>
             <Font size="25.0" />
          </font>
       </Label>
-      <AnchorPane layoutX="10.0" layoutY="95.0" prefHeight="487.0" prefWidth="714.0" visible="false">
+      <AnchorPane id="eventosDisponibles" fx:id="paneContenedorListaEquipos" layoutX="47.0" layoutY="97.0" prefHeight="471.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;" visible="false">
          <children>
-            <TableView layoutX="32.0" layoutY="8.0" prefHeight="154.0" prefWidth="668.0">
-              <columns>
-                <TableColumn prefWidth="75.0" text="C1" />
-                <TableColumn prefWidth="75.0" text="C2" />
-              </columns>
-            </TableView>
+            <ScrollPane fitToWidth="true" prefHeight="250.0" prefWidth="677.0" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <content>
+                  <VBox fx:id="vboxContenedorMisEquipos" prefHeight="468.0" prefWidth="657.0" style="-fx-background-color: #FFFFFF;" />
+               </content>
+            </ScrollPane>
          </children>
       </AnchorPane>
-      <Label id="lbl_alertaMisEquipos" layoutX="184.0" layoutY="279.0" text="Aún no tienes ningún equipo a tu cargo" textFill="#a99b9b">
+      <Label id="lbl_alertaMisEquipos" fx:id="lblMensajeEquipos" layoutX="196.0" layoutY="279.0" text="Aún no tienes ningún equipo a tu cargo" textFill="#a99b9b">
          <font>
             <Font name="System Italic" size="20.0" />
          </font>
       </Label>
-      <Label layoutX="224.0" layoutY="168.0" prefHeight="74.0" prefWidth="484.0" text="mostra equipos de coach solamente, nombre, nivel ,escuela?, evento nombre" />
    </children>
 </AnchorPane>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="270.0" prefWidth="999.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField fx:id="txtNumCtrl" layoutX="36.0" layoutY="83.0" prefHeight="14.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Label layoutX="36.0" layoutY="36.0" text="Integrante Nuevo">
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnGuardar" layoutX="818.0" layoutY="199.0" mnemonicParsing="false" onAction="#btnGuardar" prefHeight="50.0" prefWidth="167.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="GUARDAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Button>
+      <DatePicker fx:id="dateNacimiento" layoutX="731.0" layoutY="83.0" prefHeight="38.0" prefWidth="240.0" style="-fx-background-radius: 15;" />
+      <ComboBox fx:id="semestreComboBox" layoutX="36.0" layoutY="132.0" prefHeight="38.0" prefWidth="150.0" promptText="Semestre" style="-fx-background-radius: 15; -fx-background-color: #e7ecef;" visibleRowCount="15" />
+      <ComboBox id="cb_sexo" fx:id="sexoComboBox" layoutX="731.0" layoutY="131.0" prefHeight="40.0" prefWidth="240.0" promptText="Sexo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" visibleRowCount="15" />
+      <TextField fx:id="txtIntegrante" layoutX="199.0" layoutY="81.0" prefHeight="41.0" prefWidth="516.0" promptText="Nombre del Integrante " style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtCarrera" layoutX="199.0" layoutY="131.0" prefHeight="38.0" prefWidth="516.0" promptText="Nombre de la Carrera/Especialidad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+   </children>
+</AnchorPane>

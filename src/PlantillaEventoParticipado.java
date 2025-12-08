@@ -21,9 +21,9 @@ public class PlantillaEventoParticipado {
     @FXML
     private Label lblRol;
 
-    public void setDatosEventoParticipado(String nombre, String fecha) {
+    public void setDatosEventoParticipado(String nombre,String sede, String fecha) {
         lblNombreEvento.setText(nombre);
-        //lblSede.setText(sede);
+        lblSede.setText(sede);
         lblFecha.setText(fecha);
     }
 

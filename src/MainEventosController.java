@@ -25,8 +25,97 @@ public class MainEventosController {
     private Label lblMnesajeEventosDisponibles;
 
     @FXML
+    private VBox vboxContenedorEventosParticipados;
+    @FXML
+    private Label lblMensajeEventiParticipado;
+
+    @FXML
+    private Button btnEvaluarEvento;
+    @FXML
+    private Button btnMasInfoEvento;
+
+
+    @FXML
     public void initialize() {
         cargarEventos();
+        cargarEventosDelDocente();
+    }
+
+    private void cargarEventosDelDocente() {
+        vboxContenedorEventosParticipados.getChildren().clear();
+        // 1. Obtener ID del usuario actual
+        int idUsuario = Main.usuaioActual;
+        System.out.println("Cargando eventos para el usuario ID " + idUsuario);
+
+        // 2. Llamar a la función
+        List<Map<String, Object>> lista = Main.retornarEventosParticipados(idUsuario);
+
+        // 3. Validar si está vacío
+        if (lista.isEmpty()) {
+            vboxContenedorEventosParticipados.setVisible(false);
+            vboxContenedorEventosParticipados.setManaged(false);
+
+            lblMensajeEventiParticipado.setVisible(true);
+            lblMensajeEventiParticipado.setManaged(true);
+            lblMensajeEventiParticipado.setText("No estás asignado a ningún evento aún.");
+        } else {
+            vboxContenedorEventosParticipados.setVisible(true);
+            vboxContenedorEventosParticipados.setManaged(true);
+            vboxContenedorEventosParticipados.setSpacing(10);
+
+            lblMensajeEventiParticipado.setVisible(false);
+            lblMensajeEventiParticipado.setManaged(false);
+
+            try {
+                for (Map<String, Object> fila : lista) {
+
+                    // Extraer datos
+                    String nombre = (String) fila.get("nombre");
+                    String sede = (String) fila.get("sede");
+                    String rol = (String) fila.get("mi_rol");
+
+                    // Manejo seguro de fecha (puede ser null)
+                    String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Pendiente";
+
+                    // Cargar Plantilla
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEvento.fxml"));
+                    AnchorPane panelEventoParticipado = loader.load();
+
+                    // Pasar datos al controlador de la plantilla
+                    // Nota: Asegúrate que tu PlantillaEventoController tenga setDatos(nombre, sede, fecha)
+                    PlantillaEventoParticipado controller = loader.getController();
+                    controller.setDatosEventoParticipado(nombre, sede, fecha);
+
+                    // --- CAMBIO DE COLOR SEGÚN ROL ---
+                    if ("COACH".equals(rol)) {
+                        // VERDE: Evento donde voy como Coach
+                        // Ocultar el botón (Desaparece y no ocupa espacio)
+                        btnEvaluarEvento.setVisible(false);
+                        btnEvaluarEvento.setManaged(false);
+
+                        // Mostrar el botón (Aparece y recupera su espacio)
+                        btnMasInfoEvento.setVisible(true);
+                        btnMasInfoEvento.setManaged(true);
+                        //panelEventoParticipado.setStyle("-fx-border-color: #2ecc71; -fx-border-width: 3; -fx-background-color: #eafaf1;");
+                    } else {
+                        // AZUL: Evento donde voy como Juez
+                        // Ocultar el botón (Desaparece y no ocupa espacio)
+                        btnEvaluarEvento.setVisible(true);
+                        btnEvaluarEvento.setManaged(true);
+
+                        // Mostrar el botón (Aparece y recupera su espacio)
+                        btnMasInfoEvento.setVisible(false);
+                        btnMasInfoEvento.setManaged(false);
+                        //panelEventoParticipado.setStyle("-fx-border-color: #3498db; -fx-border-width: 3; -fx-background-color: #ebf5fb;");
+                    }
+
+                    // Agregar al contenedor
+                    vboxContenedorEventosParticipados.getChildren().add(panelEventoParticipado);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void cargarEventos() {
@@ -72,8 +161,6 @@ public class MainEventosController {
                     controller.setDatos(nombre,sede, fecha);
 
                     // FORZAR ALTURA MINIMA (Solo para probar si es problema de colapso)
-
-
 
                     // Agregamos la tarjeta al VBox
                     vboxContenedorEventos.getChildren().add(panelEvento);

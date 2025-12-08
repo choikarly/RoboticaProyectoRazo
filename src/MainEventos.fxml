@@ -20,21 +20,12 @@
          </font>
       </Label>
       <Separator layoutX="40.0" layoutY="272.0" prefHeight="8.0" prefWidth="668.0" />
-      <Label layoutX="79.0" layoutY="14.0" prefHeight="18.0" prefWidth="246.0" text="nombre- lugar/fecha-masinfo" />
-      <Label id="lbl_alertaEventosParticipados" layoutX="192.0" layoutY="145.0" text="No has participado en ningún evento aún:(" textFill="#a99b9b" visible="false">
+      <Label id="lbl_alertaEventosParticipados" fx:id="lblMensajeEventiParticipado" layoutX="192.0" layoutY="145.0" text="No has participado en ningún evento aún:(" textFill="#a99b9b">
          <font>
             <Font name="System Italic" size="20.0" />
          </font>
       </Label>
-      <AnchorPane id="eventosParticipados" fx:id="paneContenedorListaEventosParticipados" layoutX="38.0" layoutY="93.0" prefHeight="166.0" prefWidth="678.0" style="-fx-background-color: #FFFFFF;">
-         <children>
-            <ScrollPane prefHeight="166.0" prefWidth="678.0" style="-fx-background-color: #FFFFFF;">
-               <content>
-                  <VBox fx:id="vboxContenedorEventosParticipados" prefHeight="164.0" prefWidth="660.0" style="-fx-background-color: #FFFFFF;" />
-               </content>
-            </ScrollPane>
-         </children></AnchorPane>
-      <AnchorPane id="eventosDisponibles" fx:id="paneContenedorListaEventos" layoutX="37.0" layoutY="327.0" prefHeight="250.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;">
+      <AnchorPane id="eventosDisponibles" fx:id="paneContenedorListaEventosDisponibles" layoutX="37.0" layoutY="327.0" prefHeight="250.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;">
          <children>
             <ScrollPane fitToWidth="true" prefHeight="250.0" prefWidth="677.0" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <content>
@@ -48,5 +39,14 @@
             <Font name="System Italic" size="20.0" />
          </font>
       </Label>
+      <AnchorPane id="eventosDisponibles" fx:id="paneContenedorListaEventosParticipados" layoutX="42.0" layoutY="88.0" prefHeight="175.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;" visible="false">
+         <children>
+            <ScrollPane fitToWidth="true" prefHeight="172.0" prefWidth="658.0" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <content>
+                  <VBox fx:id="vboxContenedorEventosParticipados" prefHeight="172.0" prefWidth="657.0" style="-fx-background-color: #FFFFFF;" />
+               </content>
+            </ScrollPane>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

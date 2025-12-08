@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="309.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CrearEquipo">
+   <children>
+      <Label layoutX="34.0" layoutY="37.0" text="Nuevo Equipo">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblNombreEscuela" layoutX="153.0" layoutY="161.0" prefHeight="50.0" prefWidth="473.0" text="LABEL ESCUELA_ DOCENTE">
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Label>
+      <Label layoutX="50.0" layoutY="171.0" text="ESCUELA:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtNombreEquipo" layoutX="42.0" layoutY="90.0" prefHeight="58.0" prefWidth="578.0" promptText="NOMBRE DEL EQUIPO" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Button fx:id="btnCrearEquipo" layoutX="351.0" layoutY="234.0" mnemonicParsing="false" onAction="#btnCrearEquipo" prefHeight="50.0" prefWidth="270.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="CREAR EQUIPO" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
