@@ -50,6 +50,7 @@ public class Main extends Application {
                                           String sexo, String carrera, int semestre, int num_control) {
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL registrar_competidor(?, ?, ?, ?, ?, ?, ?, ?)}")) {
+
             cs.setString(1, nombre);
             cs.setDate(2, fecha_nacimiento);
             cs.setInt(3, escuela);
@@ -57,27 +58,19 @@ public class Main extends Application {
             cs.setString(5, carrera);
             cs.setInt(6, semestre);
             cs.setInt(7, num_control);
-            cs.registerOutParameter(8, Types.VARCHAR);
-            cs.execute();
-            String mensaje = cs.getString(8);
 
-            System.out.println("Mensaje BD: " + mensaje); // Debug
-            if (mensaje != null) {
-                // Caso 1: ÉXITO
-                if (mensaje.contains("Se registro al participante correctamente")) {
-                    return 1;
-                }
-                // Caso 2: DUPLICADO (Si tu SP lo controla y manda mensaje en vez de error)
-                else if (mensaje.contains("El numero de control ya esta registrado")) {
-                    return -1;
-                }
-            }
-            return -2;
+            // CORRECCIÓN: Registramos parámetro de salida como ENTERO, no VARCHAR
+            cs.registerOutParameter(8, Types.INTEGER);
+
+            cs.execute();
+
+            // Obtenemos el número directamente (1 = Éxito, -1 = Duplicado)
+            int resultado = cs.getInt(8);
+
+            System.out.println("Código respuesta BD: " + resultado);
+            return resultado;
 
         } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) {
-                return -1;
-            }
             System.err.println("\nError SQL: " + e.getMessage());
             return -2; // Error General
         }
@@ -499,6 +492,43 @@ public class Main extends Application {
             e.printStackTrace();
         }
         return lista;
+    }
+    // Agrega esto en RoboticaProyectoRazo/src/Main.java
+
+    public static List<Map<String, Object>> retornarEquiposDocente(int idDocente) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_docente(?)}")) {
+
+            cs.setInt(1, idDocente);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+                    fila.put("id_equipo", rs.getInt("id_equipo"));
+                    fila.put("nombre", rs.getString("nombre"));
+                    lista.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener equipos del docente: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    public static int obtenerNivelEscuela(int idEscuela) {
+        int nivel = -1;
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL obtener_nivel_escuela(?, ?)}")) {
+            cs.setInt(1, idEscuela);
+            cs.registerOutParameter(2, Types.INTEGER);
+            cs.execute();
+            nivel = cs.getInt(2);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nivel;
     }
 
 }

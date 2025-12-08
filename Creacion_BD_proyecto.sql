@@ -692,3 +692,27 @@ WHERE
 ORDER BY ev.fecha DESC, e.nombre ASC;
 END
 // DELIMITER ;
+
+DROP PROCEDURE IF EXISTS retornar_equipos_docente;
+DELIMITER //
+CREATE PROCEDURE retornar_equipos_docente(
+    IN p_id_docente INT
+)
+BEGIN
+    SELECT e.id_equipo, e.nombre 
+    FROM equipo e
+    JOIN docente d ON e.fk_escuela = d.fk_escuela
+    WHERE d.id_docente = p_id_docente;
+END
+// DELIMITER ;
+
+DROP PROCEDURE IF EXISTS obtener_nivel_escuela;
+DELIMITER //
+CREATE PROCEDURE obtener_nivel_escuela(
+    IN p_id_escuela INT,
+    OUT p_nivel INT
+)
+BEGIN
+    SELECT fk_nivel INTO p_nivel FROM escuela WHERE id_escuela = p_id_escuela;
+END
+// DELIMITER ;

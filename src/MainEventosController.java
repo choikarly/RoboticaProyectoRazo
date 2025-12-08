@@ -111,6 +111,7 @@ public class MainEventosController {
 
             try {
                 for (Map<String, Object> fila : listaEventos) {
+                    int idEvento = (int) fila.get("id_evento");
                     String nombre = (String) fila.get("nombre");
                     String sede = (String) fila.get("sede");
                     String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "";
@@ -120,7 +121,7 @@ public class MainEventosController {
                     AnchorPane panelEvento = loader.load();
 
                     PlantillaEvento controller = loader.getController();
-                    controller.setDatos(nombre, sede, fecha);
+                    controller.setDatos(idEvento, nombre, sede, fecha);
 
                     vboxContenedorEventos.getChildren().add(panelEvento);
                 }
