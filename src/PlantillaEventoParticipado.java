@@ -27,14 +27,42 @@ public class PlantillaEventoParticipado {
         lblFecha.setText(fecha);
         lblRol.setText(rol);
 
-        // Lógica de visibilidad del botón Evaluar
-        // Solo mostramos "Evaluar" si es JUEZ o AMBOS
-        if (rol.equalsIgnoreCase("JUEZ") || rol.equalsIgnoreCase("AMBOS")) {
-            btnEvaluarEvento.setVisible(true);
-            btnEvaluarEvento.setManaged(true);
+        if (lblRol != null) {
+            // Un pequeño ajuste visual para el texto del rol
+            if ("AMBOS".equalsIgnoreCase(rol)) {
+                lblRol.setText("Rol: Coach y Juez");
+            } else {
+                lblRol.setText("Rol: " + rol);
+            }
+        }
+
+        // 2. Lógica de Botones (Coach vs Juez vs Ambos)
+        if ("AMBOS".equalsIgnoreCase(rol)) {
+            // CASO 1: Es Coach y Juez -> MOSTRAR TODO
+            mostrarBoton(btnMasInfoEvento, true);
+            mostrarBoton(btnEvaluarEvento, true);
+
+        } else if ("COACH".equalsIgnoreCase(rol)) {
+            // CASO 2: Solo Coach -> Ver Info, Ocultar Evaluar
+            mostrarBoton(btnMasInfoEvento, true);
+            mostrarBoton(btnEvaluarEvento, false);
+
+        } else if ("JUEZ".equalsIgnoreCase(rol)) {
+            // CASO 3: Solo Juez -> Ocultar Info, Ver Evaluar
+            mostrarBoton(btnMasInfoEvento, false);
+            mostrarBoton(btnEvaluarEvento, true);
+
         } else {
-            btnEvaluarEvento.setVisible(false);
-            btnEvaluarEvento.setManaged(false);
+            // Seguridad: Ocultar todo si no hay rol claro
+            mostrarBoton(btnMasInfoEvento, false);
+            mostrarBoton(btnEvaluarEvento, false);
+        }
+    }
+
+    private void mostrarBoton(Button btn, boolean mostrar) {
+        if (btn != null) {
+            btn.setVisible(mostrar);
+            btn.setManaged(mostrar); // Si es false, el botón no ocupa espacio visual
         }
     }
 

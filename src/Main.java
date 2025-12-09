@@ -717,6 +717,44 @@ public class Main extends Application {
         return lista;
     }
 
+    public static List<Map<String, Object>> retornarCiudades() {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_ciudades_combo()}");
+             ResultSet rs = cs.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> fila = new HashMap<>();
+                fila.put("id", rs.getInt("id_ciudad"));
+                fila.put("nombre", rs.getString("nombre"));
+                lista.add(fila);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // Función para registrar la nueva sede
+    public static int registrarSede(String nombre, int idCiudad) {
+        int aviso = -99;
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL ingresar_sede(?, ?, ?)}")) {
+
+            cs.setString(1, nombre);
+            cs.setInt(2, idCiudad);
+            cs.registerOutParameter(3, java.sql.Types.TINYINT);
+
+            cs.execute();
+            aviso = cs.getInt(3);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return aviso;
+    }
+
+
 
     // ==========================================
     // MÉTODOS PARA EVALUACIÓN (JUECES)

@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="627.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@estilos.css">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="627.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegistrarSede">
    <children>
       <Label layoutX="37.0" layoutY="28.0" text="Nueva Sede">
          <font>
@@ -21,7 +20,7 @@
          </font>
       </TextField>
       <ComboBox fx:id="cbCiudad" layoutX="37.0" layoutY="129.0" prefHeight="42.0" prefWidth="562.0" promptText="Selecciona una Ciudad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
-      <Button fx:id="btnCrearSede" layoutX="391.0" layoutY="198.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="214.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="CREAR SEDE" textFill="WHITE">
+      <Button fx:id="btnCrearSede" layoutX="391.0" layoutY="198.0" mnemonicParsing="false" onAction="#btnGuardarSede" prefHeight="50.0" prefWidth="214.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="CREAR SEDE" textFill="WHITE">
          <font>
             <Font name="System Bold" size="17.0" />
          </font>
