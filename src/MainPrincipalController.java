@@ -103,12 +103,12 @@ public class MainPrincipalController {
     void btnMainEventosAdmin(ActionEvent event) throws IOException{
         cambiarVista("MainEventosAdmin.fxml");
     }
-
+/*
     @FXML
     void btnMainEscuelasAdmin(ActionEvent event){
         cambiarVista("MainEscuelasAdmin.fxml");
     }
-
+*/
 
 
     @FXML
