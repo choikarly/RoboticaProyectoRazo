@@ -237,9 +237,6 @@ end if;
 end
 // delimiter ;
 
-set @aviso = 0;
-call ingresar_sede("Espacio Cultural Metropolitano", 1, @aviso);
-
 drop procedure if exists ingresar_escuela;
 delimiter //
 create procedure ingresar_escuela (
@@ -271,8 +268,8 @@ CALL ingresar_escuela("Escuela Primaria Justo Sierra", 1, 1, @mensaje);
 CALL ingresar_escuela("Colegio Arboledas A.C", 3, 1, @mensaje);
 CALL ingresar_escuela("Centro de Estudios Tecnológico Industrial y de Servicio N.109 (CEBtis 109)", 2, 3, @mensaje);
 CALL ingresar_escuela("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2, @mensaje);
-
-USE concurso_robotica;
+set @aviso = 0;
+call ingresar_sede("Espacio Cultural Metropolitano", 1, @aviso);
 
 DROP PROCEDURE IF EXISTS registrar_competidor;
 DELIMITER //
@@ -359,7 +356,7 @@ call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-
 call registrar_docente("Mauro", "Mau", "12345678", "2005-06-24", 4, "H", "Calador", @mensaje);
 call registrar_docente("Carlos Santillan", "Santi", "12345678", "2005-10-15", 4, "H", "Procrasti", @mensaje);
 call registrar_docente("Jose Esteban", "Tobi", "12345678", "2005-01-13", 4, "H", "Pokemon", @mensaje);
-
+	
 drop procedure if exists crear_evento;
 delimiter //
 create procedure crear_evento(
@@ -810,6 +807,81 @@ INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez3, p
 SET aviso = 1; -- Éxito total
 COMMIT;
 END IF;
+END
+// DELIMITER ;
+
+DROP PROCEDURE IF EXISTS obtener_info_docente;
+DELIMITER //
+CREATE PROCEDURE obtener_info_docente(
+    IN p_id_docente INT
+)
+BEGIN
+    SELECT 
+        d.nombre,
+        u.nombre_usuario,
+        d.fecha_nacimiento,
+        d.sexo,
+        d.especialidad,
+        s.nombre AS nombre_escuela,
+        c.nombre AS nivel_academico
+    FROM docente d
+    JOIN usuario u ON d.id_docente = u.id_usuario
+    JOIN escuela e ON d.fk_escuela = e.id_escuela
+    JOIN sede s ON e.id_escuela = s.id_sede -- Para el nombre de la escuela
+    JOIN categoria c ON e.fk_nivel = c.id_categoria -- Para el nivel (Primaria/Sec/etc)
+    WHERE d.id_docente = p_id_docente;
+END
+// DELIMITER ;
+
+DROP PROCEDURE IF EXISTS asignar_terna_jueces;
+DELIMITER //
+CREATE PROCEDURE asignar_terna_jueces(
+    IN p_id_evento INT,
+    IN p_id_categoria INT,
+    IN p_juez1 INT,
+    IN p_juez2 INT,
+    IN p_juez3 INT,
+    OUT aviso TINYINT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET aviso = -99; -- Error crítico SQL
+    END;
+
+    START TRANSACTION;
+
+    -- 1. VALIDACIÓN DE REGLA DE NEGOCIO: ¿Es alguno de ellos Coach?
+    -- Buscamos si existe alguna inscripción en este evento y categoría donde el coach sea uno de los 3 candidatos
+    IF EXISTS (
+        SELECT * FROM inscripcion_equipo 
+        WHERE fk_evento = p_id_evento 
+        AND fk_categoria = p_id_categoria 
+        AND fk_coach IN (p_juez1, p_juez2, p_juez3)
+    ) THEN
+        SET aviso = -2; -- ERROR: Conflicto de Interés (Es Coach)
+        ROLLBACK;
+    
+    -- 2. Validar si ya estaban asignados como jueces (lo que ya tenías)
+    ELSEIF EXISTS (
+        SELECT * FROM asignacion_juez 
+        WHERE fk_evento = p_id_evento 
+        AND fk_categoria = p_id_categoria 
+        AND fk_juez IN (p_juez1, p_juez2, p_juez3)
+    ) THEN
+        SET aviso = 0; -- Ya estaba asignado como juez
+        ROLLBACK;
+        
+    ELSE
+        -- 3. Insertar los 3
+        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez1, p_id_evento, p_id_categoria);
+        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez2, p_id_evento, p_id_categoria);
+        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez3, p_id_evento, p_id_categoria);
+        
+        SET aviso = 1; -- Éxito total
+        COMMIT;
+    END IF;
 END
 // DELIMITER ;
 

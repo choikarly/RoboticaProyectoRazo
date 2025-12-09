@@ -635,4 +635,31 @@ public class Main extends Application {
         return aviso;
     }
 
+    // ... otros métodos ...
+
+    public static Map<String, String> obtenerInfoPersonalDocente(int idDocente) {
+        Map<String, String> info = new HashMap<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL obtener_info_docente(?)}")) {
+
+            cs.setInt(1, idDocente);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                if (rs.next()) {
+                    info.put("nombre", rs.getString("nombre"));
+                    info.put("usuario", rs.getString("nombre_usuario"));
+                    info.put("fecha", rs.getDate("fecha_nacimiento").toString());
+                    info.put("sexo", rs.getString("sexo"));
+                    info.put("especialidad", rs.getString("especialidad"));
+                    info.put("escuela", rs.getString("nombre_escuela"));
+                    info.put("nivel", rs.getString("nivel_academico"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener info personal: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return info;
+    }
+
 }
