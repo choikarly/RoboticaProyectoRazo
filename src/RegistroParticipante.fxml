@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="270.0" prefWidth="999.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegistroParticipante">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="270.0" prefWidth="999.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegistroParticipante" >
    <children>
       <TextField fx:id="txtNumCtrl" layoutX="36.0" layoutY="83.0" prefHeight="14.0" prefWidth="150.0" promptText="Num Ctrl." style="-fx-background-color: #6096BA; -fx-background-radius: 13;">
          <font>

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="654.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InfoEventosMasInfo" stylesheets="@estilos.css">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="654.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InfoEventosMasInfo">
    <children>
       <Label layoutX="29.0" layoutY="29.0" prefHeight="30.0" prefWidth="232.0" text="Información del Evento">
          <font>
@@ -49,59 +49,9 @@
          </font>
       </Button>
       <Separator layoutX="38.0" layoutY="148.0" prefHeight="0.0" prefWidth="574.0" />
-      <Label layoutX="29.0" layoutY="163.0" prefHeight="27.0" prefWidth="194.0" text="Equipo Participante">
+      <Label layoutX="29.0" layoutY="163.0" prefHeight="27.0" prefWidth="194.0" text="Ranking">
          <font>
             <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="138.0" layoutY="201.0" prefHeight="26.0" prefWidth="366.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label layoutX="30.0" layoutY="201.0" prefHeight="27.0" prefWidth="76.0" text="NOMBRE:">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblIntegranteUno" layoutX="183.0" layoutY="238.0" prefHeight="26.0" prefWidth="442.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label layoutX="30.0" layoutY="238.0" prefHeight="27.0" prefWidth="121.0" text="INTEGRANTE 1:">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblIntegranteDos" layoutX="183.0" layoutY="267.0" prefHeight="26.0" prefWidth="442.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label layoutX="30.0" layoutY="267.0" prefHeight="27.0" prefWidth="122.0" text="INTEGRANTE 2:">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblIntegranteTres" layoutX="183.0" layoutY="294.0" prefHeight="26.0" prefWidth="442.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label layoutX="30.0" layoutY="294.0" prefHeight="27.0" prefWidth="122.0" text="INTEGRANTE 3:">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label layoutX="29.0" layoutY="337.0" prefHeight="27.0" prefWidth="122.0" text="ESCUELA:">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblEscuela" layoutX="138.0" layoutY="337.0" prefHeight="26.0" prefWidth="310.0" text="Label">
-         <font>
-            <Font size="17.0" />
          </font>
       </Label>
    </children>

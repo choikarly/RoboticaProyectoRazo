@@ -1,8 +1,12 @@
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable; // No olvides implements Initializable
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -105,6 +109,29 @@ public class CrearEvento implements Initializable {
             // 6. CACHAR CUALQUIER ERROR INESPERADO
             e.printStackTrace(); // Imprime el error en la consola para que tú lo veas
             mostrarAlerta("Error Crítico", "Ocurrió un error inesperado: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void btnNuevaSede(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("RegistrarSede.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Registrar Nueva Sede");
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+            System.out.println("Ventana de sede cerrada, recargando lista");
+            cargarSedes();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo abrir la ventana de registro de sede.");
         }
     }
 
