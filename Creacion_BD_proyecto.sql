@@ -931,6 +931,7 @@ call registrar_docente("Mario Bros", "mario.bros", "nintendo", "1985-09-13", 9, 
 call registrar_docente("Ada Lovelace", "ada.l", "code123", "1980-12-10", 2, "M", "Programación", @aviso);
 call registrar_docente("Albert Einstein", "albert.e", "mc2", "1975-03-14", 4, "H", "Física", @aviso);
 call registrar_docente("Marie Curie", "marie.c", "radio", "1982-11-07", 5, "M", "Química", @aviso);
+CALL registrar_docente("Giancarlo Rossi", "giancarlo.rossi", "password123", "2002-12-30", 6, "H", "Backend", @mensaje);
 
 -- 5. Registrar Competidores
 -- Competidores iniciales
