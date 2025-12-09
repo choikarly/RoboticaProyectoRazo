@@ -958,4 +958,27 @@ public class Main extends Application {
         return datos;
     }
 
+    public static List<Map<String, Object>> retornarRankingEvento(int idEvento) {
+        List<Map<String, Object>> ranking = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_ranking_evento(?)}")) {
+
+            cs.setInt(1, idEvento);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+                    fila.put("equipo", rs.getString("equipo"));
+                    fila.put("escuela", rs.getString("escuela"));
+                    fila.put("categoria", rs.getString("categoria"));
+                    fila.put("puntos", rs.getInt("puntos"));
+                    ranking.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ranking;
+    }
+
 }

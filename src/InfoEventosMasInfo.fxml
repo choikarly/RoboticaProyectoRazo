@@ -3,56 +3,47 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="654.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InfoEventosMasInfo">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="750.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InfoEventosMasInfo">
    <children>
-      <Label layoutX="29.0" layoutY="29.0" prefHeight="30.0" prefWidth="232.0" text="Información del Evento">
+      <Label layoutX="29.0" layoutY="20.0" text="Resultados del Evento" textFill="#274c77">
          <font>
-            <Font size="20.0" />
+            <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="30.0" layoutY="68.0" prefHeight="27.0" prefWidth="76.0" text="NOMBRE:">
-         <font>
-            <Font size="17.0" />
-         </font>
+
+      <Label layoutX="30.0" layoutY="68.0" text="NOMBRE:">
+         <font><Font name="System Bold" size="14.0" /></font>
       </Label>
-      <Label layoutX="30.0" layoutY="106.0" prefHeight="26.0" prefWidth="76.0" text="FECHA:">
-         <font>
-            <Font size="17.0" />
-         </font>
+      <Label fx:id="lblNombreEvento" layoutX="100.0" layoutY="68.0" text="-" textFill="#555555">
+         <font><Font size="14.0" /></font>
       </Label>
-      <Label layoutX="359.0" layoutY="106.0" prefHeight="26.0" prefWidth="50.0" text="SEDE:">
-         <font>
-            <Font size="17.0" />
-         </font>
+
+      <Label layoutX="30.0" layoutY="95.0" text="SEDE:">
+         <font><Font name="System Bold" size="14.0" /></font>
       </Label>
-      <Label fx:id="lblNombreEvento" layoutX="138.0" layoutY="69.0" prefHeight="26.0" prefWidth="442.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
+      <Label fx:id="lblSede" layoutX="100.0" layoutY="95.0" text="-" textFill="#555555">
+         <font><Font size="14.0" /></font>
       </Label>
-      <Label fx:id="lblFecha" layoutX="138.0" layoutY="106.0" prefHeight="26.0" prefWidth="194.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
+
+      <Label layoutX="400.0" layoutY="68.0" text="FECHA:">
+         <font><Font name="System Bold" size="14.0" /></font>
       </Label>
-      <Label fx:id="lblSede" layoutX="424.0" layoutY="106.0" prefHeight="26.0" prefWidth="194.0" text="Label">
-         <font>
-            <Font size="17.0" />
-         </font>
+      <Label fx:id="lblFecha" layoutX="460.0" layoutY="68.0" text="-" textFill="#555555">
+         <font><Font size="14.0" /></font>
       </Label>
-      <Button fx:id="btnCerrar" layoutX="510.0" layoutY="353.0" mnemonicParsing="false" onAction="#btnCerrar" prefHeight="58.0" prefWidth="129.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="CERRAR" textFill="WHITE">
+
+      <Separator layoutX="30.0" layoutY="130.0" prefHeight="3.0" prefWidth="690.0" />
+
+      <TabPane fx:id="tabPaneRankings" layoutX="30.0" layoutY="145.0" prefHeight="320.0" prefWidth="690.0" style="-fx-background-color: #f4f4f4;" tabClosingPolicy="UNAVAILABLE" />
+
+      <Button fx:id="btnCerrar" layoutX="590.0" layoutY="490.0" mnemonicParsing="false" onAction="#btnCerrar" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: #274C77; -fx-background-radius: 10;" text="CERRAR" textFill="WHITE">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold" size="14.0" />
          </font>
       </Button>
-      <Separator layoutX="38.0" layoutY="148.0" prefHeight="0.0" prefWidth="574.0" />
-      <Label layoutX="29.0" layoutY="163.0" prefHeight="27.0" prefWidth="194.0" text="Ranking">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
    </children>
 </AnchorPane>

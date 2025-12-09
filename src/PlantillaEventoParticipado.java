@@ -79,24 +79,30 @@ public class PlantillaEventoParticipado {
     }
 
     @FXML
-    void btnMasInfoEvento(ActionEvent event) {
+    void btnMasInfoEvento(ActionEvent event){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventosMasInfo.fxml"));
             Parent root = loader.load();
 
-            String nombre = lblNombreEvento.getText();
-            String fecha = lblFecha.getText();
-            String sede = lblSede.getText();
-
+            // --- NUEVO: Pasar datos al controlador del ranking ---
             InfoEventosMasInfo controller = loader.getController();
-            controller.setDatos(nombre, fecha, sede);
+
+            // Usamos los datos que ya tenemos guardados en la tarjeta (etiquetas)
+            controller.cargarDatosRanking(
+                    this.idEventoGuardado,
+                    lblNombreEvento.getText(),
+                    lblFecha.getText(),
+                    lblSede.getText()
+            );
+            // ---------------------------------------------------
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-            stage.setTitle("Más Información");
+            stage.setTitle("Ranking del Evento");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
             stage.show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
