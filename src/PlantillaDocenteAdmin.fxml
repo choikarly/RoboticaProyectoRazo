@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaDocenteAdmin" stylesheets="@estilos.css">
+<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaDocenteAdmin">
    <children>
       <Label fx:id="lblNombre" layoutX="23.0" layoutY="10.0" prefHeight="43.0" prefWidth="508.0" text="NOMBRE DEL DOCENTE" textFill="WHITE">
          <font>
@@ -19,12 +19,12 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblEscuela" layoutX="112.0" layoutY="62.0" prefHeight="36.0" prefWidth="390.0" text="Label" textFill="WHITE">
+      <Label fx:id="lblEscuela" layoutX="112.0" layoutY="62.0" prefHeight="36.0" prefWidth="508.0" text="Label" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblRol" layoutX="23.0" layoutY="93.0" prefHeight="27.0" prefWidth="194.0" text="Label" textFill="WHITE">
+      <Label fx:id="lblRol" layoutX="23.0" layoutY="93.0" prefHeight="27.0" prefWidth="482.0" text="Label" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>

@@ -102,7 +102,11 @@ public class AsignarJueces implements Initializable {
                 mostrarAlertaError("Error",
                         "Uno o más de los jueces seleccionados YA estaban asignados a esta categoría anteriormente.",
                         "");
-            } else {
+            }else if (resultado == -2) {
+                mostrarAlertaError("Conflicto de Interés",
+                        "Acción No Permitida",
+                        "Uno de los docentes seleccionados es COACH de un equipo inscrito en esta categoría.\n\nNo puede ser Juez y Coach al mismo tiempo.");
+            }else {
                 mostrarAlertaError("Error",
                         "Ocurrió un error en la base de datos.",
                         "");
