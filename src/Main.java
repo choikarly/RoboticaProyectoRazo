@@ -693,4 +693,28 @@ public class Main extends Application {
         return puntos;
     }
 
+    // En Main.java
+    public static List<Map<String, Object>> retornarEquiposParaEvaluar(int idEvento, int idJuez) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_a_evaluar(?, ?)}")) {
+
+            cs.setInt(1, idEvento);
+            cs.setInt(2, idJuez);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+                    fila.put("id", rs.getInt("id_equipo"));
+                    fila.put("equipo", rs.getString("nombre_equipo"));
+                    fila.put("categoria", rs.getString("nombre_categoria"));
+                    lista.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
 }

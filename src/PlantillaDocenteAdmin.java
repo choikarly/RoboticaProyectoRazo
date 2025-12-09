@@ -39,6 +39,9 @@ public class PlantillaDocenteAdmin {
 
     @FXML
     void btnMasInfoDocentesMain(ActionEvent event) {
+
+
+        System.out.println("info desplegado");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("MainInfoPersonal.fxml"));
             Parent root = loader.load();
