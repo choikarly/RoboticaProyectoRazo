@@ -5,7 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox; // O FlowPane, según tu diseño
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 
 public class MainEquiposAdmin implements Initializable {
 
-    @FXML private VBox vboxContenedorEquiposFiltradosAdmin; // El contenedor donde van las tarjetas
+    @FXML private VBox vboxContenedorEquiposFiltradosAdmin;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -25,23 +25,19 @@ public class MainEquiposAdmin implements Initializable {
         cargarEquiposFiltrados(-1, -1);
     }
 
-    // Este método abre la ventana pequeña
     @FXML
     void btnAbrirFiltro(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FiltroEquipo.fxml"));
             Parent root = loader.load();
 
-            // 1. Obtener el controlador del filtro
             FiltroEquipos controller = loader.getController();
-
-            // 2. Pasarle 'this' (esta clase) para que pueda llamarnos de vuelta
             controller.setPadre(this);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Filtrar Equipos");
-            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana de atrás
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
             stage.show();
 
@@ -50,20 +46,14 @@ public class MainEquiposAdmin implements Initializable {
         }
     }
 
-    // --- ESTE MÉTODO ES LLAMADO POR 'FiltroEquipos' O AL INICIAR ---
-
-    // En MainEquiposAdmin.java
-
     public void cargarEquiposFiltrados(int idEvento, int idCategoria) {
         vboxContenedorEquiposFiltradosAdmin.getChildren().clear();
 
-        // 1. Llamamos a la función que trae EQUIPOS (no eventos)
         List<Map<String, Object>> lista = Main.retornarEquiposAdminFiltro(idEvento, idCategoria);
 
         if (lista.isEmpty()) {
             vboxContenedorEquiposFiltradosAdmin.setVisible(false);
             vboxContenedorEquiposFiltradosAdmin.setManaged(false);
-
         } else {
             vboxContenedorEquiposFiltradosAdmin.setVisible(true);
             vboxContenedorEquiposFiltradosAdmin.setManaged(true);
@@ -71,6 +61,10 @@ public class MainEquiposAdmin implements Initializable {
 
             try{
                 for (Map<String, Object> fila : lista) {
+                    // 1. Extraer los IDs (Ahora ya vienen gracias al cambio en Main y SQL)
+                    int idEquipo = (int) fila.get("id_equipo");
+                    int idEventoFila = (int) fila.get("id_evento");
+
                     String equipo = (String) fila.get("equipo");
                     String evento = (String) fila.get("evento");
                     String escuela = (String) fila.get("escuela");
@@ -80,12 +74,13 @@ public class MainEquiposAdmin implements Initializable {
                     AnchorPane tarjeta = loader.load();
 
                     PlantillaMisEquipos cardCtrl = loader.getController();
-                    cardCtrl.setDatosMisEquipos(equipo, evento, escuela, categoria);
+
+                    // 2. Usar el método actualizado que acepta los 6 parámetros
+                    cardCtrl.setDatosMisEquipos(idEquipo, idEventoFila, equipo, evento, escuela, categoria);
 
                     vboxContenedorEquiposFiltradosAdmin.getChildren().add(tarjeta);
-
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

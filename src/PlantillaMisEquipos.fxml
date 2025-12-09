@@ -13,7 +13,7 @@
             <Font name="System Bold" size="22.0" />
          </font>
       </Label>
-      <Button fx:id="btnMostrarResultadosEquipo" layoutX="509.0" layoutY="34.0" mnemonicParsing="false" onAction="#btnMostrarResultadosEquipo" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Resultados" textFill="WHITE">
+      <Button fx:id="btnMostrarResultadosEquipo" layoutX="509.0" layoutY="34.0" mnemonicParsing="false" onAction="#btnMostrarResultadosEquipo" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Mas Info" textFill="WHITE">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>

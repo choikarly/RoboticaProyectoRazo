@@ -265,8 +265,8 @@ public class Main extends Application {
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
-
-                    // Usamos los alias exactos que definiste en el SELECT del Procedure
+                    fila.put("id_equipo", rs.getInt("id_equipo"));
+                    fila.put("id_evento", rs.getInt("id_evento"));
                     fila.put("equipo", rs.getString("equipo"));
                     fila.put("escuela", rs.getString("escuela"));
                     fila.put("evento", rs.getString("evento"));
@@ -494,6 +494,10 @@ public class Main extends Application {
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
+                    // --- CAPTURAMOS LOS IDS ---
+                    fila.put("id_equipo", rs.getInt("id_equipo"));
+                    fila.put("id_evento", rs.getInt("id_evento"));
+                    // --------------------------
                     fila.put("equipo", rs.getString("equipo"));
                     fila.put("escuela", rs.getString("escuela"));
                     fila.put("evento", rs.getString("evento"));
@@ -506,7 +510,6 @@ public class Main extends Application {
         }
         return lista;
     }
-    // Agrega esto en RoboticaProyectoRazo/src/Main.java
 
     public static List<Map<String, Object>> retornarEquiposDocente(int idDocente) {
         List<Map<String, Object>> lista = new ArrayList<>();
@@ -658,6 +661,36 @@ public class Main extends Application {
             e.printStackTrace();
         }
         return info;
+    }
+
+    public static List<Map<String, String>> retornarMiembrosEquipo(int idEquipo, int idEvento) {
+        List<Map<String, String>> miembros = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_miembros_equipo(?, ?)}")) {
+            cs.setInt(1, idEquipo);
+            cs.setInt(2, idEvento);
+            ResultSet rs = cs.executeQuery();
+            while (rs.next()) {
+                Map<String, String> m = new HashMap<>();
+                m.put("nombre", rs.getString("nombre"));
+                m.put("num_control", String.valueOf(rs.getInt("num_control")));
+                miembros.add(m);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return miembros;
+    }
+
+    public static int obtenerPuntajeEquipo(int idEquipo, int idEvento) {
+        int puntos = -2;
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL obtener_puntaje_equipo(?, ?, ?)}")) {
+            cs.setInt(1, idEquipo);
+            cs.setInt(2, idEvento);
+            cs.registerOutParameter(3, Types.INTEGER);
+            cs.execute();
+            puntos = cs.getInt(3);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return puntos;
     }
 
 }

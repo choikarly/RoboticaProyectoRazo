@@ -53,17 +53,16 @@ public class MainMisEquipos {
 
             try {
                 for (Map<String, Object> fila : misEquipos) {
+                    int idEquipo = (int) fila.get("id_equipo");
+                    int idEvento = (int) fila.get("id_evento");
                     String nombreEquipo = (String) fila.get("equipo");
                     String nombreEvento = (String) fila.get("evento");
                     String categoria = (String) fila.get("categoria");
                     String escuela = (String) fila.get("escuela");
-
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaMisEquipos.fxml"));
                     AnchorPane tarjetaEquipo = loader.load();
-
                     PlantillaMisEquipos controller = loader.getController();
-                    controller.setDatosMisEquipos(nombreEquipo, nombreEvento, escuela, categoria);
-
+                    controller.setDatosMisEquipos(idEquipo, idEvento, nombreEquipo, nombreEvento, escuela, categoria);
                     vboxContenedorMisEquipos.getChildren().add(tarjetaEquipo);
                 }
             } catch (IOException e) {

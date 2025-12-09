@@ -10,20 +10,20 @@ create schema concurso_robotica;
 use concurso_robotica;
 
 create table categoria(
-                          id_categoria    int primary key auto_increment,
-                          nombre          varchar(20) not null
+	id_categoria    int primary key auto_increment,
+    nombre          varchar(20) not null
 );
 
 create table ciudad(
-                       id_ciudad       int primary key auto_increment,
-                       nombre          varchar(80) not null
+	id_ciudad       int primary key auto_increment,
+    nombre          varchar(80) not null
 );
 
 create table sede(
-                     id_sede     int primary key auto_increment,
-                     nombre      varchar(80) not null,
-                     fk_ciudad   int not null,
-                     foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE
+	id_sede     int primary key auto_increment,
+    nombre      varchar(80) not null,
+    fk_ciudad   int not null,
+    foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 create table escuela(
@@ -655,15 +655,17 @@ begin
 end
 // delimiter ;
 
--- Procedimiento: Filtrar Equipos (Admin)
+-- Procedimiento: Retornar Equipos para Admin con Filtro 
 drop procedure if exists retornar_equipos_admin_filtro;
 delimiter //
 create procedure retornar_equipos_admin_filtro(
     in p_id_evento int,    -- -1 para todos
-    in p_id_categoria int  -- -1 para todos
+    in p_id_categoria int  -- -1 para todas
 )
 begin
     select
+        equipo.id_equipo,
+        evento.id_evento,
         equipo.nombre as equipo,
         sede.nombre as escuela,
         evento.nombre as evento,
@@ -676,7 +678,7 @@ begin
     join categoria on inscripcion_equipo.fk_categoria = categoria.id_categoria
     where
         (p_id_evento = -1 or inscripcion_equipo.fk_evento = p_id_evento)
-        and
+    and
         (p_id_categoria = -1 or inscripcion_equipo.fk_categoria = p_id_categoria)
     order by evento.fecha desc, equipo.nombre asc;
 end
@@ -824,6 +826,65 @@ begin
 end
 // delimiter ;
 
+-- Procedimiento: Retornar Equipos por Coach 
+drop procedure if exists retornar_equipos_coach;
+delimiter //
+create procedure retornar_equipos_coach(
+    in p_id_coach int
+)
+begin
+    select 
+        equipo.id_equipo,       
+        evento.id_evento,       
+        equipo.nombre as equipo, 
+        sede.nombre as escuela, 
+        evento.nombre as evento, 
+        categoria.nombre as categoria
+    from inscripcion_equipo
+    join equipo on id_equipo = fk_equipo
+    join escuela on fk_escuela = id_escuela
+    join sede on id_escuela = id_sede
+    join evento on fk_evento = id_evento
+    join categoria on fk_categoria = id_categoria
+    where fk_coach = p_id_coach;
+end
+// delimiter ;
+
+-- Procedimiento: Retornar Miembros de un Equipo en un Evento
+drop procedure if exists retornar_miembros_equipo;
+delimiter //
+create procedure retornar_miembros_equipo(
+    in p_id_equipo int,
+    in p_id_evento int
+)
+begin
+    select participante.nombre, participante.num_control
+    from participante
+    join integrante_inscripcion on participante.id_participante = integrante_inscripcion.fk_participante
+    where integrante_inscripcion.fk_equipo = p_id_equipo and integrante_inscripcion.fk_evento = p_id_evento;
+end
+// delimiter ;
+
+-- Procedimiento: Obtener Puntaje Total de un Equipo
+drop procedure if exists obtener_puntaje_equipo;
+delimiter //
+create procedure obtener_puntaje_equipo(
+    in p_id_equipo int,
+    in p_id_evento int,
+    out p_puntos int
+)
+begin
+    select puntos_totales into p_puntos 
+    from criterios_evaluacion 
+    where fk_equipo = p_id_equipo and fk_evento = p_id_evento;
+    
+    -- Si no hay registro, asignamos -2 para indicar que no ha sido evaluado
+    if p_puntos is null then
+        set p_puntos = -2; 
+    end if;
+end
+// delimiter ;
+
 -- ==================================================================
 -- SECCIÓN DE INSERCIÓN DE DATOS Y LLAMADAS DE PRUEBA
 -- ==================================================================
@@ -842,8 +903,10 @@ insert into ciudad(nombre) values ("Tampico");
 insert into ciudad(nombre) values ("Madero");
 insert into ciudad(nombre) values ("Altamira");
 
--- 3. Dar de alta Sedes y Escuelas
+
 set @aviso = 0;
+
+-- 3. Dar de alta Sedes y Escuelas
 call ingresar_escuela("Instituto Tecnológico de Ciudad Madero (ITCM)", 2, 4, @aviso);
 call ingresar_escuela("Universidad Autonoma de Tamaulipas (UAT)", 1, 4, @aviso);
 call ingresar_escuela("Centro de Bachillerato Tecnológico Industrial y de Servicio N.103(CBTis 103)", 2, 3, @aviso);
@@ -912,3 +975,34 @@ call registrar_equipo(4, 3, 2, 4, 7, 8, 9, @aviso);
 -- Entrenadores Pokémon
 -- (Coach ID 5, Equipo ID 4, Evento ID 3, Categ 2, Partic 10,11,12)
 call registrar_equipo(5, 4, 3, 2, 10, 11, 12, @aviso);
+
+-- ==================================================================
+-- ASIGNACIÓN DE JUECES (Usando docentes que son Coaches en otros torneos)
+-- ==================================================================
+
+-- Inicializamos la variable de salida
+SET @aviso = 0;
+
+-- Llamada al procedimiento:
+-- Evento: 1 (OtakuVex)
+-- Categoría: 1 (Primaria)
+-- Jueces: 3, 4, 5 (Mauro, Carlos y José)
+CALL asignar_terna_jueces(1, 1, 3, 4, 5, @aviso);
+
+-- Verificar el resultado
+-- 1  = Éxito
+-- -2 = Error: Conflicto de interés (Uno de ellos es coach en este evento/categoría)
+-- 0  = Error: Ya estaban asignados
+SELECT @aviso as 'Estatus_Operacion';
+
+-- Verificación visual: Consultar la tabla de asignaciones para confirmar
+SELECT 
+    e.nombre as Evento, 
+    c.nombre as Categoria, 
+    d.nombre as Juez_Asignado,
+    d.especialidad
+FROM asignacion_juez aj
+JOIN evento e ON aj.fk_evento = e.id_evento
+JOIN categoria c ON aj.fk_categoria = c.id_categoria
+JOIN docente d ON aj.fk_juez = d.id_docente
+WHERE aj.fk_evento = 1 AND aj.fk_categoria = 1;
