@@ -635,8 +635,6 @@ public class Main extends Application {
         return aviso;
     }
 
-    // ... otros métodos ...
-
     public static Map<String, String> obtenerInfoPersonalDocente(int idDocente) {
         Map<String, String> info = new HashMap<>();
         try (Connection conn = getConexion();

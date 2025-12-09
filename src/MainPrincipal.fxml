@@ -33,19 +33,27 @@
                <Font size="16.0" />
             </font>
          </Label>
-            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="220.0" prefHeight="203.0" prefWidth="201.0">
+            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="220.0" prefHeight="260.0" prefWidth="201.0">
                <children>
-                  <Button fx:id="btn_eventos_Docente" layoutY="144.0" mnemonicParsing="false" onAction="#btnEventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
+                  <Button fx:id="btnInfoPersonal" layoutX="1.0" layoutY="5.0" mnemonicParsing="false" onAction="#btnInfoPersonalDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Info. Personal" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
+
                   <Button fx:id="btnMisEquiposDocente" layoutX="1.0" layoutY="70.0" mnemonicParsing="false" onAction="#btnMisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-                  <Label fx:id="lbl_rol" layoutX="64.0" layoutY="5.0" text="Docente" textFill="WHITE">
+
+                  <Button fx:id="btn_eventos_Docente" layoutY="135.0" mnemonicParsing="false" onAction="#btnEventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+
+                  <Label fx:id="lbl_rol" layoutX="60.0" layoutY="200.0" text="Docente" textFill="WHITE">
                      <font>
                         <Font name="System Bold Italic" size="19.0" />
                      </font>
