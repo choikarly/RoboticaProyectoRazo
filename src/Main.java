@@ -59,12 +59,10 @@ public class Main extends Application {
             cs.setInt(6, semestre);
             cs.setInt(7, num_control);
 
-            // CORRECCIÓN: Registramos parámetro de salida como ENTERO, no VARCHAR
             cs.registerOutParameter(8, Types.INTEGER);
 
             cs.execute();
 
-            // Obtenemos el número directamente (1 = Éxito, -1 = Duplicado)
             int resultado = cs.getInt(8);
 
             System.out.println("Código respuesta BD: " + resultado);
@@ -124,7 +122,6 @@ public class Main extends Application {
     }
 
 
-    // Función para crear un evento llamando al SP crear_evento
     public static int crearEvento(String nombre, java.sql.Date fecha, int idSede) {
         int aviso = -2; // Valor por defecto si falla la conexión
 
@@ -133,18 +130,14 @@ public class Main extends Application {
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall(sql)) {
 
-            // 1. Parámetros de Entrada (IN)
             cs.setString(1, nombre);
             cs.setDate(2, fecha);
             cs.setInt(3, idSede);
 
-            // 2. Parámetro de Salida (OUT) - El aviso
             cs.registerOutParameter(4, java.sql.Types.TINYINT);
 
-            // 3. Ejecutar
             cs.execute();
 
-            // 4. Recuperar el resultado
             aviso = cs.getInt(4);
 
         } catch (SQLException e) {
@@ -187,14 +180,13 @@ public class Main extends Application {
                     escuela.put("id_escuela", rs.getInt("id_escuela"));
                     escuela.put("nombre", rs.getString("nombre"));
                     escuela.put("fk_ciudad", rs.getInt("fk_ciudad"));
-                    escuela.put("fk_nivel", rs.getInt("fk_nivel")); // getObject por si es int o string
+                    escuela.put("fk_nivel", rs.getInt("fk_nivel"));
                     listaEscuelas.add(escuela);
                 }
             }
-            System.out.println("Escuelas encontradas: " + listaEscuelas.size()); // Debug
+            System.out.println("Escuelas encontradas: " + listaEscuelas.size());
         } catch (SQLException e) {
             System.err.println("\nError al obtener escuelas: " + e.getMessage());
-            // En caso de error devolvemos la lista vacía para no romper el programa
         }
         return listaEscuelas;
     }
@@ -202,21 +194,17 @@ public class Main extends Application {
     public static List<Map<String, Object>> retornarEventos() {
         List<Map<String, Object>> lista = new ArrayList<>();
 
-        // Asegúrate de que el SP en SQL ya incluya 'id_evento' en el SELECT
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_eventos()}");
              ResultSet rs = cs.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, Object> fila = new HashMap<>();
-
-                // --- ESTA ES LA LÍNEA QUE TE FALTA ---
                 fila.put("id_evento", rs.getInt("id_evento"));
-                // -------------------------------------
 
                 fila.put("nombre", rs.getString("nombre"));
                 fila.put("sede", rs.getString("sede"));
-                fila.put("fecha", rs.getDate("fecha")); // O getString, según como lo manejes
+                fila.put("fecha", rs.getDate("fecha"));
 
                 lista.add(fila);
             }
@@ -236,14 +224,13 @@ public class Main extends Application {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
 
-                    // Guardamos las columnas de la tabla 'categoria'
                     fila.put("id_categoria", rs.getInt("id_categoria"));
                     fila.put("nombre", rs.getString("nombre"));
 
                     listaCategorias.add(fila);
                 }
             }
-            System.out.println("Categorías recuperadas: " + listaCategorias.size()); // Debug
+            System.out.println("Categorías recuperadas: " + listaCategorias.size());
 
         } catch (SQLException e) {
             System.err.println("Error al obtener categorías: " + e.getMessage());
@@ -258,10 +245,7 @@ public class Main extends Application {
 
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_coach(?)}")) {
-
-            // Pasamos el parámetro de entrada (ID del coach)
             cs.setInt(1, idCoach);
-
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
@@ -275,7 +259,7 @@ public class Main extends Application {
                     listaEquipos.add(fila);
                 }
             }
-            System.out.println("Equipos encontrados para el coach " + idCoach + ": " + listaEquipos.size()); // Debug
+            System.out.println("Equipos encontrados para el coach " + idCoach + ": " + listaEquipos.size());
 
         } catch (SQLException e) {
             System.err.println("Error al obtener equipos del coach: " + e.getMessage());
@@ -284,8 +268,6 @@ public class Main extends Application {
 
         return listaEquipos;
     }
-
-// En Main.java
 
     public static List<Map<String, Object>> retornarEventosParticipados(int idUsuario) {
         List<Map<String, Object>> lista = new ArrayList<>();
@@ -298,13 +280,11 @@ public class Main extends Application {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
 
-                    // Leemos el ID y lo guardamos con la clave "id_evento"
                     fila.put("id_evento", rs.getInt("id_evento"));
                     fila.put("nombre", rs.getString("nombre"));
-                    fila.put("fecha", rs.getDate("fecha")); // O getString, según prefieras
+                    fila.put("fecha", rs.getDate("fecha"));
                     fila.put("sede", rs.getString("sede"));
-                    fila.put("mi_rol", rs.getString("mi_rol")); // "COACH" o "JUEZ"
-
+                    fila.put("mi_rol", rs.getString("mi_rol"));
                     lista.add(fila);
                 }
             }
@@ -315,22 +295,17 @@ public class Main extends Application {
     }
 
     public static int crearEquipo(String nombreEquipo, int idEscuela) {
-        int idEquipo = -1; // Valor inicial de error
-
+        int idEquipo = -1;
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL crear_equipo(?, ?, ?)}")) {
 
-            // 1. Parámetros de ENTRADA (Lo que mandas)
             cs.setString(1, nombreEquipo);
             cs.setInt(2, idEscuela);
 
-            // 2. Parámetro de SALIDA (Lo que esperas recibir: el ID)
             cs.registerOutParameter(3, Types.INTEGER);
 
-            // 3. Ejecutar
             cs.execute();
 
-            // 4. Leer el valor que devolvió la base de datos
             idEquipo = cs.getInt(3);
 
             System.out.println("Equipo gestionado correctamente. ID: " + idEquipo); // Debug
@@ -347,13 +322,9 @@ public class Main extends Application {
 
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL obtener_id_escuela_docente(?, ?)}")) {
-            // 1. Parámetro de entrada: El ID del usuario logueado
             cs.setInt(1, idDocente);
-            // 2. Parámetro de salida: El ID de la escuela que queremos recuperar
             cs.registerOutParameter(2, Types.INTEGER);
-            // 3. Ejecutar
             cs.execute();
-            // 4. Obtener el resultado
             idEscuela = cs.getInt(2);
 
         } catch (SQLException e) {
@@ -367,17 +338,9 @@ public class Main extends Application {
 
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL obtener_nombre_escuela_docente(?, ?)}")) {
-
-            // 1. Entrada: ID del docente
             cs.setInt(1, idDocente);
-
-            // 2. Salida: Nombre de la escuela (VARCHAR)
             cs.registerOutParameter(2, Types.VARCHAR);
-
-            // 3. Ejecutar
             cs.execute();
-
-            // 4. Recuperar el texto
             nombreEscuela = cs.getString(2);
 
             if (nombreEscuela == null) {
@@ -439,17 +402,9 @@ public class Main extends Application {
 
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL obtener_escuela_equipo(?, ?)}")) {
-
-            // 1. Entrada: ID del Equipo
             cs.setInt(1, idEquipo);
-
-            // 2. Salida: ID de la Escuela
             cs.registerOutParameter(2, Types.INTEGER);
-
-            // 3. Ejecutar
             cs.execute();
-
-            // 4. Recuperar el valor
             idEscuela = cs.getInt(2);
 
         } catch (SQLException e) {
@@ -494,10 +449,8 @@ public class Main extends Application {
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
-                    // --- CAPTURAMOS LOS IDS ---
                     fila.put("id_equipo", rs.getInt("id_equipo"));
                     fila.put("id_evento", rs.getInt("id_evento"));
-                    // --------------------------
                     fila.put("equipo", rs.getString("equipo"));
                     fila.put("escuela", rs.getString("escuela"));
                     fila.put("evento", rs.getString("evento"));
@@ -556,11 +509,8 @@ public class Main extends Application {
 
             while (rs.next()) {
                 Map<String, Object> fila = new HashMap<>();
-
-                // Guardamos ID y Nombre
                 fila.put("id", rs.getInt("id_sede"));
                 fila.put("nombre", rs.getString("nombre"));
-
                 lista.add(fila);
             }
         } catch (SQLException e) {
@@ -591,19 +541,14 @@ public class Main extends Application {
 
     public static List<Map<String, Object>> retornarDocentes() {
         List<Map<String, Object>> lista = new ArrayList<>();
-
-        // Llamamos a TU procedimiento existente
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_docentes()}");
              ResultSet rs = cs.executeQuery()) {
-
             while (rs.next()) {
                 Map<String, Object> fila = new HashMap<>();
 
                 fila.put("id", rs.getInt("id_docente"));
                 fila.put("nombre", rs.getString("nombre"));
-
-                // Estos vienen extra, los guardamos por si acaso
                 fila.put("escuela", rs.getString("escuela"));
                 fila.put("especialidad", rs.getString("especialidad"));
 
@@ -617,7 +562,6 @@ public class Main extends Application {
 
     public static int registrarTernaEnBD(int idEvento, int idCategoria, int j1, int j2, int j3) {
         int aviso = -1;
-        // Nota: Como ya estamos dentro de Main, llamamos a getConexion() directamente
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL asignar_terna_jueces(?, ?, ?, ?, ?, ?)}")) {
 
@@ -693,7 +637,6 @@ public class Main extends Application {
         return puntos;
     }
 
-    // En Main.java
     public static List<Map<String, Object>> retornarEquiposParaEvaluar(int idEvento, int idJuez) {
         List<Map<String, Object>> lista = new ArrayList<>();
         try (Connection conn = getConexion();
@@ -735,7 +678,6 @@ public class Main extends Application {
         return lista;
     }
 
-    // Función para registrar la nueva sede
     public static int registrarSede(String nombre, int idCiudad) {
         int aviso = -99;
         try (Connection conn = getConexion();
@@ -754,13 +696,6 @@ public class Main extends Application {
         return aviso;
     }
 
-
-
-    // ==========================================
-    // MÉTODOS PARA EVALUACIÓN (JUECES)
-    // ==========================================
-
-    // 1. Obtener equipos asignados al juez para el evento actual
     public static List<Map<String, Object>> retornarEquiposAEvaluar(int idEvento, int idJuez) {
         List<Map<String, Object>> lista = new ArrayList<>();
         try (Connection conn = getConexion();
@@ -785,18 +720,12 @@ public class Main extends Application {
         return lista;
     }
 
-    // ------------------------------------------
-    // CRITERIO: DISEÑO
-    // ------------------------------------------
     public static void gestionarEvaluacionDiseno(int equipo, int evento, boolean... checks) {
-        // El SP espera: equipo, evento + 11 booleans (TINYINT)
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL gestionar_evaluacion_diseno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
 
             cs.setInt(1, equipo);
             cs.setInt(2, evento);
-
-            // Recorremos los checks y los pasamos como 1 o 0
             for (int i = 0; i < checks.length; i++) {
                 cs.setInt(i + 3, checks[i] ? 1 : 0);
             }
@@ -841,11 +770,7 @@ public class Main extends Application {
         return datos;
     }
 
-    // ------------------------------------------
-    // CRITERIO: PROGRAMACIÓN
-    // ------------------------------------------
     public static void gestionarEvaluacionProg(int equipo, int evento, boolean... checks) {
-        // El SP espera: equipo, evento + 18 booleans
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL gestionar_evaluacion_prog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
 
@@ -900,11 +825,7 @@ public class Main extends Application {
         return datos;
     }
 
-    // ------------------------------------------
-    // CRITERIO: CONSTRUCCIÓN
-    // ------------------------------------------
     public static void gestionarEvaluacionConst(int equipo, int evento, boolean... checks) {
-        // El SP espera: equipo, evento + 17 booleans
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL gestionar_evaluacion_const(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
 
