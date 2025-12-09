@@ -942,4 +942,39 @@ public class Main extends Application {
         return ranking;
     }
 
+    public static List<Map<String, String>> retornarEquiposPorCategoria(int idEvento) {
+        List<Map<String, String>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_por_categoria_evento(?)}")) {
+            cs.setInt(1, idEvento);
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, String> m = new HashMap<>();
+                    m.put("categoria", rs.getString("categoria"));
+                    m.put("equipo", rs.getString("equipo"));
+                    m.put("escuela", rs.getString("escuela"));
+                    lista.add(m);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
+
+    public static List<Map<String, String>> retornarJuecesPorCategoria(int idEvento) {
+        List<Map<String, String>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_jueces_por_categoria_evento(?)}")) {
+            cs.setInt(1, idEvento);
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, String> m = new HashMap<>();
+                    m.put("categoria", rs.getString("categoria"));
+                    m.put("juez", rs.getString("juez"));
+                    lista.add(m);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
+
 }

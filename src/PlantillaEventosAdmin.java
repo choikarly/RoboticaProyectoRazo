@@ -62,4 +62,25 @@ public class PlantillaEventosAdmin {
         }
     }
 
+    @FXML
+    void btnVerDetalles(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("DetalleEventoAdmin.fxml"));
+            Parent root = loader.load();
+
+            DetalleEventoAdminController controller = loader.getController();
+            controller.cargarDatos(this.idEventoGuardado, this.nombreEventoGuardado);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Detalle del Evento - Admin");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

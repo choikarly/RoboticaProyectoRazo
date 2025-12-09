@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="355.0" prefWidth="647.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CrearEvento">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="355.0" prefWidth="647.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CrearEvento">
    <children>
       <Label layoutX="34.0" layoutY="28.0" text="Nuevo Evento">
          <font>
@@ -35,7 +31,7 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <DatePicker fx:id="dateEvento" layoutX="114.0" layoutY="138.0" prefHeight="34.0" prefWidth="485.0" />
+      <DatePicker fx:id="dateEvento" editable="false" layoutX="114.0" layoutY="138.0" prefHeight="34.0" prefWidth="485.0" />
       <ComboBox fx:id="cbSede" layoutX="114.0" layoutY="192.0" prefHeight="42.0" prefWidth="486.0" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
       <Button fx:id="btnNuevaSede" layoutX="29.0" layoutY="303.0" mnemonicParsing="false" onAction="#btnNuevaSede" style="-fx-background-color: #274C77;" text="Registrar Nueva Sede" textFill="WHITE">
          <font>

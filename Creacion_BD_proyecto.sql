@@ -951,8 +951,44 @@ order by nombre asc;
 end
 // delimiter ;
 
+-- 1. Obtener equipos por evento y categoría
+DROP PROCEDURE IF EXISTS retornar_equipos_por_categoria_evento;
+DELIMITER //
+CREATE PROCEDURE retornar_equipos_por_categoria_evento(
+    IN p_id_evento INT
+)
+BEGIN
+    SELECT 
+        c.nombre AS categoria,
+        e.nombre AS equipo,
+        s.nombre AS escuela
+    FROM inscripcion_equipo ie
+    JOIN equipo e ON ie.fk_equipo = e.id_equipo
+    JOIN escuela esc ON e.fk_escuela = esc.id_escuela
+    JOIN sede s ON esc.id_escuela = s.id_sede
+    JOIN categoria c ON ie.fk_categoria = c.id_categoria
+    WHERE ie.fk_evento = p_id_evento
+    ORDER BY c.nombre, e.nombre;
+END //
+DELIMITER ;
 
-
+-- 2. Obtener jueces por evento y categoría
+DROP PROCEDURE IF EXISTS retornar_jueces_por_categoria_evento;
+DELIMITER //
+CREATE PROCEDURE retornar_jueces_por_categoria_evento(
+    IN p_id_evento INT
+)
+BEGIN
+    SELECT 
+        c.nombre AS categoria,
+        d.nombre AS juez
+    FROM asignacion_juez aj
+    JOIN docente d ON aj.fk_juez = d.id_docente
+    JOIN categoria c ON aj.fk_categoria = c.id_categoria
+    WHERE aj.fk_evento = p_id_evento
+    ORDER BY c.nombre, d.nombre;
+END //
+DELIMITER ;
 
 -- PUNTAJE
 -- 1. procedimiento para diseño (corregido)
