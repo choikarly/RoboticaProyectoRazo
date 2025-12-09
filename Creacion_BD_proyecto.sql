@@ -916,6 +916,7 @@ delimiter ;
 
 -- PUNTAJE
 -- 1. procedimiento para diseño (corregido)
+-- Procedimiento: Gestionar Evaluación de Diseño (criterio_dis)
 drop procedure if exists gestionar_evaluacion_diseno;
 delimiter //
 create procedure gestionar_evaluacion_diseno(
@@ -923,35 +924,31 @@ create procedure gestionar_evaluacion_diseno(
     in p_reg_fechas tinyint, in p_justif tinyint, in p_ortografia tinyint, in p_presentacion tinyint,
     in p_video tinyint, in p_software tinyint, in p_analisis tinyint, in p_ensamble tinyint,
     in p_modelo tinyint, in p_simulacion tinyint, in p_restricciones tinyint,
-    in p_diagramas tinyint  -- ¡nuevo parámetro!
+    in p_diagramas tinyint -- Nuevo parámetro
 )
 begin
     declare v_categoria int;
     
-    -- 1. obtener la categoría de la inscripción para poder crear el registro padre
-select fk_categoria into v_categoria
-from inscripcion_equipo
-where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
+    -- 1. Obtener la categoría de la inscripción para crear el registro padre
+    select fk_categoria into v_categoria
+    from inscripcion_equipo
+    where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
 
--- 2. asegurar que existe el registro padre en 'criterios_evaluacion'
-insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales)
+    -- 2. Asegurar que existe el registro padre en 'criterios_evaluacion'
+    insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales) 
     values (p_equipo, p_evento, v_categoria, 0);
 
-    -- 3. guardar o actualizar diseño
-insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento,
-                          diagramas_imagenes) -- ¡nueva columna en insert!
-values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones,
-        p_diagramas) -- ¡nuevo valor!
+    -- 3. Guardar o Actualizar Diseño (Incluye el nuevo campo diagramas_imagenes)
+    insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento, 
+    diagramas_imagenes)
+    values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones, 
+    p_diagramas)
     on duplicate key update
-                         registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
-                         diagramas_imagenes=p_diagramas; -- ¡nueva columna en update!
+    registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
+    diagramas_imagenes=p_diagramas;
+end
+// delimiter ;
 
--- actualización del puntaje total
-update criterios_evaluacion
-set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
-where fk_equipo = p_equipo and fk_evento = p_evento;
-end //
-delimiter ;
 
 drop procedure if exists obtener_evaluacion_diseno;
 delimiter //
