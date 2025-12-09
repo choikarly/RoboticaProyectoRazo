@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class PlantillaEventoParticipado {
     @FXML
     private Label lblNombreEvento;
@@ -79,17 +81,20 @@ public class PlantillaEventoParticipado {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventosEvaluar.fxml"));
             Parent root = loader.load();
 
-            Stage stagePaso = new Stage();
-            stagePaso.setScene(new Scene(root));
-            stagePaso.setTitle("Más Informacion");
+            // Obtener el controlador de la nueva ventana
+            InfoEventosEvaluar controller = loader.getController();
 
-            // Esto obliga al usuario a terminar aquí antes de volver a Eventos
-            stagePaso.initModality(Modality.APPLICATION_MODAL);
-            stagePaso.setResizable(false);
-            stagePaso.show();
+            // PASARLE EL ID DEL EVENTO
+            controller.recibirDatosEquiposFiltrados(this.idEventoActual);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Evaluación de Evento");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

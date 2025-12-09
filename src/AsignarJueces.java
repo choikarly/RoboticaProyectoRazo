@@ -142,6 +142,14 @@ public class AsignarJueces implements Initializable {
             cbJuezUno.getItems().add(nombre); cbJuezDos.getItems().add(nombre); cbJuezTres.getItems().add(nombre);
             mapaJueces.put(nombre, id);
         }
+
+        if (cats.isEmpty()) {
+            cbCategoriaJuez.setPromptText("No hay categorías disponibles (Llenas o sin equipos)");
+            cbCategoriaJuez.setDisable(true); // Desactivar el combo si no hay nada
+        } else {
+            cbCategoriaJuez.setPromptText("Seleccione una categoría");
+            cbCategoriaJuez.setDisable(false);
+        }
     }
 
     public void mostrarAlertaError(String titulo, String encabezado, String contenido) {

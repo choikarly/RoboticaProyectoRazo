@@ -31,6 +31,8 @@ public class PlantillaDocenteAdmin {
     }
     @FXML
     void btnMasInfoDocentesMain(ActionEvent event) {
+
+
         System.out.println("info desplegado");
     }
 }
