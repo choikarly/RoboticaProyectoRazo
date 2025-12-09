@@ -49,8 +49,7 @@ public class MainDocentesAdmin implements Initializable {
         }
 
         for (Map<String, Object> docente : listaMaestra) {
-
-            // Extraer datos
+            int idDocente = (int) docente.get("id_docente");
             boolean esCoach = (boolean) docente.get("es_coach");
             boolean esJuez = (boolean) docente.get("es_juez");
             String nombre = (String) docente.get("nombre");
@@ -87,21 +86,18 @@ public class MainDocentesAdmin implements Initializable {
 
             // --- SI PASA EL FILTRO, CREAMOS LA TARJETA ---
             if (mostrar) {
-                crearTarjetaDocente(nombre, escuela, esCoach, esJuez);
+                crearTarjetaDocente(idDocente, nombre, escuela, esCoach, esJuez);
             }
         }
     }
 
-    private void crearTarjetaDocente(String nombre, String escuela, boolean esCoach, boolean esJuez) {
+    private void crearTarjetaDocente(int idDocente, String nombre, String escuela, boolean esCoach, boolean esJuez) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaDocenteAdmin.fxml"));
             AnchorPane tarjeta = loader.load();
-
             PlantillaDocenteAdmin controller = loader.getController();
-            controller.setDatosDocentesAdmin(nombre, escuela, esCoach, esJuez);
-
+            controller.setDatosDocentesAdmin(idDocente, nombre, escuela, esCoach, esJuez);
             vboxContenedorDocentesAdmin.getChildren().add(tarjeta);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
