@@ -467,11 +467,11 @@ public class Main extends Application {
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
+                    fila.put("id_docente", rs.getInt("id_docente"));
                     fila.put("nombre", rs.getString("nombre"));
                     fila.put("escuela", rs.getString("escuela"));
-                    // Recuperamos las "banderas" (flags)
-                    fila.put("es_coach", rs.getInt("es_coach") == 1); // Guardamos como boolean
-                    fila.put("es_juez", rs.getInt("es_juez") == 1);   // Guardamos como boolean
+                    fila.put("es_coach", rs.getInt("es_coach") == 1);
+                    fila.put("es_juez", rs.getInt("es_juez") == 1);
 
                     lista.add(fila);
                 }

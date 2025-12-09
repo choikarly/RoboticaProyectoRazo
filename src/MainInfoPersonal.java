@@ -14,11 +14,14 @@ public class MainInfoPersonal {
 
     @FXML
     public void initialize() {
-        cargarDatos();
+        // Al abrirse, intenta cargar los datos del usuario actual (comportamiento para Docentes)
+        // Si es Admin, esto no mostrará nada relevante hasta que llamemos manualmente a cargarDatos(id)
+        if (Main.usuaioActual != null && Main.usuaioActual > 0) {
+            cargarDatos(Main.usuaioActual);
+        }
     }
 
-    private void cargarDatos() {
-        int idDocente = Main.usuaioActual;
+    public void cargarDatos(int idDocente) {
         Map<String, String> info = Main.obtenerInfoPersonalDocente(idDocente);
 
         if (!info.isEmpty()) {
@@ -27,13 +30,16 @@ public class MainInfoPersonal {
             lblFecha.setText(info.get("fecha"));
 
             String sexo = info.get("sexo");
-            lblSexo.setText(sexo.equals("H") ? "Hombre" : "Mujer");
+            lblSexo.setText(sexo != null && sexo.equals("H") ? "Hombre" : "Mujer");
 
             lblEspecialidad.setText(info.get("especialidad"));
             lblEscuela.setText(info.get("escuela"));
             lblNivel.setText(info.get("nivel"));
         } else {
-            lblNombre.setText("Error al cargar datos.");
+            lblNombre.setText("No se encontró información.");
+            // Limpiamos los otros campos
+            lblUsuario.setText("-"); lblFecha.setText("-"); lblSexo.setText("-");
+            lblEspecialidad.setText("-"); lblEscuela.setText("-"); lblNivel.setText("-");
         }
     }
 }

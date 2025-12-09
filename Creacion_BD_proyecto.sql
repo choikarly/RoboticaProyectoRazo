@@ -931,6 +931,7 @@ call registrar_docente("Mario Bros", "mario.bros", "nintendo", "1985-09-13", 9, 
 call registrar_docente("Ada Lovelace", "ada.l", "code123", "1980-12-10", 2, "M", "Programación", @aviso);
 call registrar_docente("Albert Einstein", "albert.e", "mc2", "1975-03-14", 4, "H", "Física", @aviso);
 call registrar_docente("Marie Curie", "marie.c", "radio", "1982-11-07", 5, "M", "Química", @aviso);
+CALL registrar_docente("Giancarlo Rossi", "giancarlo.rossi", "password123", "2002-12-30", 6, "H", "Backend", @mensaje);
 
 -- 5. Registrar Competidores
 -- Competidores iniciales
@@ -948,6 +949,9 @@ call registrar_competidor("Natasha Romanoff", "2004-11-22", 2, "M", "Ing. Indust
 call registrar_competidor("Ash Ketchum", "2010-05-20", 4, "H", "N/A", 2, 4001, @aviso);
 call registrar_competidor("Misty Waterflower", "2010-09-15", 4, "M", "N/A", 2, 4002, @aviso);
 call registrar_competidor("Brock Harrison", "2009-02-10", 4, "H", "N/A", 3, 4003, @aviso);
+CALL registrar_competidor("Sofia Hernandez", "2019-11-01", 6, "M", "N/A", 1, 6001, @aviso);
+CALL registrar_competidor("Luis Garcia", "2017-08-15", 6, "H", "N/A", 3, 6002, @aviso);
+CALL registrar_competidor("Elena Martinez", "2018-05-22", 6, "M", "N/A", 2, 6003, @aviso);
 
 -- 6. Crear Eventos
 call crear_evento("OtakuVex","2025-12-12", 1, @aviso);
@@ -976,33 +980,8 @@ call registrar_equipo(4, 3, 2, 4, 7, 8, 9, @aviso);
 -- (Coach ID 5, Equipo ID 4, Evento ID 3, Categ 2, Partic 10,11,12)
 call registrar_equipo(5, 4, 3, 2, 10, 11, 12, @aviso);
 
--- ==================================================================
 -- ASIGNACIÓN DE JUECES (Usando docentes que son Coaches en otros torneos)
--- ==================================================================
-
--- Inicializamos la variable de salida
-SET @aviso = 0;
-
--- Llamada al procedimiento:
 -- Evento: 1 (OtakuVex)
 -- Categoría: 1 (Primaria)
 -- Jueces: 3, 4, 5 (Mauro, Carlos y José)
 CALL asignar_terna_jueces(1, 1, 3, 4, 5, @aviso);
-
--- Verificar el resultado
--- 1  = Éxito
--- -2 = Error: Conflicto de interés (Uno de ellos es coach en este evento/categoría)
--- 0  = Error: Ya estaban asignados
-SELECT @aviso as 'Estatus_Operacion';
-
--- Verificación visual: Consultar la tabla de asignaciones para confirmar
-SELECT 
-    e.nombre as Evento, 
-    c.nombre as Categoria, 
-    d.nombre as Juez_Asignado,
-    d.especialidad
-FROM asignacion_juez aj
-JOIN evento e ON aj.fk_evento = e.id_evento
-JOIN categoria c ON aj.fk_categoria = c.id_categoria
-JOIN docente d ON aj.fk_juez = d.id_docente
-WHERE aj.fk_evento = 1 AND aj.fk_categoria = 1;

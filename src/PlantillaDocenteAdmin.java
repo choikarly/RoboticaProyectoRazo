@@ -1,20 +1,27 @@
-import javafx.event.ActionEvent; // <--- ¡ESTA ES LA CLAVE! (NO java.awt)
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.IOException;
 
 public class PlantillaDocenteAdmin {
 
     @FXML private Label lblNombre;
     @FXML private Label lblEscuela;
-    @FXML private Label lblRol; // Un label extra para decir "COACH", "JUEZ" o "AMBOS"
+    @FXML private Label lblRol;
 
+    private int idDocenteGuardado;
 
-    public void setDatosDocentesAdmin(String nombre, String escuela, boolean esCoach, boolean esJuez) {
+    public void setDatosDocentesAdmin(int idDocente, String nombre, String escuela, boolean esCoach, boolean esJuez) {
+        this.idDocenteGuardado = idDocente;
         lblNombre.setText(nombre);
         lblEscuela.setText(escuela);
 
-        // Lógica visual para identificar el rol
         if (esCoach && esJuez) {
             lblRol.setText("ROL: HÍBRIDO (Coach y Juez)");
             lblRol.setStyle("-fx-text-fill: purple; -fx-font-weight: bold;");
@@ -29,10 +36,28 @@ public class PlantillaDocenteAdmin {
             lblRol.setStyle("-fx-text-fill: grey;");
         }
     }
+
     @FXML
     void btnMasInfoDocentesMain(ActionEvent event) {
 
 
         System.out.println("info desplegado");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainInfoPersonal.fxml"));
+            Parent root = loader.load();
+
+            MainInfoPersonal controller = loader.getController();
+            controller.cargarDatos(this.idDocenteGuardado);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Detalle del Docente");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
