@@ -18,7 +18,6 @@ public class PlantillaEventoParticipado {
 
     private int idEventoGuardado;
 
-    // ACTUALIZADO: Recibe 5 parámetros para coincidir con tu MainEventosController
     public void setDatosEventoParticipado(int idEvento, String nombre, String sede, String fecha, String rol) {
         this.idEventoGuardado = idEvento;
 
@@ -27,42 +26,33 @@ public class PlantillaEventoParticipado {
         lblFecha.setText(fecha);
         lblRol.setText(rol);
 
-        if (lblRol != null) {
-            // Un pequeño ajuste visual para el texto del rol
-            if ("AMBOS".equalsIgnoreCase(rol)) {
-                lblRol.setText("Rol: Coach y Juez");
-            } else {
-                lblRol.setText("Rol: " + rol);
-            }
-        }
-
-        // 2. Lógica de Botones (Coach vs Juez vs Ambos)
         if ("AMBOS".equalsIgnoreCase(rol)) {
-            // CASO 1: Es Coach y Juez -> MOSTRAR TODO
             mostrarBoton(btnMasInfoEvento, true);
             mostrarBoton(btnEvaluarEvento, true);
+            lblRol.setText("COACH Y JUEZ");
 
         } else if ("COACH".equalsIgnoreCase(rol)) {
-            // CASO 2: Solo Coach -> Ver Info, Ocultar Evaluar
             mostrarBoton(btnMasInfoEvento, true);
             mostrarBoton(btnEvaluarEvento, false);
+            lblRol.setText("COACH");
 
         } else if ("JUEZ".equalsIgnoreCase(rol)) {
-            // CASO 3: Solo Juez -> Ocultar Info, Ver Evaluar
             mostrarBoton(btnMasInfoEvento, false);
             mostrarBoton(btnEvaluarEvento, true);
+            lblRol.setText("JUEZ");
 
         } else {
-            // Seguridad: Ocultar todo si no hay rol claro
             mostrarBoton(btnMasInfoEvento, false);
             mostrarBoton(btnEvaluarEvento, false);
+            lblRol .setText("?");
+
         }
     }
 
     private void mostrarBoton(Button btn, boolean mostrar) {
         if (btn != null) {
             btn.setVisible(mostrar);
-            btn.setManaged(mostrar); // Si es false, el botón no ocupa espacio visual
+            btn.setManaged(mostrar);
         }
     }
 
@@ -94,12 +84,10 @@ public class PlantillaEventoParticipado {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventosMasInfo.fxml"));
             Parent root = loader.load();
 
-            // OBTENER DATOS DE LA ETIQUETAS ACTUALES
             String nombre = lblNombreEvento.getText();
             String fecha = lblFecha.getText();
             String sede = lblSede.getText();
 
-            // PASAR DATOS AL CONTROLADOR
             InfoEventosMasInfo controller = loader.getController();
             controller.setDatos(nombre, fecha, sede);
 

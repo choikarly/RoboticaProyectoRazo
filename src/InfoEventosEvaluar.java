@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.stage.StageStyle;
 
 public class InfoEventosEvaluar {
 
@@ -67,6 +68,10 @@ public class InfoEventosEvaluar {
 
             // Abrimos la evaluación
             Stage stage = new Stage();
+
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setOnCloseRequest(e -> e.consume());
+
             stage.setScene(new Scene(root));
             stage.setTitle("Evaluación: Diseño");
             stage.show();
