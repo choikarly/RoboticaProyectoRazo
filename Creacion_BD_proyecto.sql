@@ -812,3 +812,111 @@ COMMIT;
 END IF;
 END
 // DELIMITER ;
+
+-- ==================================================================
+-- 1. REGISTRAR DOCENTES (COACHES Y JUECES)
+-- ==================================================================
+-- Usaremos escuelas existentes: 
+-- ID 9: CBTis 109, ID 2: ITCM, ID 5: Sec N.3, ID 6: UT Altamira
+
+SET @aviso = 0;
+
+-- Docente para CBTis 109 (ID 9)
+CALL registrar_docente("Mario Bros", "mario.bros", "nintendo", "1985-09-13", 9, "H", "Mecatrónica", @aviso);
+
+-- Docente para ITCM (ID 2)
+CALL registrar_docente("Ada Lovelace", "ada.l", "code123", "1980-12-10", 2, "M", "Programación", @aviso);
+
+-- Docente para Secundaria N.3 (ID 4)
+CALL registrar_docente("Albert Einstein", "albert.e", "mc2", "1975-03-14", 4, "H", "Física", @aviso);
+
+-- Docente para UT Altamira (ID 5)
+CALL registrar_docente("Marie Curie", "marie.c", "radio", "1982-11-07", 5, "M", "Química", @aviso);
+
+-- ==================================================================
+-- 2. REGISTRAR ESTUDIANTES (PARTICIPANTES)
+-- ==================================================================
+-- Nota: Aseguramos que el número de control sea único y correspondan a la escuela correcta.
+
+-- Alumnos para CBTis 109 (ID 9) - Nivel Bachillerato
+CALL registrar_competidor("Peter Parker", "2007-08-10", 9, "H", "Electrónica", 3, 109001, @aviso);
+CALL registrar_competidor("Gwen Stacy", "2007-12-15", 9, "M", "Electrónica", 3, 109002, @aviso);
+CALL registrar_competidor("Miles Morales", "2008-01-20", 9, "H", "Electrónica", 3, 109003, @aviso);
+
+-- Alumnos para ITCM (ID 2) - Nivel Profesional
+CALL registrar_competidor("Tony Stark", "2003-05-29", 2, "H", "Ing. Mecatrónica", 7, 2007100, @aviso);
+CALL registrar_competidor("Bruce Banner", "2002-12-18", 2, "H", "Ing. Sistemas", 8, 2007101, @aviso);
+CALL registrar_competidor("Natasha Romanoff", "2004-11-22", 2, "M", "Ing. Industrial", 6, 2007102, @aviso);
+
+-- Alumnos para Secundaria N.3 (ID 4) - Nivel Secundaria
+CALL registrar_competidor("Ash Ketchum", "2010-05-20", 4, "H", "N/A", 2, 4001, @aviso);
+CALL registrar_competidor("Misty Waterflower", "2010-09-15", 4, "M", "N/A", 2, 4002, @aviso);
+CALL registrar_competidor("Brock Harrison", "2009-02-10", 4, "H", "N/A", 3, 4003, @aviso);
+
+-- ==================================================================
+-- 3. CREAR NUEVOS EVENTOS
+-- ==================================================================
+-- Usamos sedes existentes.
+-- Sede ID 2 es el ITCM. Sede ID 6 es UT Altamira.
+
+-- Evento en ITCM
+CALL crear_evento("Torneo de Robots Madero 2025", "2025-10-20", 2, @aviso);
+
+-- Evento en UT Altamira
+CALL crear_evento("Expo Tech Altamira", "2025-11-15", 6, @aviso);
+
+-- ==================================================================
+-- 4. CREAR EQUIPOS
+-- ==================================================================
+SET @id_equipo = 0;
+
+-- Equipo del CBTis 109 (Escuela ID 9)
+CALL crear_equipo("Arañas Tecnológicas", 9, @id_equipo);
+-- @id_equipo ahora tiene el ID de este nuevo equipo
+
+-- Equipo del ITCM (Escuela ID 2)
+CALL crear_equipo("Vengadores ITCM", 2, @id_equipo);
+
+-- Equipo de la Secundaria N.3 (Escuela ID 4)
+CALL crear_equipo("Entrenadores Pokémon", 4, @id_equipo);
+
+-- ==================================================================
+-- 5. INSCRIPCIÓN DE EQUIPOS A EVENTOS
+-- ==================================================================
+-- Aquí necesitamos los IDs generados. Asumiremos los IDs basados en el orden de inserción
+-- Si tu base de datos estaba limpia antes de esto, los IDs deberían coincidir.
+
+-- :: Inscripción 1 ::
+-- Equipo: Arañas Tecnológicas (CBTis 109). 
+-- Coach: Mario Bros (ID usuario aprox 3, ID docente 3).
+-- Evento: Torneo de Robots Madero (ID 2).
+-- Categoría: Bachillerato (ID 3).
+-- Participantes: Peter, Gwen, Miles (IDs aprox 4, 5, 6).
+
+-- NOTA: Revisa los IDs de tus docentes y participantes con un SELECT si no estás seguro.
+-- SELECT * FROM docente;
+-- SELECT * FROM participante;
+
+-- Ejemplo asumiendo IDs consecutivos:
+CALL registrar_equipo(3, 2, 2, 3, 4, 5, 6, @aviso); 
+-- (Coach ID 3, Equipo ID 2, Evento ID 2, Categ 3, Partic 4,5,6)
+
+
+-- :: Inscripción 2 ::
+-- Equipo: Vengadores ITCM.
+-- Coach: Ada Lovelace (ID docente 4).
+-- Evento: Torneo de Robots Madero (ID 2).
+-- Categoría: Profesional (ID 4).
+-- Participantes: Tony, Bruce, Natasha (IDs aprox 7, 8, 9).
+
+CALL registrar_equipo(4, 3, 2, 4, 7, 8, 9, @aviso);
+
+
+-- :: Inscripción 3 ::
+-- Equipo: Entrenadores Pokémon (Secundaria).
+-- Coach: Albert Einstein (ID docente 5).
+-- Evento: Expo Tech Altamira (ID 3).
+-- Categoría: Secundaria (ID 2).
+-- Participantes: Ash, Misty, Brock (IDs aprox 10, 11, 12).
+
+CALL registrar_equipo(5, 4, 3, 2, 10, 11, 12, @aviso);
