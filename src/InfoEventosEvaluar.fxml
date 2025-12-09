@@ -13,7 +13,7 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <ComboBox fx:id="cbEquiposFiltrados" layoutX="34.0" layoutY="90.0" prefHeight="41.0" prefWidth="432.0" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+      <ComboBox fx:id="cbEquipos" layoutX="34.0" layoutY="90.0" prefHeight="41.0" prefWidth="432.0" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
       <Button fx:id="btnComenzarEvaluacion" layoutX="115.0" layoutY="212.0" mnemonicParsing="false" onAction="#btnComenzarEvaluacion" prefHeight="58.0" prefWidth="270.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="COMENZAR EVALUACIÓN" textFill="WHITE">
          <font>
             <Font name="System Bold" size="17.0" />

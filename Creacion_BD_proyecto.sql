@@ -173,6 +173,7 @@ create table criterio_dis(
                              modelo_acorde_robot                 boolean not null,
                              acorde_simulacion_calculos          boolean not null,
                              restricciones_movimiento            boolean not null,
+                             diagramas_imagenes 				 BOOLEAN NOT NULL,
                              constraint id_criterio_disc PRIMARY KEY (fk_equipo, fk_evento),
                              FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -443,11 +444,11 @@ begin
 end
 // delimiter ;
 
-drop procedure if exists retornar_ciudades;
+drop procedure if exists retornar_ciudades_combo;
 delimiter //
-create procedure retornar_ciudades()
+create procedure retornar_ciudades_combo()
 begin
-    select * from ciudad;
+    select id_ciudad, nombre from ciudad order by nombre asc;
 end
 // delimiter ;
 
@@ -740,20 +741,24 @@ create procedure retornar_categorias_por_evento(
     in p_id_evento int
 )
 begin
-    select categoria.id_categoria, categoria.nombre
-    from categoria
-    join categoria_evento on categoria.id_categoria = categoria_evento.fk_categoria
-    where categoria_evento.fk_evento = p_id_evento
+    select c.id_categoria, c.nombre 
+    from categoria c
+    join categoria_evento ce on c.id_categoria = ce.fk_categoria
+    where ce.fk_evento = p_id_evento
+    
+    -- 1. filtro: menos de 3 jueces
     and (
-        select count(*) from asignacion_juez 
-        where fk_evento = p_id_evento and fk_categoria = categoria.id_categoria
-    ) < 3 -- Solo si hay menos de 3 jueces asignados
-    and (
-        select count(*) from inscripcion_equipo ie
+        select count(*) from asignacion_juez aj
+        where aj.fk_evento = p_id_evento and aj.fk_categoria = c.id_categoria
+    ) < 3 
+    
+    -- 2. filtro: que tenga equipos inscritos
+    and exists (
+        select 1 from inscripcion_equipo ie
         where ie.fk_evento = p_id_evento
         and ie.fk_categoria = c.id_categoria
-    ) > 0
-    order by categoria.nombre;
+    )
+    order by c.nombre;
 end
 // delimiter ;
 
@@ -817,31 +822,6 @@ begin
         
         set aviso = 1; -- Éxito
     end if;
-end
-// delimiter ;
-
--- Procedimiento: Retornar Eventos donde participa Usuario
-drop procedure if exists retornar_eventos_participados;
-delimiter //
-create procedure retornar_eventos_participados(
-    in p_id_usuario int
-)
-begin
-    -- Eventos donde es Coach
-    select distinct evento.id_evento, evento.nombre, evento.fecha, sede.nombre as sede, 'COACH' as mi_rol
-    from evento
-    join sede on evento.fk_sede = sede.id_sede
-    join inscripcion_equipo on inscripcion_equipo.fk_evento = evento.id_evento
-    where inscripcion_equipo.fk_coach = p_id_usuario
-
-    union
-
-    -- Eventos donde es Juez
-    select distinct evento.id_evento, evento.nombre, evento.fecha, sede.nombre as sede, 'JUEZ' as mi_rol
-    from evento
-    join sede on evento.fk_sede = sede.id_sede
-    join asignacion_juez on asignacion_juez.fk_evento = evento.id_evento
-    where asignacion_juez.fk_juez = p_id_usuario;
 end
 // delimiter ;
 
@@ -931,6 +911,186 @@ order by c.nombre, e.nombre;
 end
 //
 delimiter ;
+
+-- PUNTAJE
+-- 1. procedimiento para diseño (corregido)
+drop procedure if exists gestionar_evaluacion_diseno;
+delimiter //
+create procedure gestionar_evaluacion_diseno(
+    in p_equipo int, in p_evento int,
+    in p_reg_fechas tinyint, in p_justif tinyint, in p_ortografia tinyint, in p_presentacion tinyint,
+    in p_video tinyint, in p_software tinyint, in p_analisis tinyint, in p_ensamble tinyint,
+    in p_modelo tinyint, in p_simulacion tinyint, in p_restricciones tinyint,
+    in p_diagramas tinyint  -- ¡nuevo parámetro!
+)
+begin
+    declare v_categoria int;
+    
+    -- 1. obtener la categoría de la inscripción para poder crear el registro padre
+    select fk_categoria into v_categoria 
+    from inscripcion_equipo 
+    where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
+
+    -- 2. asegurar que existe el registro padre en 'criterios_evaluacion'
+    insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales) 
+    values (p_equipo, p_evento, v_categoria, 0);
+
+    -- 3. guardar o actualizar diseño
+    insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento, 
+    diagramas_imagenes) -- ¡nueva columna en insert!
+    values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones, 
+    p_diagramas) -- ¡nuevo valor!
+    on duplicate key update
+    registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
+    diagramas_imagenes=p_diagramas; -- ¡nueva columna en update!
+    
+    -- actualización del puntaje total
+    update criterios_evaluacion 
+    set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
+    where fk_equipo = p_equipo and fk_evento = p_evento;
+end //
+delimiter ;
+
+drop procedure if exists obtener_evaluacion_diseno;
+delimiter //
+create procedure obtener_evaluacion_diseno(in p_equipo int, in p_evento int)
+begin
+    select * from criterio_dis where fk_equipo = p_equipo and fk_evento = p_evento;
+end
+// delimiter ;
+
+-- 2. procedimiento para programación (corregido)
+drop procedure if exists gestionar_evaluacion_prog;
+delimiter //
+create procedure gestionar_evaluacion_prog(
+    in p_equipo int, in p_evento int,
+    in p_soft tinyint, in p_uso_func tinyint, in p_complejidad tinyint, in p_justif tinyint,
+    in p_conocimiento tinyint, in p_depuracion tinyint, in p_modular tinyint, in p_doc tinyint,
+    in p_vinc_acc tinyint, in p_sensores tinyint, in p_vinc_joy tinyint, in p_calib tinyint,
+    in p_resp tinyint, in p_doc_cod tinyint, in p_demo15 tinyint, in p_no_inc tinyint,
+    in p_demo_obj tinyint, in p_explicacion tinyint
+)
+begin
+    declare v_categoria int;
+    
+    select fk_categoria into v_categoria 
+    from inscripcion_equipo 
+    where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
+
+    insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales) 
+    values (p_equipo, p_evento, v_categoria, 0);
+
+    insert into criterio_prog (fk_equipo, fk_evento, soft_prog, uso_func, complejidad, just_prog, conocimiento_estr_func, depuracion, codigo_modular_efi, documentacion, vinculación_acciones, sensores, vinculo_jostick, calibración, respuesta_dispositivo, documentación_codigo, demostración_15min, no_inconvenientes, demostracion_objetivo, explicacion_rutina)
+    values (p_equipo, p_evento, p_soft, p_uso_func, p_complejidad, p_justif, p_conocimiento, p_depuracion, p_modular, p_doc, p_vinc_acc, p_sensores, p_vinc_joy, p_calib, p_resp, p_doc_cod, p_demo15, p_no_inc, p_demo_obj, p_explicacion)
+    on duplicate key update
+    soft_prog=p_soft, uso_func=p_uso_func, complejidad=p_complejidad, just_prog=p_justif, conocimiento_estr_func=p_conocimiento, depuracion=p_depuracion, codigo_modular_efi=p_modular, documentacion=p_doc, vinculación_acciones=p_vinc_acc, sensores=p_sensores, vinculo_jostick=p_vinc_joy, calibración=p_calib, respuesta_dispositivo=p_resp, documentación_codigo=p_doc_cod, demostración_15min=p_demo15, no_inconvenientes=p_no_inc, demostracion_objetivo=p_demo_obj, explicacion_rutina=p_explicacion;
+
+    -- actualización del puntaje total
+    update criterios_evaluacion 
+    set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
+    where fk_equipo = p_equipo and fk_evento = p_evento;
+end //
+delimiter ;
+
+drop procedure if exists obtener_evaluacion_prog;
+delimiter //
+create procedure obtener_evaluacion_prog(in p_equipo int, in p_evento int)
+begin
+    select * from criterio_prog where fk_equipo = p_equipo and fk_evento = p_evento;
+end
+// delimiter ;
+
+drop function if exists calcular_puntaje_total;
+delimiter //
+create function calcular_puntaje_total(p_equipo int, p_evento int) 
+returns int
+reads sql data
+begin
+    declare v_puntos int default 0;
+    
+    -- variables para sumas crudas y puntajes escalados
+    declare v_raw_diseno int default 0;
+    declare v_score_diseno int default 0;
+    
+    declare v_raw_prog int default 0;
+    declare v_score_prog int default 0;
+    
+    declare v_raw_const int default 0;
+    declare v_score_const int default 0;
+
+    -- 1. calcular diseño (12 ítems)
+    select ifnull(
+        (registro_fechas + justificacion_cambios_prototipos + ortografia_redacción + presentación + 
+         video_animación + diseno_modelado_software + analisis_elementos + ensamble_prototipo + 
+         modelo_acorde_robot + acorde_simulacion_calculos + restricciones_movimiento + diagramas_imagenes), 0)
+    into v_raw_diseno
+    from criterio_dis where fk_equipo = p_equipo and fk_evento = p_evento;
+    
+    -- escalar a 10 puntos: (suma / 12) * 10
+    -- usamos round para redondear al entero más cercano
+    set v_score_diseno = round((v_raw_diseno / 12.0) * 10);
+
+    -- 2. calcular programación (18 ítems)
+    select ifnull(
+        (soft_prog + uso_func + complejidad + just_prog + conocimiento_estr_func + depuracion + 
+         codigo_modular_efi + documentacion + vinculación_acciones + sensores + vinculo_jostick + 
+         calibración + respuesta_dispositivo + documentación_codigo + demostración_15min + 
+         no_inconvenientes + demostracion_objetivo + explicacion_rutina), 0)
+    into v_raw_prog
+    from criterio_prog where fk_equipo = p_equipo and fk_evento = p_evento;
+
+    -- escalar a 10 puntos: (suma / 18) * 10
+    set v_score_prog = round((v_raw_prog / 18.0) * 10);
+
+    -- 3. calcular construcción (17 ítems)
+    select ifnull(
+        (prototipo_estetico + estructuras_estables + uso_sistemas_transmision + uso_sensores + 
+         cableado_adecuado + calculo_implementacion_sistema_neumático + conocimiento_alcance + 
+         implementación_marca_vex + uso_procesador_cortexm3 + analisis_estruc + relacion_velocidades + 
+         tren_engranes + centro_gravedad + sis_transmicion + potencia + torque + velocidad), 0)
+    into v_raw_const
+    from criterio_const where fk_equipo = p_equipo and fk_evento = p_evento;
+
+    -- escalar a 10 puntos: (suma / 17) * 10
+    set v_score_const = round((v_raw_const / 17.0) * 10);
+
+    -- 4. sumar total (máximo 30)
+    set v_puntos = v_score_diseno + v_score_prog + v_score_const;
+    
+    return v_puntos;
+end //
+delimiter ;
+
+drop procedure if exists gestionar_evaluacion_const;
+delimiter //
+create procedure gestionar_evaluacion_const(
+    in p_equipo int, in p_evento int,
+    in p_proto tinyint, in p_estruc tinyint, in p_sis_trans tinyint, in p_sensores tinyint,
+    in p_cableado tinyint, in p_neumatico tinyint, in p_alcance tinyint, in p_vex tinyint,
+    in p_cortex tinyint, in p_analisis tinyint, in p_rel_vel tinyint, in p_tren tinyint,
+    in p_centro tinyint, in p_transmision tinyint, in p_potencia tinyint, in p_torque tinyint, in p_velocidad tinyint
+)
+begin
+    -- 1. insertar/actualizar construcción
+    insert into criterio_const (fk_equipo, fk_evento, prototipo_estetico, estructuras_estables, uso_sistemas_transmision, uso_sensores, cableado_adecuado, calculo_implementacion_sistema_neumático, conocimiento_alcance, implementación_marca_vex, uso_procesador_cortexm3, analisis_estruc, relacion_velocidades, tren_engranes, centro_gravedad, sis_transmicion, potencia, torque, velocidad)
+    values (p_equipo, p_evento, p_proto, p_estruc, p_sis_trans, p_sensores, p_cableado, p_neumatico, p_alcance, p_vex, p_cortex, p_analisis, p_rel_vel, p_tren, p_centro, p_transmision, p_potencia, p_torque, p_velocidad)
+    on duplicate key update
+    prototipo_estetico=p_proto, estructuras_estables=p_estruc, uso_sistemas_transmision=p_sis_trans, uso_sensores=p_sensores, cableado_adecuado=p_cableado, calculo_implementacion_sistema_neumático=p_neumatico, conocimiento_alcance=p_alcance, implementación_marca_vex=p_vex, uso_procesador_cortexm3=p_cortex, analisis_estruc=p_analisis, relacion_velocidades=p_rel_vel, tren_engranes=p_tren, centro_gravedad=p_centro, sis_transmicion=p_transmision, potencia=p_potencia, torque=p_torque, velocidad=p_velocidad;
+
+    -- 2. calcular puntaje real usando la función
+    update criterios_evaluacion 
+    set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
+    where fk_equipo = p_equipo and fk_evento = p_evento;
+end //
+delimiter ;
+
+drop procedure if exists obtener_evaluacion_const;
+delimiter //
+create procedure obtener_evaluacion_const(in p_equipo int, in p_evento int)
+begin
+    select * from criterio_const where fk_equipo = p_equipo and fk_evento = p_evento;
+end
+// delimiter ;
 
 -- ==================================================================
 -- SECCIÓN DE INSERCIÓN DE DATOS Y LLAMADAS DE PRUEBA

@@ -7,7 +7,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="718.0" prefWidth="1118.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@estilos.css">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="718.0" prefWidth="1118.0"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            stylesheets="@estilos.css"
+            fx:controller="EvaluarProgController">
    <children>
       <Label layoutX="50.0" layoutY="30.0" prefHeight="50.0" prefWidth="205.0" text="Evaluación del equipo:">
          <font>
@@ -138,7 +142,7 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button fx:id="btnSigCriterio" layoutX="910.0" layoutY="644.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="185.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="SIG. CRITERIO" textFill="WHITE">
+      <Button fx:id="btnSigCriterio" onAction="#btnSigCriterio" layoutX="910.0" layoutY="644.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="185.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="SIG. CRITERIO" textFill="WHITE">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>

@@ -717,4 +717,207 @@ public class Main extends Application {
         return lista;
     }
 
+
+    // ==========================================
+    // MÉTODOS PARA EVALUACIÓN (JUECES)
+    // ==========================================
+
+    // 1. Obtener equipos asignados al juez para el evento actual
+    public static List<Map<String, Object>> retornarEquiposAEvaluar(int idEvento, int idJuez) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_equipos_a_evaluar(?, ?)}")) {
+
+            cs.setInt(1, idEvento);
+            cs.setInt(2, idJuez);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+                    fila.put("id_equipo", rs.getInt("id_equipo"));
+                    fila.put("nombre_equipo", rs.getString("nombre_equipo"));
+                    fila.put("nombre_categoria", rs.getString("nombre_categoria"));
+                    lista.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener equipos a evaluar: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // ------------------------------------------
+    // CRITERIO: DISEÑO
+    // ------------------------------------------
+    public static void gestionarEvaluacionDiseno(int equipo, int evento, boolean... checks) {
+        // El SP espera: equipo, evento + 11 booleans (TINYINT)
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL gestionar_evaluacion_diseno(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setInt(1, equipo);
+            cs.setInt(2, evento);
+
+            // Recorremos los checks y los pasamos como 1 o 0
+            for (int i = 0; i < checks.length; i++) {
+                cs.setInt(i + 3, checks[i] ? 1 : 0);
+            }
+
+            cs.execute();
+            System.out.println("Evaluación de Diseño guardada.");
+
+        } catch (SQLException e) {
+            System.err.println("Error al guardar evaluación de diseño: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static Map<String, Boolean> obtenerEvaluacionDiseno(int equipo, int evento) {
+        Map<String, Boolean> datos = new HashMap<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL obtener_evaluacion_diseno(?, ?)}")) {
+
+            cs.setInt(1, equipo);
+            cs.setInt(2, evento);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                if (rs.next()) {
+                    // Mapeamos las columnas de la BD a claves del mapa
+                    datos.put("registro_fechas", rs.getBoolean("registro_fechas"));
+                    datos.put("justificacion_cambios_prototipos", rs.getBoolean("justificacion_cambios_prototipos"));
+                    datos.put("ortografia_redacción", rs.getBoolean("ortografia_redacción"));
+                    datos.put("presentación", rs.getBoolean("presentación"));
+                    datos.put("video_animación", rs.getBoolean("video_animación"));
+                    datos.put("diseno_modelado_software", rs.getBoolean("diseno_modelado_software"));
+                    datos.put("analisis_elementos", rs.getBoolean("analisis_elementos"));
+                    datos.put("ensamble_prototipo", rs.getBoolean("ensamble_prototipo"));
+                    datos.put("modelo_acorde_robot", rs.getBoolean("modelo_acorde_robot"));
+                    datos.put("acorde_simulacion_calculos", rs.getBoolean("acorde_simulacion_calculos"));
+                    datos.put("restricciones_movimiento", rs.getBoolean("restricciones_movimiento"));
+                    datos.put("diagramas_imagenes", rs.getBoolean("diagramas_imagenes"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return datos;
+    }
+
+    // ------------------------------------------
+    // CRITERIO: PROGRAMACIÓN
+    // ------------------------------------------
+    public static void gestionarEvaluacionProg(int equipo, int evento, boolean... checks) {
+        // El SP espera: equipo, evento + 18 booleans
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL gestionar_evaluacion_prog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setInt(1, equipo);
+            cs.setInt(2, evento);
+
+            for (int i = 0; i < checks.length; i++) {
+                cs.setInt(i + 3, checks[i] ? 1 : 0);
+            }
+
+            cs.execute();
+            System.out.println("Evaluación de Programación guardada.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Map<String, Boolean> obtenerEvaluacionProg(int equipo, int evento) {
+        Map<String, Boolean> datos = new HashMap<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL obtener_evaluacion_prog(?, ?)}")) {
+
+            cs.setInt(1, equipo);
+            cs.setInt(2, evento);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                if (rs.next()) {
+                    datos.put("soft_prog", rs.getBoolean("soft_prog"));
+                    datos.put("uso_func", rs.getBoolean("uso_func"));
+                    datos.put("complejidad", rs.getBoolean("complejidad"));
+                    datos.put("just_prog", rs.getBoolean("just_prog"));
+                    datos.put("conocimiento_estr_func", rs.getBoolean("conocimiento_estr_func"));
+                    datos.put("depuracion", rs.getBoolean("depuracion"));
+                    datos.put("codigo_modular_efi", rs.getBoolean("codigo_modular_efi"));
+                    datos.put("documentacion", rs.getBoolean("documentacion"));
+                    datos.put("vinculación_acciones", rs.getBoolean("vinculación_acciones"));
+                    datos.put("sensores", rs.getBoolean("sensores"));
+                    datos.put("vinculo_jostick", rs.getBoolean("vinculo_jostick"));
+                    datos.put("calibración", rs.getBoolean("calibración"));
+                    datos.put("respuesta_dispositivo", rs.getBoolean("respuesta_dispositivo"));
+                    datos.put("documentación_codigo", rs.getBoolean("documentación_codigo"));
+                    datos.put("demostración_15min", rs.getBoolean("demostración_15min"));
+                    datos.put("no_inconvenientes", rs.getBoolean("no_inconvenientes"));
+                    datos.put("demostracion_objetivo", rs.getBoolean("demostracion_objetivo"));
+                    datos.put("explicacion_rutina", rs.getBoolean("explicacion_rutina"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return datos;
+    }
+
+    // ------------------------------------------
+    // CRITERIO: CONSTRUCCIÓN
+    // ------------------------------------------
+    public static void gestionarEvaluacionConst(int equipo, int evento, boolean... checks) {
+        // El SP espera: equipo, evento + 17 booleans
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL gestionar_evaluacion_const(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setInt(1, equipo);
+            cs.setInt(2, evento);
+
+            for (int i = 0; i < checks.length; i++) {
+                cs.setInt(i + 3, checks[i] ? 1 : 0);
+            }
+
+            cs.execute();
+            System.out.println("Evaluación de Construcción guardada.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Map<String, Boolean> obtenerEvaluacionConst(int equipo, int evento) {
+        Map<String, Boolean> datos = new HashMap<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL obtener_evaluacion_const(?, ?)}")) {
+
+            cs.setInt(1, equipo);
+            cs.setInt(2, evento);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                if (rs.next()) {
+                    datos.put("prototipo_estetico", rs.getBoolean("prototipo_estetico"));
+                    datos.put("estructuras_estables", rs.getBoolean("estructuras_estables"));
+                    datos.put("uso_sistemas_transmision", rs.getBoolean("uso_sistemas_transmision"));
+                    datos.put("uso_sensores", rs.getBoolean("uso_sensores"));
+                    datos.put("cableado_adecuado", rs.getBoolean("cableado_adecuado"));
+                    datos.put("calculo_implementacion_sistema_neumático", rs.getBoolean("calculo_implementacion_sistema_neumático"));
+                    datos.put("conocimiento_alcance", rs.getBoolean("conocimiento_alcance"));
+                    datos.put("implementación_marca_vex", rs.getBoolean("implementación_marca_vex"));
+                    datos.put("uso_procesador_cortexm3", rs.getBoolean("uso_procesador_cortexm3"));
+                    datos.put("analisis_Estruc", rs.getBoolean("analisis_Estruc"));
+                    datos.put("relacion_velocidades", rs.getBoolean("relacion_velocidades"));
+                    datos.put("tren_engranes", rs.getBoolean("tren_engranes"));
+                    datos.put("centro_gravedad", rs.getBoolean("centro_gravedad"));
+                    datos.put("sis_transmicion", rs.getBoolean("sis_transmicion"));
+                    datos.put("potencia", rs.getBoolean("potencia"));
+                    datos.put("torque", rs.getBoolean("torque"));
+                    datos.put("velocidad", rs.getBoolean("velocidad"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return datos;
+    }
+
 }

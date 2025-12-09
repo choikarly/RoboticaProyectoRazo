@@ -71,11 +71,9 @@ public class MainEventosController {
                     String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Pendiente";
 
                     // 2. PASAR DATOS A LA PLANTILLA
-                    // Nota: Debemos actualizar este método en la plantilla para recibir el ID
                     controller.setDatosEventoParticipado(idEvento, nombre, sede, fecha, rol);
 
                     vboxContenedorEventosParticipados.getChildren().add(panelEventoParticipado);
-
                 } catch (IOException e) {
                     System.err.println("Error al cargar FXML de plantilla participada:");
                     e.printStackTrace();
