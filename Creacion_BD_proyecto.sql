@@ -200,26 +200,58 @@ create table criterio_const(
                                constraint id_criterio_const PRIMARY KEY (fk_equipo, fk_evento),
                                FOREIGN KEY (fk_equipo, fk_evento) REFERENCES criterios_evaluacion(fk_equipo, fk_evento) ON DELETE CASCADE ON UPDATE CASCADE
 );
+-- ==================================================================
+-- SECCIÓN DE FUNCIONES Y PROCEDIMIENTOS ALMACENADOS
+-- ==================================================================
 
--- Creacion del admin
+-- Función: Grado Admin
+drop function if exists grado_admin;
+delimiter //
+create function grado_admin(
+    f_id_usuario int
+) returns int
+reads sql data
+begin
+    declare v_nivel int;
+    if exists (select * from administrador where id_administrador = f_id_usuario) then
+        select grado into v_nivel from administrador where id_administrador = f_id_usuario;
+    else
+        set v_nivel = -1;
+    end if;
+    return v_nivel;
+end
+// delimiter ;
 
-insert into usuario(nombre_usuario, clave) values ("admin", "1029384756");
-insert into administrador(id_administrador, grado) values (last_insert_id(), 3);
+-- Procedimiento: Inicio de Sesión
+drop procedure if exists inicio_sesion;
+delimiter //
+create procedure inicio_sesion(
+    p_nombre_usuario    varchar(80),
+    p_clave             varchar(225),
+    out p_grado         tinyint,
+    out p_id_usuario    int,
+    out p_nombre_completo varchar(80)
+)
+begin
+    if exists (select * from usuario where nombre_usuario = p_nombre_usuario and clave = p_clave) then
+        select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
+        select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
+        select nombre_usuario into p_nombre_completo from usuario where id_usuario = p_id_usuario;
+        
+        -- Intentar obtener nombre real si es docente
+        select nombre into @temp_nombre from docente where id_docente = p_id_usuario;
+        if @temp_nombre is not null then
+            set p_nombre_completo = @temp_nombre;
+        end if;
+    else
+        set p_grado = -2;
+        set p_id_usuario = -1;
+        set p_nombre_completo = null;
+    end if;
+end
+// delimiter ;
 
--- Creacion de categorias
-
-insert into categoria(nombre) values ("Primaria");
-insert into categoria(nombre) values ("Secundaria");
-insert into categoria(nombre) values ("Bachillerato");
-insert into categoria(nombre) values ("Profesional");
-
--- Dar de alta ciudades
-
-insert into ciudad(nombre) values ("Tampico");
-insert into ciudad(nombre) values ("Madero");
-insert into ciudad(nombre) values ("Altamira");
-
--- Procesos almacenados
+-- Procedimiento: Ingresar Sede
 drop procedure if exists ingresar_sede;
 delimiter //
 create procedure ingresar_sede (
@@ -228,15 +260,16 @@ create procedure ingresar_sede (
     out aviso tinyint
 )
 begin
-	if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
-		set aviso = -1; -- Nombre de sede existente en esa ciudad
-else
-		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
-        set aviso = 1; -- Se ingreso la sede correctamente
-end if;
+    if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
+        set aviso = -1; -- Nombre de sede existente en esa ciudad
+    else
+        insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
+        set aviso = 1; 
+    end if;
 end
 // delimiter ;
 
+-- Procedimiento: Ingresar Escuela
 drop procedure if exists ingresar_escuela;
 delimiter //
 create procedure ingresar_escuela (
@@ -246,81 +279,61 @@ create procedure ingresar_escuela (
     out aviso tinyint
 )
 begin
-	if exists (select * from escuela join sede on id_escuela = id_sede
+    if exists (select * from escuela join sede on id_escuela = id_sede
     where nombre = p_nombre and fk_ciudad = p_fk_ciudad and fk_nivel = p_fk_nivel) then
-		set aviso = -1; -- Sede existente en esa
-else
-		insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
-insert into escuela (id_escuela, fk_nivel) values (last_insert_id(), p_fk_nivel);
-set aviso = 1; -- Se ingreso la sede correctamente
-end if;
+        set aviso = -1;
+    else
+        insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
+        insert into escuela (id_escuela, fk_nivel) values (last_insert_id(), p_fk_nivel);
+        set aviso = 1;
+    end if;
 end
 // delimiter ;
 
--- Dar de alta escuelas
-set @mensaje = 0;
-CALL ingresar_escuela("Instituto Tecnológico de Ciudad Madero (ITCM)", 2, 4, @mensaje);
-CALL ingresar_escuela("Universidad Autonoma de Tamaulipas (UAT)", 1, 4, @mensaje);
-CALL ingresar_escuela("Centro de Bachillerato Tecnológico Industrial y de Servicio N.103(CBTis 103)", 2, 3, @mensaje);
-CALL ingresar_escuela("Escuela Secundaria N.3 Club de Leones", 1, 2, @mensaje);
-CALL ingresar_escuela("Universidad Tecnologica de Altamira (UT Altamira)", 3, 4, @mensaje);
-CALL ingresar_escuela("Escuela Primaria Justo Sierra", 1, 1, @mensaje);
-CALL ingresar_escuela("Colegio Arboledas A.C", 3, 1, @mensaje);
-CALL ingresar_escuela("Centro de Estudios Tecnológico Industrial y de Servicio N.109 (CEBtis 109)", 2, 3, @mensaje);
-CALL ingresar_escuela("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2, @mensaje);
-set @aviso = 0;
-call ingresar_sede("Espacio Cultural Metropolitano", 1, @aviso);
+-- Procedimiento: Registrar Competidor
+drop procedure if exists registrar_competidor;
+delimiter //
+create procedure registrar_competidor(
+    in p_nombre varchar(80),
+    in p_fecha_nacimiento date,
+    in p_escuela int,
+    in p_sexo enum("H","M"),
+    in p_carrera varchar(40),
+    in p_semestre tinyint,
+    in p_num_control int,
+    out aviso tinyint
+)
+begin
+    declare v_nivel int;
+    declare v_edad int;
+    declare v_edad_minima int;
 
-DROP PROCEDURE IF EXISTS registrar_competidor;
-DELIMITER //
-CREATE PROCEDURE registrar_competidor(
-    IN p_nombre VARCHAR(80),
-    IN p_fecha_nacimiento DATE,
-    IN p_escuela INT,
-    IN p_sexo ENUM("H","M"),
-    IN p_carrera VARCHAR(40),
-    IN p_semestre TINYINT,
-    IN p_num_control INT,
-    OUT aviso TINYINT
-        )
-BEGIN
-    DECLARE v_nivel INT;
-    DECLARE v_edad INT;
-    DECLARE v_edad_minima INT;
+    select fk_nivel into v_nivel from escuela where id_escuela = p_escuela;
 
-    -- 1. Obtener el nivel de la escuela (1=Primaria, 2=Secundaria, etc.)
-SELECT fk_nivel INTO v_nivel FROM escuela WHERE id_escuela = p_escuela;
+    -- Definir edad mínima según nivel
+    case v_nivel
+        when 1 then set v_edad_minima = 6;  -- Primaria
+        when 2 then set v_edad_minima = 12; -- Secundaria
+        when 3 then set v_edad_minima = 15; -- Bachillerato
+        when 4 then set v_edad_minima = 17; -- Universidad
+        else set v_edad_minima = 0;
+    end case;
 
--- 2. Definir la edad mínima según el nivel
-CASE v_nivel
-        WHEN 1 THEN SET v_edad_minima = 6;  -- Primaria
-WHEN 2 THEN SET v_edad_minima = 12; -- Secundaria
-WHEN 3 THEN SET v_edad_minima = 15; -- Bachillerato
-WHEN 4 THEN SET v_edad_minima = 17; -- Universidad
-ELSE SET v_edad_minima = 0;
-END CASE;
+    set v_edad = timestampdiff(year, p_fecha_nacimiento, curdate());
 
-    -- 3. Calcular la edad actual
-    SET v_edad = TIMESTAMPDIFF(YEAR, p_fecha_nacimiento, CURDATE());
+    if v_edad < v_edad_minima then
+        set aviso = -3; -- Error: Muy joven
+    elseif exists (select * from participante where num_control = p_num_control and fk_escuela = p_escuela) then
+        set aviso = -1; -- Error: Duplicado
+    else
+        insert into participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
+        values (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_carrera, p_semestre, p_num_control);
+        set aviso = 1;
+    end if;
+end
+// delimiter ;
 
-    -- 4. Validar
-    IF v_edad < v_edad_minima THEN
-        SET aviso = -3; -- ERROR: Muy joven
-    ELSEIF EXISTS (SELECT * FROM participante WHERE num_control = p_num_control AND fk_escuela = p_escuela) THEN
-        SET aviso = -1; -- ERROR: Duplicado
-ELSE
-        -- Insertar si cumple la edad
-        INSERT INTO participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
-        VALUES (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_carrera, p_semestre, p_num_control);
-        SET aviso = 1; -- ÉXITO
-END IF;
-END
-// DELIMITER ;
-
-call registrar_competidor("Adan", "2005-01-14", 2, "H", "Ing. Sistemas Computacionales", 5, 23070402, @aviso);
-call registrar_competidor("Karla", "2005-02-09", 2, "M", "Ing. Sistemas Computacionales", 5, 23070465, @aviso);
-call registrar_competidor("Barbara", "2005-12-04", 2, "M", "Ing. Sistemas Computacionales", 5, 23070456, @aviso);
-
+-- Procedimiento: Registrar Docente
 drop procedure if exists registrar_docente;
 delimiter //
 create procedure registrar_docente(
@@ -332,31 +345,27 @@ create procedure registrar_docente(
     p_sexo enum("H","M"),
     p_especialidad varchar(40),
     out aviso tinyint
-        )
+)
 begin
-    declare v_edad INT;
-    set v_edad = TIMESTAMPDIFF(YEAR, p_fecha_nacimiento, CURDATE());
+    declare v_edad int;
+    set v_edad = timestampdiff(year, p_fecha_nacimiento, curdate());
+    
     if v_edad >= 18 then
         if exists (select * from usuario where nombre_usuario = p_usuario) then
-            set aviso = 0;-- Nombre de usuario existente
-else
+            set aviso = 0; -- Usuario existente
+        else
             insert into usuario (nombre_usuario, clave) values (p_usuario, p_clave);
-insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
-values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
-set aviso = 1; -- Se registro correctamente
-end if;
-else
-        set aviso = -1; -- Menor de edad (no puede ser docente)
-end if;
+            insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
+            values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
+            set aviso = 1;
+        end if;
+    else
+        set aviso = -1; -- Menor de edad
+    end if;
 end
 // delimiter ;
 
-set @mensaje = "0";
-call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-21", 2, "H", "Redes de computadoras", @mensaje);
-call registrar_docente("Mauro", "Mau", "12345678", "2005-06-24", 4, "H", "Calador", @mensaje);
-call registrar_docente("Carlos Santillan", "Santi", "12345678", "2005-10-15", 4, "H", "Procrasti", @mensaje);
-call registrar_docente("Jose Esteban", "Tobi", "12345678", "2005-01-13", 4, "H", "Pokemon", @mensaje);
-	
+-- Procedimiento: Crear Evento
 drop procedure if exists crear_evento;
 delimiter //
 create procedure crear_evento(
@@ -366,158 +375,19 @@ create procedure crear_evento(
     out aviso tinyint
 )
 begin
-	if exists (select * from evento where fecha like p_fecha and fk_sede like p_fk_sede) then
-		set aviso = -1; -- Ya existe un evento en esa sede ese mismo dia
-	elseif exists (select * from evento where nombre like p_nombre_evento) then
-		set aviso = 0; -- Ya existe un evento con ese mismo nombre
-else
-		insert into evento (nombre, fecha, fk_sede) values (p_nombre_evento, p_fecha, p_fk_sede);
-insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
-set aviso = 1; -- Se creo correctamente el equipo
-end if;
+    if exists (select * from evento where fecha like p_fecha and fk_sede like p_fk_sede) then
+        set aviso = -1; -- Evento existente en esa sede y fecha
+    elseif exists (select * from evento where nombre like p_nombre_evento) then
+        set aviso = 0; -- Nombre duplicado
+    else
+        insert into evento (nombre, fecha, fk_sede) values (p_nombre_evento, p_fecha, p_fk_sede);
+        insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
+        set aviso = 1;
+    end if;
 end
 // delimiter ;
 
-set @aviso = 0;
-call crear_evento("OtakuVex","2025-12-12",1, @aviso);
-
-drop function if exists grado_admin;
-delimiter //
-create function grado_admin(
-    f_id_usuario int
-) returns int
-    reads sql data
-begin
-	declare v_nivel int;
-	if exists (select * from administrador where id_administrador = f_id_usuario) then
-select grado into v_nivel from administrador where id_administrador = f_id_usuario;
-else
-		set v_nivel = -1;
-end if;
-return v_nivel;
-end
-// delimiter ;
-
-drop procedure if exists inicio_sesion;
-delimiter //
-create procedure inicio_sesion(
-    p_nombre_usuario	varchar(80),
-    p_clave 			varchar(225),
-    out p_grado 		tinyint,
-    out p_id_usuario 	int,
-    out p_nombre_completo varchar(80)
-)
-begin
-	if exists (select * from usuario where nombre_usuario = p_nombre_usuario and clave = p_clave) then
-select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
-select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
-SELECT nombre_usuario INTO p_nombre_completo FROM usuario WHERE id_usuario = p_id_usuario;
-SELECT nombre INTO @temp_nombre FROM docente WHERE id_docente = p_id_usuario;
-IF @temp_nombre IS NOT NULL THEN
-            SET p_nombre_completo = @temp_nombre;
-END IF;
-else
-		set p_grado = -2;
-		set p_id_usuario = -1;
-        set p_nombre_completo = null;
-end if;
-end
-// delimiter ;
-
-drop procedure if exists retornar_categorias;
-delimiter //
-create procedure retornar_categorias()
-begin
-select * from categoria;
-end
-// delimiter ;
-
-drop procedure if exists retornar_ciudades;
-delimiter //
-create procedure retornar_ciudades()
-begin
-select * from ciudad;
-end
-// delimiter ;
-
-drop procedure if exists retornar_escuelas;
-delimiter //
-create procedure retornar_escuelas()
-begin
-select id_escuela, nombre, fk_ciudad, fk_nivel from sede join escuela on id_escuela = id_sede;
-end
-// delimiter ;
-
-drop procedure if exists retornar_docentes;
-delimiter //
-create procedure retornar_docentes()
-begin
-select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
-                                                                                          join escuela on id_escuela = fk_escuela
-                                                                                          join sede on id_escuela = id_sede;
-end
-// delimiter ;
-
-drop procedure if exists retornar_coach;
-delimiter //
-create procedure retornar_coach()
-begin
-select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
-                                                                                          join inscripcion_equipo on id_docente = fk_coach
-                                                                                          join escuela on id_escuela = fk_escuela
-                                                                                          join sede on id_escuela = id_sede;
-end
-// delimiter ;
-
-drop procedure if exists retornar_juez;
-delimiter //
-create procedure retornar_juez()
-begin
-select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
-                                                                                          join asignacion_juez on id_docente = fk_juez
-                                                                                          join escuela on id_escuela = fk_escuela
-                                                                                          join sede on id_escuela = id_sede;
-end
-// delimiter ;
-
-drop procedure if exists retornar_coach_juez;
-delimiter //
-create procedure retornar_coach_juez()
-begin
-select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad from docente
-                                                                                          join asignacion_juez on id_docente = fk_juez
-                                                                                          join inscripcion_equipo on id_docente = fk_coach
-                                                                                          join escuela on id_escuela = fk_escuela
-                                                                                          join sede on id_escuela = id_sede;
-end
-// delimiter ;
-
-drop procedure if exists retornar_eventos;
-delimiter //
-create procedure retornar_eventos()
-begin
-select evento.id_evento,evento.nombre, sede.nombre as sede, fecha from evento
-                                                                           join sede on fk_sede = id_sede;
-end
-// delimiter ;
-
-drop procedure if exists retornar_equipos_coach;
-delimiter //
-create procedure retornar_equipos_coach(
-    p_id_coach int
-)
-begin
-select equipo.nombre as equipo, sede.nombre as escuela, evento.nombre as evento, categoria.nombre as categoria
-from inscripcion_equipo
-         join equipo on id_equipo = fk_equipo
-         join escuela on fk_escuela = id_escuela
-         join sede on id_escuela = id_sede
-         join evento on fk_evento = id_evento
-         join categoria on fk_categoria = id_categoria
-where fk_coach = p_id_coach;
-end
-// delimiter ;
-
+-- Procedimiento: Crear Equipo
 drop procedure if exists crear_equipo;
 delimiter //
 create procedure crear_equipo(
@@ -526,18 +396,16 @@ create procedure crear_equipo(
     out p_id_equipo int
 )
 begin
-	if exists (select * from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela) then
-		set p_id_equipo = (select id_equipo from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela);
-else
-		insert into equipo (nombre, fk_escuela) values (p_nombre, p_fk_escuela);
+    if exists (select * from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela) then
+        set p_id_equipo = (select id_equipo from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela);
+    else
+        insert into equipo (nombre, fk_escuela) values (p_nombre, p_fk_escuela);
         set p_id_equipo = last_insert_id();
-end if;
+    end if;
 end
 // delimiter ;
 
-set @id_equipo = 0;
-call crear_equipo("Los Eevees", 2, @id_equipo);
-
+-- Procedimiento: Registrar Equipo (Inscripción)
 drop procedure if exists registrar_equipo;
 delimiter //
 create procedure registrar_equipo(
@@ -551,19 +419,120 @@ create procedure registrar_equipo(
     out aviso tinyint
 )
 begin
-	if exists (select * from inscripcion_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
-		set aviso = -1; -- El equipo ya esta registrado en este evento
-else
-		insert into inscripcion_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
-insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
-insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
-insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
-set aviso = 1;
-end if;
+    if exists (select * from inscripcion_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
+        set aviso = -1; -- Equipo ya registrado en este evento
+    else
+        insert into inscripcion_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) 
+        values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
+        
+        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
+        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
+        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
+        set aviso = 1;
+    end if;
 end
 // delimiter ;
 
-call registrar_equipo(2,1,1,4,1,2,3,@aviso);
+-- Consultas de Retorno (Getters) --
+
+drop procedure if exists retornar_categorias;
+delimiter //
+create procedure retornar_categorias()
+begin
+    select * from categoria;
+end
+// delimiter ;
+
+drop procedure if exists retornar_ciudades;
+delimiter //
+create procedure retornar_ciudades()
+begin
+    select * from ciudad;
+end
+// delimiter ;
+
+drop procedure if exists retornar_escuelas;
+delimiter //
+create procedure retornar_escuelas()
+begin
+    select id_escuela, nombre, fk_ciudad, fk_nivel from sede join escuela on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_docentes;
+delimiter //
+create procedure retornar_docentes()
+begin
+    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
+    from docente
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_coach;
+delimiter //
+create procedure retornar_coach()
+begin
+    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
+    from docente
+    join inscripcion_equipo on id_docente = fk_coach
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_juez;
+delimiter //
+create procedure retornar_juez()
+begin
+    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
+    from docente
+    join asignacion_juez on id_docente = fk_juez
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_coach_juez;
+delimiter //
+create procedure retornar_coach_juez()
+begin
+    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
+    from docente
+    join asignacion_juez on id_docente = fk_juez
+    join inscripcion_equipo on id_docente = fk_coach
+    join escuela on id_escuela = fk_escuela
+    join sede on id_escuela = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_eventos;
+delimiter //
+create procedure retornar_eventos()
+begin
+    select evento.id_evento, evento.nombre, sede.nombre as sede, fecha 
+    from evento
+    join sede on fk_sede = id_sede;
+end
+// delimiter ;
+
+drop procedure if exists retornar_equipos_coach;
+delimiter //
+create procedure retornar_equipos_coach(
+    p_id_coach int
+)
+begin
+    select equipo.nombre as equipo, sede.nombre as escuela, evento.nombre as evento, categoria.nombre as categoria
+    from inscripcion_equipo
+    join equipo on id_equipo = fk_equipo
+    join escuela on fk_escuela = id_escuela
+    join sede on id_escuela = id_sede
+    join evento on fk_evento = id_evento
+    join categoria on fk_categoria = id_categoria
+    where fk_coach = p_id_coach;
+end
+// delimiter ;
 
 drop procedure if exists retornar_participante;
 delimiter //
@@ -574,421 +543,372 @@ create procedure retornar_participante(
     out p_nombre varchar(80)
 )
 begin
-	if exists (select * from participante where num_control = p_num_control and fk_escuela = p_fk_escuela) then
-select id_participante, nombre into p_id_participante, p_nombre from participante where num_control = p_num_control and fk_escuela = p_fk_escuela;
-else
-		set p_id_participante = -1;
-		set p_nombre = "";
-end if;
+    if exists (select * from participante where num_control = p_num_control and fk_escuela = p_fk_escuela) then
+        select id_participante, nombre into p_id_participante, p_nombre 
+        from participante where num_control = p_num_control and fk_escuela = p_fk_escuela;
+    else
+        set p_id_participante = -1;
+        set p_nombre = "";
+    end if;
 end
 // delimiter ;
 
-DROP PROCEDURE IF EXISTS retornar_eventos_participados;
-DELIMITER //
-CREATE PROCEDURE retornar_eventos_participados(
-    p_id_usuario INT
+-- Procedimiento: Retornar Eventos donde participa Usuario (Coach o Juez)
+drop procedure if exists retornar_eventos_participados;
+delimiter //
+create procedure retornar_eventos_participados(
+    p_id_usuario int
 )
-BEGIN
-    -- 1. EVENTOS DONDE ES COACH
-SELECT DISTINCT
-    e.nombre,
-    e.fecha,
-    s.nombre as sede,
-    'COACH' as mi_rol
-FROM evento e
-         JOIN sede s ON e.fk_sede = s.id_sede
-         JOIN inscripcion_equipo ie ON ie.fk_evento = e.id_evento
-WHERE ie.fk_coach = p_id_usuario
+begin
+    -- Eventos donde es Coach
+    select distinct evento.nombre, evento.fecha, sede.nombre as sede, 'COACH' as mi_rol
+    from evento
+    join sede on evento.fk_sede = sede.id_sede
+    join inscripcion_equipo on inscripcion_equipo.fk_evento = evento.id_evento
+    where inscripcion_equipo.fk_coach = p_id_usuario
 
-UNION
+    union
 
--- 2. EVENTOS DONDE ES JUEZ
-SELECT DISTINCT
-    e.nombre,
-    e.fecha,
-    s.nombre as sede,
-    'JUEZ' as mi_rol
-FROM evento e
-         JOIN sede s ON e.fk_sede = s.id_sede
-         JOIN asignacion_juez aj ON aj.fk_evento = e.id_evento
-WHERE aj.fk_juez = p_id_usuario;
-END
-// DELIMITER ;
+    -- Eventos donde es Juez
+    select distinct evento.nombre, evento.fecha, sede.nombre as sede, 'JUEZ' as mi_rol
+    from evento
+    join sede on evento.fk_sede = sede.id_sede
+    join asignacion_juez on asignacion_juez.fk_evento = evento.id_evento
+    where asignacion_juez.fk_juez = p_id_usuario;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS obtener_id_escuela_docente;
-DELIMITER //
-CREATE PROCEDURE obtener_id_escuela_docente(
-    IN p_id_docente INT,
-    OUT p_id_escuela INT
+-- Procedimiento: Obtener ID Escuela Docente
+drop procedure if exists obtener_id_escuela_docente;
+delimiter //
+create procedure obtener_id_escuela_docente(
+    in p_id_docente int,
+    out p_id_escuela int
 )
-BEGIN
-SELECT fk_escuela INTO p_id_escuela
-FROM docente
-WHERE id_docente = p_id_docente;
-END
-// DELIMITER ;
+begin
+    select fk_escuela into p_id_escuela from docente where id_docente = p_id_docente;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS obtener_nombre_escuela_docente;
-DELIMITER //
-CREATE PROCEDURE obtener_nombre_escuela_docente(
-    IN p_id_docente INT,
-    OUT p_nombre_escuela VARCHAR(100)
+-- Procedimiento: Obtener Nombre Escuela Docente
+drop procedure if exists obtener_nombre_escuela_docente;
+delimiter //
+create procedure obtener_nombre_escuela_docente(
+    in p_id_docente int,
+    out p_nombre_escuela varchar(100)
 )
-BEGIN
-SELECT s.nombre INTO p_nombre_escuela
-FROM docente d
-         JOIN escuela e ON d.fk_escuela = e.id_escuela
-    -- CORRECCIÓN: La tabla escuela se une a sede usando id_escuela = id_sede
-         JOIN sede s ON e.id_escuela = s.id_sede
-WHERE d.id_docente = p_id_docente;
-END
-// DELIMITER ;
+begin
+    select sede.nombre into p_nombre_escuela
+    from docente
+    join escuela on docente.fk_escuela = escuela.id_escuela
+    join sede on escuela.id_escuela = sede.id_sede
+    where docente.id_docente = p_id_docente;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS retornar_alumnos_por_escuela;
-DELIMITER //
-CREATE PROCEDURE retornar_alumnos_por_escuela(
-    IN p_id_escuela INT
+-- Procedimiento: Retornar Alumnos por Escuela
+drop procedure if exists retornar_alumnos_por_escuela;
+delimiter //
+create procedure retornar_alumnos_por_escuela(
+    in p_id_escuela int
 )
-BEGIN
-SELECT id_participante, nombre
-FROM participante
-WHERE fk_escuela = p_id_escuela
-ORDER BY nombre ASC;
-END
-// DELIMITER ;
-DROP PROCEDURE IF EXISTS obtener_escuela_equipo;
-DELIMITER //
-CREATE PROCEDURE obtener_escuela_equipo(
-    IN p_id_equipo INT,
-    OUT p_id_escuela INT
+begin
+    select id_participante, nombre
+    from participante
+    where fk_escuela = p_id_escuela
+    order by nombre asc;
+end
+// delimiter ;
+
+-- Procedimiento: Obtener Escuela de un Equipo
+drop procedure if exists obtener_escuela_equipo;
+delimiter //
+create procedure obtener_escuela_equipo(
+    in p_id_equipo int,
+    out p_id_escuela int
 )
-BEGIN
-SELECT fk_escuela INTO p_id_escuela
-FROM equipo
-WHERE id_equipo = p_id_equipo;
-END
-// DELIMITER ;
+begin
+    select fk_escuela into p_id_escuela
+    from equipo
+    where id_equipo = p_id_equipo;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS retornar_docentes_con_roles;
-DELIMITER //
-CREATE PROCEDURE retornar_docentes_con_roles()
-BEGIN
-SELECT
-    d.id_docente,
-    d.nombre,
-    s.nombre as escuela,
-    d.especialidad, -- Agregué especialidad por si la quieres mostrar
-    -- Columna calculada: ¿Es Coach?
-    (CASE WHEN EXISTS (SELECT 1 FROM inscripcion_equipo WHERE fk_coach = d.id_docente) THEN 1 ELSE 0 END) as es_coach,
-    -- Columna calculada: ¿Es Juez?
-    (CASE WHEN EXISTS (SELECT 1 FROM asignacion_juez WHERE fk_juez = d.id_docente) THEN 1 ELSE 0 END) as es_juez
-FROM docente d
-         JOIN escuela e ON d.fk_escuela = e.id_escuela
-    -- AQUÍ ESTABA EL ERROR: Usamos e.id_escuela, no e.id_sede
-         JOIN sede s ON e.id_escuela = s.id_sede
-ORDER BY d.nombre ASC;
-END
-// DELIMITER ;
+-- Procedimiento: Retornar Docentes con Roles (Flags)
+drop procedure if exists retornar_docentes_con_roles;
+delimiter //
+create procedure retornar_docentes_con_roles()
+begin
+    select
+        docente.id_docente,
+        docente.nombre,
+        sede.nombre as escuela,
+        docente.especialidad,
+        -- Es Coach?
+        (case when exists (select 1 from inscripcion_equipo where fk_coach = docente.id_docente) then 1 else 0 end) as es_coach,
+        -- Es Juez?
+        (case when exists (select 1 from asignacion_juez where fk_juez = docente.id_docente) then 1 else 0 end) as es_juez
+    from docente
+    join escuela on docente.fk_escuela = escuela.id_escuela
+    join sede on escuela.id_escuela = sede.id_sede
+    order by docente.nombre asc;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS retornar_equipos_admin_filtro;
-DELIMITER //
-CREATE PROCEDURE retornar_equipos_admin_filtro(
-    IN p_id_evento INT,    -- Si envías -1, trae todos los eventos
-    IN p_id_categoria INT  -- Si envías -1, trae todas las categorías
+-- Procedimiento: Filtrar Equipos (Admin)
+drop procedure if exists retornar_equipos_admin_filtro;
+delimiter //
+create procedure retornar_equipos_admin_filtro(
+    in p_id_evento int,    -- -1 para todos
+    in p_id_categoria int  -- -1 para todos
 )
-BEGIN
-SELECT
-    e.nombre as equipo,
-    s.nombre as escuela,
-    ev.nombre as evento,
-    c.nombre as categoria
-FROM inscripcion_equipo ie
-         JOIN equipo e ON ie.fk_equipo = e.id_equipo
-         JOIN escuela esc ON e.fk_escuela = esc.id_escuela
-         JOIN sede s ON esc.id_escuela = s.id_sede
-         JOIN evento ev ON ie.fk_evento = ev.id_evento
-         JOIN categoria c ON ie.fk_categoria = c.id_categoria
-WHERE
-  -- Lógica del Filtro Inteligente:
-    (p_id_evento = -1 OR ie.fk_evento = p_id_evento)
-  AND
-    (p_id_categoria = -1 OR ie.fk_categoria = p_id_categoria)
-ORDER BY ev.fecha DESC, e.nombre ASC;
-END
-// DELIMITER ;
+begin
+    select
+        equipo.nombre as equipo,
+        sede.nombre as escuela,
+        evento.nombre as evento,
+        categoria.nombre as categoria
+    from inscripcion_equipo
+    join equipo on inscripcion_equipo.fk_equipo = equipo.id_equipo
+    join escuela on equipo.fk_escuela = escuela.id_escuela
+    join sede on escuela.id_escuela = sede.id_sede
+    join evento on inscripcion_equipo.fk_evento = evento.id_evento
+    join categoria on inscripcion_equipo.fk_categoria = categoria.id_categoria
+    where
+        (p_id_evento = -1 or inscripcion_equipo.fk_evento = p_id_evento)
+        and
+        (p_id_categoria = -1 or inscripcion_equipo.fk_categoria = p_id_categoria)
+    order by evento.fecha desc, equipo.nombre asc;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS retornar_equipos_docente;
-DELIMITER //
-CREATE PROCEDURE retornar_equipos_docente(
-    IN p_id_docente INT
+-- Procedimiento: Retornar Equipos de un Docente
+drop procedure if exists retornar_equipos_docente;
+delimiter //
+create procedure retornar_equipos_docente(
+    in p_id_docente int
 )
-BEGIN
-SELECT e.id_equipo, e.nombre
-FROM equipo e
-         JOIN docente d ON e.fk_escuela = d.fk_escuela
-WHERE d.id_docente = p_id_docente;
-END
-// DELIMITER ;
+begin
+    select equipo.id_equipo, equipo.nombre
+    from equipo
+    join docente on equipo.fk_escuela = docente.fk_escuela
+    where docente.id_docente = p_id_docente;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS obtener_nivel_escuela;
-DELIMITER //
-CREATE PROCEDURE obtener_nivel_escuela(
-    IN p_id_escuela INT,
-    OUT p_nivel INT
+-- Procedimiento: Obtener Nivel Escuela
+drop procedure if exists obtener_nivel_escuela;
+delimiter //
+create procedure obtener_nivel_escuela(
+    in p_id_escuela int,
+    out p_nivel int
 )
-BEGIN
-SELECT fk_nivel INTO p_nivel FROM escuela WHERE id_escuela = p_id_escuela;
-END
-// DELIMITER ;
+begin
+    select fk_nivel into p_nivel from escuela where id_escuela = p_id_escuela;
+end
+// delimiter ;
 
--- *************************** 08/12/25 7.44pm karla
+-- Procedimiento: Retornar Sedes (Combo)
+drop procedure if exists retornar_sedes_combo;
+delimiter //
+create procedure retornar_sedes_combo()
+begin
+    select id_sede, nombre from sede order by nombre asc;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS retornar_sedes_combo;
-DELIMITER //
-CREATE PROCEDURE retornar_sedes_combo()
-BEGIN
-SELECT id_sede, nombre
-FROM sede
-ORDER BY nombre ASC;
-END
-// DELIMITER ;
-
-DROP PROCEDURE IF EXISTS retornar_categorias_por_evento;
-DELIMITER //
-CREATE PROCEDURE retornar_categorias_por_evento(
-    IN p_id_evento INT
+-- Procedimiento: Retornar Categorias por Evento (Filtra si ya tiene jueces llenos)
+drop procedure if exists retornar_categorias_por_evento;
+delimiter //
+create procedure retornar_categorias_por_evento(
+    in p_id_evento int
 )
-BEGIN
-SELECT c.id_categoria, c.nombre
-FROM categoria c
-         JOIN categoria_evento ce ON c.id_categoria = ce.fk_categoria
-WHERE ce.fk_evento = p_id_evento
-  -- AQUÍ ESTÁ EL FILTRO MÁGICO:
-  AND (
-          SELECT COUNT(*)
-          FROM asignacion_juez aj
-          WHERE aj.fk_evento = p_id_evento
-            AND aj.fk_categoria = c.id_categoria
-      ) < 3 -- Solo si hay menos de 3 jueces asignados
-ORDER BY c.nombre;
-END
-// DELIMITER ;
+begin
+    select categoria.id_categoria, categoria.nombre
+    from categoria
+    join categoria_evento on categoria.id_categoria = categoria_evento.fk_categoria
+    where categoria_evento.fk_evento = p_id_evento
+    and (
+        select count(*) from asignacion_juez 
+        where fk_evento = p_id_evento and fk_categoria = categoria.id_categoria
+    ) < 3 -- Solo si hay menos de 3 jueces asignados
+    order by categoria.nombre;
+end
+// delimiter ;
 
-DROP PROCEDURE IF EXISTS asignar_terna_jueces;
-DELIMITER //
-CREATE PROCEDURE asignar_terna_jueces(
-    IN p_id_evento INT,
-    IN p_id_categoria INT,
-    IN p_juez1 INT,
-    IN p_juez2 INT,
-    IN p_juez3 INT,
-    OUT aviso TINYINT
+-- Procedimiento: Obtener Info Detallada Docente
+drop procedure if exists obtener_info_docente;
+delimiter //
+create procedure obtener_info_docente(
+    in p_id_docente int
 )
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-        -- Si pasa algo malo, deshacer todo
-ROLLBACK;
-SET aviso = -1;
-END;
+begin
+    select 
+        docente.nombre,
+        usuario.nombre_usuario,
+        docente.fecha_nacimiento,
+        docente.sexo,
+        docente.especialidad,
+        sede.nombre as nombre_escuela,
+        categoria.nombre as nivel_academico
+    from docente
+    join usuario on docente.id_docente = usuario.id_usuario
+    join escuela on docente.fk_escuela = escuela.id_escuela
+    join sede on escuela.id_escuela = sede.id_sede 
+    join categoria on escuela.fk_nivel = categoria.id_categoria
+    where docente.id_docente = p_id_docente;
+end
+// delimiter ;
 
-START TRANSACTION;
-
--- Validar si alguno de los 3 ya existe en esa categoría y evento
-IF EXISTS (SELECT * FROM asignacion_juez WHERE fk_evento = p_id_evento AND fk_categoria = p_id_categoria AND fk_juez IN (p_juez1, p_juez2, p_juez3)) THEN
-        SET aviso = 0; -- Al menos uno ya estaba asignado, cancelamos todo.
-ROLLBACK;
-ELSE
-        -- Insertamos los 3 de golpe
-        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez1, p_id_evento, p_id_categoria);
-INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez2, p_id_evento, p_id_categoria);
-INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez3, p_id_evento, p_id_categoria);
-
-SET aviso = 1; -- Éxito total
-COMMIT;
-END IF;
-END
-// DELIMITER ;
-
-DROP PROCEDURE IF EXISTS obtener_info_docente;
-DELIMITER //
-CREATE PROCEDURE obtener_info_docente(
-    IN p_id_docente INT
+-- Procedimiento: Asignar Terna de Jueces
+drop procedure if exists asignar_terna_jueces;
+delimiter //
+create procedure asignar_terna_jueces(
+    in p_id_evento int,
+    in p_id_categoria int,
+    in p_juez1 int,
+    in p_juez2 int,
+    in p_juez3 int,
+    out aviso tinyint
 )
-BEGIN
-    SELECT 
-        d.nombre,
-        u.nombre_usuario,
-        d.fecha_nacimiento,
-        d.sexo,
-        d.especialidad,
-        s.nombre AS nombre_escuela,
-        c.nombre AS nivel_academico
-    FROM docente d
-    JOIN usuario u ON d.id_docente = u.id_usuario
-    JOIN escuela e ON d.fk_escuela = e.id_escuela
-    JOIN sede s ON e.id_escuela = s.id_sede -- Para el nombre de la escuela
-    JOIN categoria c ON e.fk_nivel = c.id_categoria -- Para el nivel (Primaria/Sec/etc)
-    WHERE d.id_docente = p_id_docente;
-END
-// DELIMITER ;
+begin
+    -- 1. Validar conflicto de interés: ¿Es coach alguno de los candidatos?
+    if exists (
+        select * from inscripcion_equipo 
+        where fk_evento = p_id_evento and fk_categoria = p_id_categoria 
+        and fk_coach in (p_juez1, p_juez2, p_juez3)
+    ) then
+        set aviso = -2; -- Error: Conflicto de interés
 
-DROP PROCEDURE IF EXISTS asignar_terna_jueces;
-DELIMITER //
-CREATE PROCEDURE asignar_terna_jueces(
-    IN p_id_evento INT,
-    IN p_id_categoria INT,
-    IN p_juez1 INT,
-    IN p_juez2 INT,
-    IN p_juez3 INT,
-    OUT aviso TINYINT
-)
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        SET aviso = -99; -- Error crítico SQL
-    END;
+    -- 2. Validar duplicidad: ¿Ya está asignado alguno como juez?
+    elseif exists (
+        select * from asignacion_juez 
+        where fk_evento = p_id_evento and fk_categoria = p_id_categoria 
+        and fk_juez in (p_juez1, p_juez2, p_juez3)
+    ) then
+        set aviso = 0; -- Error: Ya asignados
 
-    START TRANSACTION;
-
-    -- 1. VALIDACIÓN DE REGLA DE NEGOCIO: ¿Es alguno de ellos Coach?
-    -- Buscamos si existe alguna inscripción en este evento y categoría donde el coach sea uno de los 3 candidatos
-    IF EXISTS (
-        SELECT * FROM inscripcion_equipo 
-        WHERE fk_evento = p_id_evento 
-        AND fk_categoria = p_id_categoria 
-        AND fk_coach IN (p_juez1, p_juez2, p_juez3)
-    ) THEN
-        SET aviso = -2; -- ERROR: Conflicto de Interés (Es Coach)
-        ROLLBACK;
-    
-    -- 2. Validar si ya estaban asignados como jueces (lo que ya tenías)
-    ELSEIF EXISTS (
-        SELECT * FROM asignacion_juez 
-        WHERE fk_evento = p_id_evento 
-        AND fk_categoria = p_id_categoria 
-        AND fk_juez IN (p_juez1, p_juez2, p_juez3)
-    ) THEN
-        SET aviso = 0; -- Ya estaba asignado como juez
-        ROLLBACK;
+    else
+        -- 3. Si no hay errores, procedemos a insertar los 3 registros
+        insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez1, p_id_evento, p_id_categoria);
+        insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez2, p_id_evento, p_id_categoria);
+        insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez3, p_id_evento, p_id_categoria);
         
-    ELSE
-        -- 3. Insertar los 3
-        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez1, p_id_evento, p_id_categoria);
-        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez2, p_id_evento, p_id_categoria);
-        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez3, p_id_evento, p_id_categoria);
-        
-        SET aviso = 1; -- Éxito total
-        COMMIT;
-    END IF;
-END
-// DELIMITER ;
+        set aviso = 1; -- Éxito
+    end if;
+end
+// delimiter ;
+
+-- Procedimiento: Retornar Eventos donde participa Usuario
+drop procedure if exists retornar_eventos_participados;
+delimiter //
+create procedure retornar_eventos_participados(
+    in p_id_usuario int
+)
+begin
+    -- Eventos donde es Coach
+    select distinct evento.id_evento, evento.nombre, evento.fecha, sede.nombre as sede, 'COACH' as mi_rol
+    from evento
+    join sede on evento.fk_sede = sede.id_sede
+    join inscripcion_equipo on inscripcion_equipo.fk_evento = evento.id_evento
+    where inscripcion_equipo.fk_coach = p_id_usuario
+
+    union
+
+    -- Eventos donde es Juez
+    select distinct evento.id_evento, evento.nombre, evento.fecha, sede.nombre as sede, 'JUEZ' as mi_rol
+    from evento
+    join sede on evento.fk_sede = sede.id_sede
+    join asignacion_juez on asignacion_juez.fk_evento = evento.id_evento
+    where asignacion_juez.fk_juez = p_id_usuario;
+end
+// delimiter ;
 
 -- ==================================================================
--- 1. REGISTRAR DOCENTES (COACHES Y JUECES)
+-- SECCIÓN DE INSERCIÓN DE DATOS Y LLAMADAS DE PRUEBA
 -- ==================================================================
--- Usaremos escuelas existentes: 
--- ID 9: CBTis 109, ID 2: ITCM, ID 5: Sec N.3, ID 6: UT Altamira
 
-SET @aviso = 0;
+-- 1. Crear usuario admin
+insert into usuario(nombre_usuario, clave) values ("admin", "1029384756");
+insert into administrador(id_administrador, grado) values (last_insert_id(), 3);
 
--- Docente para CBTis 109 (ID 9)
-CALL registrar_docente("Mario Bros", "mario.bros", "nintendo", "1985-09-13", 9, "H", "Mecatrónica", @aviso);
+-- 2. Crear datos estáticos (Categorías y Ciudades)
+insert into categoria(nombre) values ("Primaria");
+insert into categoria(nombre) values ("Secundaria");
+insert into categoria(nombre) values ("Bachillerato");
+insert into categoria(nombre) values ("Profesional");
 
--- Docente para ITCM (ID 2)
-CALL registrar_docente("Ada Lovelace", "ada.l", "code123", "1980-12-10", 2, "M", "Programación", @aviso);
+insert into ciudad(nombre) values ("Tampico");
+insert into ciudad(nombre) values ("Madero");
+insert into ciudad(nombre) values ("Altamira");
 
--- Docente para Secundaria N.3 (ID 4)
-CALL registrar_docente("Albert Einstein", "albert.e", "mc2", "1975-03-14", 4, "H", "Física", @aviso);
+-- 3. Dar de alta Sedes y Escuelas
+set @aviso = 0;
+call ingresar_escuela("Instituto Tecnológico de Ciudad Madero (ITCM)", 2, 4, @aviso);
+call ingresar_escuela("Universidad Autonoma de Tamaulipas (UAT)", 1, 4, @aviso);
+call ingresar_escuela("Centro de Bachillerato Tecnológico Industrial y de Servicio N.103(CBTis 103)", 2, 3, @aviso);
+call ingresar_escuela("Escuela Secundaria N.3 Club de Leones", 1, 2, @aviso);
+call ingresar_escuela("Universidad Tecnologica de Altamira (UT Altamira)", 3, 4, @aviso);
+call ingresar_escuela("Escuela Primaria Justo Sierra", 1, 1, @aviso);
+call ingresar_escuela("Colegio Arboledas A.C", 3, 1, @aviso);
+call ingresar_escuela("Centro de Estudios Tecnológico Industrial y de Servicio N.109 (CEBtis 109)", 2, 3, @aviso);
+call ingresar_escuela("Escuela Secundaria General N.1 Melchor Ocampo", 2, 2, @aviso);
 
--- Docente para UT Altamira (ID 5)
-CALL registrar_docente("Marie Curie", "marie.c", "radio", "1982-11-07", 5, "M", "Química", @aviso);
+call ingresar_sede("Espacio Cultural Metropolitano", 1, @aviso);
 
--- ==================================================================
--- 2. REGISTRAR ESTUDIANTES (PARTICIPANTES)
--- ==================================================================
--- Nota: Aseguramos que el número de control sea único y correspondan a la escuela correcta.
+-- 4. Registrar Docentes (Incluye ejemplos iniciales y los del caso de prueba)
+-- Docentes iniciales
+call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-21", 2, "H", "Redes de computadoras", @aviso);
+call registrar_docente("Mauro", "Mau", "12345678", "2005-06-24", 4, "H", "Calador", @aviso);
+call registrar_docente("Carlos Santillan", "Santi", "12345678", "2005-10-15", 4, "H", "Procrasti", @aviso);
+call registrar_docente("Jose Esteban", "Tobi", "12345678", "2005-01-13", 4, "H", "Pokemon", @aviso);
 
--- Alumnos para CBTis 109 (ID 9) - Nivel Bachillerato
-CALL registrar_competidor("Peter Parker", "2007-08-10", 9, "H", "Electrónica", 3, 109001, @aviso);
-CALL registrar_competidor("Gwen Stacy", "2007-12-15", 9, "M", "Electrónica", 3, 109002, @aviso);
-CALL registrar_competidor("Miles Morales", "2008-01-20", 9, "H", "Electrónica", 3, 109003, @aviso);
+-- Docentes adicionales para pruebas
+call registrar_docente("Mario Bros", "mario.bros", "nintendo", "1985-09-13", 9, "H", "Mecatrónica", @aviso);
+call registrar_docente("Ada Lovelace", "ada.l", "code123", "1980-12-10", 2, "M", "Programación", @aviso);
+call registrar_docente("Albert Einstein", "albert.e", "mc2", "1975-03-14", 4, "H", "Física", @aviso);
+call registrar_docente("Marie Curie", "marie.c", "radio", "1982-11-07", 5, "M", "Química", @aviso);
 
--- Alumnos para ITCM (ID 2) - Nivel Profesional
-CALL registrar_competidor("Tony Stark", "2003-05-29", 2, "H", "Ing. Mecatrónica", 7, 2007100, @aviso);
-CALL registrar_competidor("Bruce Banner", "2002-12-18", 2, "H", "Ing. Sistemas", 8, 2007101, @aviso);
-CALL registrar_competidor("Natasha Romanoff", "2004-11-22", 2, "M", "Ing. Industrial", 6, 2007102, @aviso);
+-- 5. Registrar Competidores
+-- Competidores iniciales
+call registrar_competidor("Adan", "2005-01-14", 2, "H", "Ing. Sistemas Computacionales", 5, 23070402, @aviso);
+call registrar_competidor("Karla", "2005-02-09", 2, "M", "Ing. Sistemas Computacionales", 5, 23070465, @aviso);
+call registrar_competidor("Barbara", "2005-12-04", 2, "M", "Ing. Sistemas Computacionales", 5, 23070456, @aviso);
 
--- Alumnos para Secundaria N.3 (ID 4) - Nivel Secundaria
-CALL registrar_competidor("Ash Ketchum", "2010-05-20", 4, "H", "N/A", 2, 4001, @aviso);
-CALL registrar_competidor("Misty Waterflower", "2010-09-15", 4, "M", "N/A", 2, 4002, @aviso);
-CALL registrar_competidor("Brock Harrison", "2009-02-10", 4, "H", "N/A", 3, 4003, @aviso);
+-- Competidores adicionales para pruebas
+call registrar_competidor("Peter Parker", "2007-08-10", 9, "H", "Electrónica", 3, 109001, @aviso);
+call registrar_competidor("Gwen Stacy", "2007-12-15", 9, "M", "Electrónica", 3, 109002, @aviso);
+call registrar_competidor("Miles Morales", "2008-01-20", 9, "H", "Electrónica", 3, 109003, @aviso);
+call registrar_competidor("Tony Stark", "2003-05-29", 2, "H", "Ing. Mecatrónica", 7, 2007100, @aviso);
+call registrar_competidor("Bruce Banner", "2002-12-18", 2, "H", "Ing. Sistemas", 8, 2007101, @aviso);
+call registrar_competidor("Natasha Romanoff", "2004-11-22", 2, "M", "Ing. Industrial", 6, 2007102, @aviso);
+call registrar_competidor("Ash Ketchum", "2010-05-20", 4, "H", "N/A", 2, 4001, @aviso);
+call registrar_competidor("Misty Waterflower", "2010-09-15", 4, "M", "N/A", 2, 4002, @aviso);
+call registrar_competidor("Brock Harrison", "2009-02-10", 4, "H", "N/A", 3, 4003, @aviso);
 
--- ==================================================================
--- 3. CREAR NUEVOS EVENTOS
--- ==================================================================
--- Usamos sedes existentes.
--- Sede ID 2 es el ITCM. Sede ID 6 es UT Altamira.
+-- 6. Crear Eventos
+call crear_evento("OtakuVex","2025-12-12", 1, @aviso);
+call crear_evento("Torneo de Robots Madero 2025", "2025-10-20", 2, @aviso);
+call crear_evento("Expo Tech Altamira", "2025-11-15", 6, @aviso);
 
--- Evento en ITCM
-CALL crear_evento("Torneo de Robots Madero 2025", "2025-10-20", 2, @aviso);
+-- 7. Crear Equipos
+call crear_equipo("Los Eevees", 2, @id_equipo);
+call crear_equipo("Arañas Tecnológicas", 9, @id_equipo);
+call crear_equipo("Vengadores ITCM", 2, @id_equipo);
+call crear_equipo("Entrenadores Pokémon", 4, @id_equipo);
 
--- Evento en UT Altamira
-CALL crear_evento("Expo Tech Altamira", "2025-11-15", 6, @aviso);
+-- 8. Registrar Equipos en Eventos (Inscripciones)
+-- Los Eevees
+call registrar_equipo(2, 1, 1, 4, 1, 2, 3, @aviso);
 
--- ==================================================================
--- 4. CREAR EQUIPOS
--- ==================================================================
-SET @id_equipo = 0;
-
--- Equipo del CBTis 109 (Escuela ID 9)
-CALL crear_equipo("Arañas Tecnológicas", 9, @id_equipo);
--- @id_equipo ahora tiene el ID de este nuevo equipo
-
--- Equipo del ITCM (Escuela ID 2)
-CALL crear_equipo("Vengadores ITCM", 2, @id_equipo);
-
--- Equipo de la Secundaria N.3 (Escuela ID 4)
-CALL crear_equipo("Entrenadores Pokémon", 4, @id_equipo);
-
--- ==================================================================
--- 5. INSCRIPCIÓN DE EQUIPOS A EVENTOS
--- ==================================================================
--- Aquí necesitamos los IDs generados. Asumiremos los IDs basados en el orden de inserción
--- Si tu base de datos estaba limpia antes de esto, los IDs deberían coincidir.
-
--- :: Inscripción 1 ::
--- Equipo: Arañas Tecnológicas (CBTis 109). 
--- Coach: Mario Bros (ID usuario aprox 3, ID docente 3).
--- Evento: Torneo de Robots Madero (ID 2).
--- Categoría: Bachillerato (ID 3).
--- Participantes: Peter, Gwen, Miles (IDs aprox 4, 5, 6).
-
--- NOTA: Revisa los IDs de tus docentes y participantes con un SELECT si no estás seguro.
--- SELECT * FROM docente;
--- SELECT * FROM participante;
-
--- Ejemplo asumiendo IDs consecutivos:
-CALL registrar_equipo(3, 2, 2, 3, 4, 5, 6, @aviso); 
+-- Arañas Tecnológicas
 -- (Coach ID 3, Equipo ID 2, Evento ID 2, Categ 3, Partic 4,5,6)
+call registrar_equipo(3, 2, 2, 3, 4, 5, 6, @aviso); 
 
+-- Vengadores ITCM
+-- (Coach ID 4, Equipo ID 3, Evento ID 2, Categ 4, Partic 7,8,9)
+call registrar_equipo(4, 3, 2, 4, 7, 8, 9, @aviso);
 
--- :: Inscripción 2 ::
--- Equipo: Vengadores ITCM.
--- Coach: Ada Lovelace (ID docente 4).
--- Evento: Torneo de Robots Madero (ID 2).
--- Categoría: Profesional (ID 4).
--- Participantes: Tony, Bruce, Natasha (IDs aprox 7, 8, 9).
-
-CALL registrar_equipo(4, 3, 2, 4, 7, 8, 9, @aviso);
-
-
--- :: Inscripción 3 ::
--- Equipo: Entrenadores Pokémon (Secundaria).
--- Coach: Albert Einstein (ID docente 5).
--- Evento: Expo Tech Altamira (ID 3).
--- Categoría: Secundaria (ID 2).
--- Participantes: Ash, Misty, Brock (IDs aprox 10, 11, 12).
-
-CALL registrar_equipo(5, 4, 3, 2, 10, 11, 12, @aviso);
+-- Entrenadores Pokémon
+-- (Coach ID 5, Equipo ID 4, Evento ID 3, Categ 2, Partic 10,11,12)
+call registrar_equipo(5, 4, 3, 2, 10, 11, 12, @aviso);
