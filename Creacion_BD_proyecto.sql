@@ -789,45 +789,64 @@ end
 // delimiter ;
 
 -- Procedimiento: Asignar Terna de Jueces
-drop procedure if exists asignar_terna_jueces;
-delimiter //
-create procedure asignar_terna_jueces(
-    in p_id_evento int,
-    in p_id_categoria int,
-    in p_juez1 int,
-    in p_juez2 int,
-    in p_juez3 int,
-    out aviso tinyint
+DROP PROCEDURE IF EXISTS asignar_terna_jueces;
+DELIMITER //
+CREATE PROCEDURE asignar_terna_jueces(
+    IN p_id_evento INT,
+    IN p_id_categoria INT,
+    IN p_juez1 INT,
+    IN p_juez2 INT,
+    IN p_juez3 INT,
+    OUT aviso INT,                 -- Código de resultado
+    OUT p_nombre_conflicto VARCHAR(100) -- Nuevo: Nombre del "culpable"
 )
-begin
-    -- 1. Validar conflicto de interés: ¿Es coach alguno de los candidatos?
-    if exists (
-        select * from inscripcion_equipo 
-        where fk_evento = p_id_evento and fk_categoria = p_id_categoria 
-        and fk_coach in (p_juez1, p_juez2, p_juez3)
-    ) then
-        set aviso = -2; -- Error: Conflicto de interés
+BEGIN
+    DECLARE exit handler for sqlexception
+BEGIN
+ROLLBACK;
+SET aviso = -99;
+END;
 
-    -- 2. Validar duplicidad: ¿Ya está asignado alguno como juez?
-    elseif exists (
-        select * from asignacion_juez 
-        where fk_evento = p_id_evento and fk_categoria = p_id_categoria 
-        and fk_juez in (p_juez1, p_juez2, p_juez3)
-    ) then
-        set aviso = 0; -- Error: Ya asignados
+START TRANSACTION;
 
-else
-        -- 3. Si no hay errores, procedemos a insertar los 3 registros
-        insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez1, p_id_evento, p_id_categoria);
-insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez2, p_id_evento, p_id_categoria);
-insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez3, p_id_evento, p_id_categoria);
+-- 1. BUSCAR SI HAY UN COACH ENTRE LOS CANDIDATOS
+-- Intentamos obtener el nombre del docente que causa el conflicto
+SELECT d.nombre INTO p_nombre_conflicto
+FROM inscripcion_equipo ie
+         JOIN docente d ON ie.fk_coach = d.id_docente
+WHERE ie.fk_evento = p_id_evento
+  AND ie.fk_categoria = p_id_categoria
+  AND ie.fk_coach IN (p_juez1, p_juez2, p_juez3)
+    LIMIT 1; -- Solo necesitamos uno para bloquear
 
-set aviso = 1; -- Éxito
-end if;
-end
-// delimiter ;
+-- Si la consulta anterior encontró algo (la variable no es NULL), hay conflicto
+IF p_nombre_conflicto IS NOT NULL THEN
+        SET aviso = -2; -- Código de Conflicto
+ROLLBACK;
 
--- Procedimiento: Retornar Equipos por Coach 
+-- 2. Validar duplicados (si ya son jueces)
+ELSEIF EXISTS (
+        SELECT * FROM asignacion_juez
+        WHERE fk_evento = p_id_evento
+        AND fk_categoria = p_id_categoria
+        AND fk_juez IN (p_juez1, p_juez2, p_juez3)
+    ) THEN
+        SET aviso = 0; -- Código de Duplicado
+ROLLBACK;
+
+ELSE
+        -- 3. Todo limpio, insertamos
+        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez1, p_id_evento, p_id_categoria);
+INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez2, p_id_evento, p_id_categoria);
+INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez3, p_id_evento, p_id_categoria);
+
+SET aviso = 1; -- Éxito
+COMMIT;
+END IF;
+END
+// DELIMITER ;
+
+-- Procedimiento: Retornar Equipos por Coach
 drop procedure if exists retornar_equipos_coach;
 delimiter //
 create procedure retornar_equipos_coach(
@@ -914,6 +933,27 @@ end
 //
 delimiter ;
 
+drop procedure if exists retornar_jueces_disponibles;
+delimiter //
+create procedure retornar_jueces_disponibles(
+    in p_id_evento int
+)
+begin
+select id_docente, nombre
+from docente
+where id_docente not in (
+    -- subconsulta: lista negra de jueces ya ocupados en este evento
+    select fk_juez
+    from asignacion_juez
+    where fk_evento = p_id_evento
+)
+order by nombre asc;
+end
+// delimiter ;
+
+
+
+
 -- PUNTAJE
 -- 1. procedimiento para diseño (corregido)
 -- Procedimiento: Gestionar Evaluación de Diseño (criterio_dis)
@@ -930,22 +970,22 @@ begin
     declare v_categoria int;
     
     -- 1. Obtener la categoría de la inscripción para crear el registro padre
-    select fk_categoria into v_categoria
-    from inscripcion_equipo
-    where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
+select fk_categoria into v_categoria
+from inscripcion_equipo
+where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
 
-    -- 2. Asegurar que existe el registro padre en 'criterios_evaluacion'
-    insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales) 
+-- 2. Asegurar que existe el registro padre en 'criterios_evaluacion'
+insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales)
     values (p_equipo, p_evento, v_categoria, 0);
 
     -- 3. Guardar o Actualizar Diseño (Incluye el nuevo campo diagramas_imagenes)
-    insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento, 
-    diagramas_imagenes)
-    values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones, 
-    p_diagramas)
+insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento,
+                          diagramas_imagenes)
+values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones,
+        p_diagramas)
     on duplicate key update
-    registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
-    diagramas_imagenes=p_diagramas;
+                         registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
+                         diagramas_imagenes=p_diagramas;
 end
 // delimiter ;
 
