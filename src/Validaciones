@@ -1,0 +1,342 @@
+/* ESTILOS.CSS */
+
+/* Aplica a todos los TextField y PasswordField cuando tienen el foco */
+.text-field:focused, .password-field:focused {
+    /* Mantenemos el color gris del prompt.
+       Puedes cambiar #808080 por un gris más claro u oscuro si prefieres */
+    -fx-prompt-text-fill: #808080;
+}
+
+/* Opcional: Asegurarnos de que el color base también sea gris */
+.text-field, .password-field {
+    -fx-prompt-text-fill: #808080;
+}
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="589.0" prefWidth="942.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InicioSesionController">
+   <children>
+      <Pane layoutX="-3.0" layoutY="-3.0" prefHeight="589.0" prefWidth="948.0" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="-3.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label id="lbl_tituloInicioSesion" layoutX="266.0" layoutY="105.0" prefHeight="83.0" prefWidth="417.0" text="Inicio de Sesión" textAlignment="CENTER">
+               <font>
+                  <Font name="Calibri Bold" size="64.0" />
+               </font></Label>
+            <TextField id="txt_usuario" fx:id="txt_usuario" focusTraversable="false" layoutX="282.0" layoutY="215.0" prefHeight="45.0" prefWidth="385.0" promptText="USUARIO" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="20.0" />
+               </font></TextField>
+            <Button id="btn_IniciarSesion" layoutX="384.0" layoutY="406.0" mnemonicParsing="false" onAction="#btnIniciarSesion" prefHeight="54.0" prefWidth="181.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="ENTRAR" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font></Button>
+            <Button id="btn_redireccionarRegistro" fx:id="abrirVentanaRegistro" layoutX="337.0" layoutY="333.0" mnemonicParsing="false" onAction="#abrirVentanaRegistro" prefHeight="40.0" prefWidth="274.0" style="-fx-background-color: #FFFFFF;" text="¿No tienes cuenta? Create una!" underline="true">
+               <font>
+                  <Font name="System Italic" size="18.0" />
+               </font></Button>
+            <PasswordField id="txt_contra_oculta" fx:id="txt_contra_oculta" layoutX="282.0" layoutY="273.0" prefHeight="43.0" prefWidth="385.0" promptText="CONTRASEÑA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </PasswordField>
+            <TextField id="txt_contra_visible" fx:id="txt_contra_visible" focusTraversable="false" layoutX="282.0" layoutY="272.0" prefHeight="45.0" prefWidth="385.0" promptText="CONTRASEÑA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" visible="false">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </TextField>
+            <ToggleButton id="btn_ver" fx:id="btn_ver" layoutX="569.0" layoutY="282.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="82.0" style="-fx-background-radius: 20;" text="Ver" />
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="942.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegistroController" stylesheets="@estilos.css">
+   <children>
+      <Pane layoutY="-56.0" prefHeight="456.0" prefWidth="757.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Button id="btn_Registro" fx:id="btnRegistrarse" layoutX="381.0" layoutY="454.0" mnemonicParsing="false" onAction="#btnRegistrarse" prefHeight="54.0" prefWidth="181.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="REGISTRARSE" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Button>
+            <Label id="lbl_tituloRegistro" contentDisplay="CENTER" layoutX="361.0" layoutY="79.0" prefHeight="84.0" prefWidth="222.0" text="Registro" textAlignment="CENTER">
+               <font>
+                  <Font name="Calibri Bold" size="64.0" />
+               </font>
+            </Label>
+            <TextField id="txt_NombreCompleto" fx:id="txt_nombrecompleto" focusTraversable="false" layoutX="97.0" layoutY="181.0" prefHeight="40.0" prefWidth="770.0" promptText="Nombre Completo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <DatePicker id="dtpk_FechaNac" fx:id="fecha_nacimiento_date" editable="false" layoutX="97.0" layoutY="344.0" prefHeight="40.0" prefWidth="369.0" promptText="Fecha de Nacimiento" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" />
+            <PasswordField fx:id="txt_contra_oculta" layoutX="490.0" layoutY="234.0" prefHeight="40.0" prefWidth="369.0" promptText="CONTRASEÑA" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </PasswordField>
+            <TextField id="txt_Contra" fx:id="txt_contra" layoutX="486.0" layoutY="234.0" prefHeight="40.0" prefWidth="382.0" promptText="Contraseña" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <ToggleButton fx:id="btn_ver" layoutX="791.0" layoutY="239.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" style="-fx-background-radius: 20;" text="VER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </ToggleButton>
+            <TextField id="txt_Usuario" fx:id="txt_usuario" layoutX="97.0" layoutY="234.0" prefHeight="40.0" prefWidth="369.0" promptText="Usuario" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <TextField id="txt_especialidad" fx:id="txt_especialidad" focusTraversable="false" layoutX="100.0" layoutY="395.0" prefHeight="40.0" prefWidth="770.0" promptText="Especialidad" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <ComboBox id="cb_escuelaProcedencia" fx:id="EscuelaProcedenciaComboBox" layoutX="97.0" layoutY="288.0" prefHeight="40.0" prefWidth="770.0" promptText="Escuela Procedencia" style="-fx-background-color: #e7ecef; -fx-background-radius: 15; -fx-text-fill: #7d8995;" />
+            <ComboBox id="cb_sexo" fx:id="sexoComboBox" layoutX="486.0" layoutY="344.0" prefHeight="40.0" prefWidth="382.0" promptText="Sexo" style="-fx-background-color: #e7ecef; -fx-background-radius: 15;" visibleRowCount="15" />
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+
+public class RegistroController implements Initializable {
+    @FXML
+    private ToggleButton btn_ver;
+    private Map<String, Integer> mapaEscuelas = new HashMap<>();
+
+    @FXML
+    private TextField txt_nombrecompleto;
+    @FXML
+    private TextField txt_usuario;
+    @FXML
+    private TextField txt_contra;
+    @FXML
+    private TextField txt_contra_oculta;
+    @FXML
+    private ComboBox<String> EscuelaProcedenciaComboBox;
+    @FXML
+    private DatePicker fecha_nacimiento_date;
+    @FXML
+    private ComboBox<String> sexoComboBox;
+    @FXML
+    private TextField txt_especialidad;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        cargarEscuelas();
+        sexoComboBox.getItems().addAll("H", "M");
+        txt_contra.textProperty().bindBidirectional(txt_contra_oculta.textProperty());
+        txt_contra.visibleProperty().bind(btn_ver.selectedProperty());
+        txt_contra_oculta.visibleProperty().bind(btn_ver.selectedProperty().not());
+
+        btn_ver.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                btn_ver.setText("Ocultar");
+            } else {
+                btn_ver.setText("Ver");
+            }
+        });
+    }
+
+    private void cargarEscuelas() {
+        // 1. Traemos la lista de la Base de Datos
+        List<Map<String, Object>> listaBD = Main.retornarEscuelas();
+
+        // 2. Limpiamos por si acaso
+        EscuelaProcedenciaComboBox.getItems().clear();
+        mapaEscuelas.clear();
+
+        // 3. Llenamos el ComboBox y el Mapa al mismo tiempo
+        for (Map<String, Object> fila : listaBD) {
+            String nombre = (String) fila.get("nombre");
+            int id = (int) fila.get("id_escuela");
+
+            // Agregamos visualmente al ComboBox
+            EscuelaProcedenciaComboBox.getItems().add(nombre);
+
+            // Guardamos logicamente en el Mapa
+            mapaEscuelas.put(nombre, id);
+        }
+    }
+
+
+    @FXML
+    void btnRegistrarse(ActionEvent event) throws IOException {
+        // 1. Extraer los datos de texto
+        String nombreCompleto = txt_nombrecompleto.getText().trim(); // .trim() elimina espacios extra al inicio/final
+        String usuarioNuevo = txt_usuario.getText().trim();
+
+        // Obtenemos la contraseña del campo visible u oculto según corresponda
+        String passwordIngresado = txt_contra_oculta.getText();
+
+        String especialidad = txt_especialidad.getText();
+        String escuelaProcedencia = EscuelaProcedenciaComboBox.getValue();
+
+        // --- VALIDACIÓN 1: CAMPOS VACÍOS ---
+        if (fecha_nacimiento_date.getValue() == null ||
+                EscuelaProcedenciaComboBox.getValue() == null ||
+                sexoComboBox.getValue() == null ||
+                nombreCompleto.isEmpty() ||
+                usuarioNuevo.isEmpty() ||
+                passwordIngresado.isEmpty() ||
+                especialidad.isEmpty()) {
+
+            mostrarAlertaError("ERROR", "Campos Vacíos", "Por favor llena todos los campos de texto.");
+            return; // Detenemos la ejecución aquí
+        }
+
+        // --- VALIDACIÓN 2: NOMBRE SIN NÚMEROS NI SÍMBOLOS ---
+        // Explicación Regex: ^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$
+        // Permite letras mayúsculas, minúsculas, vocales con acento, ñ y espacios.
+        if (!nombreCompleto.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")) {
+            mostrarAlertaError("Error de Formato", "Nombre Inválido",
+                    "El nombre solo puede contener letras y espacios (no números ni símbolos).");
+            return;
+        }
+
+        // --- VALIDACIÓN 3: CONTRASEÑA SEGURA (Mayúscula, Número, Especial, Min 6) ---
+        // Explicación del Regex:
+        // (?=.*[0-9])       -> Debe contener al menos un número
+        // (?=.*[A-Z])       -> Debe contener al menos una letra mayúscula
+        // (?=.*[@#$%^&+=!._-]) -> Debe contener al menos un carácter especial (puedes agregar más si quieres)
+        // .{6,}             -> Debe tener al menos 6 caracteres de longitud
+
+        String patronContrasena = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@#$%^&+=!._-]).{6,}$";
+
+        if (!passwordIngresado.matches(patronContrasena)) {
+            mostrarAlertaError("Seguridad", "Contraseña Débil",
+                    "La contraseña debe cumplir con:\n" +
+                            "- Mínimo 6 caracteres\n" +
+                            "- Al menos una mayúscula (A-Z)\n" +
+                            "- Al menos un número (0-9)\n" +
+                            "- Al menos un símbolo especial (@ # $ % ^ & + = ! . _ -)");
+            return;
+        }
+
+        // --- SI PASA LAS VALIDACIONES, CONTINUAMOS CON LA LÓGICA DE BD ---
+
+        // Conversión de datos
+        java.sql.Date fechaParaBD = java.sql.Date.valueOf(fecha_nacimiento_date.getValue());
+        String sexo = sexoComboBox.getSelectionModel().getSelectedItem();
+
+        if (mapaEscuelas.containsKey(escuelaProcedencia)) {
+
+            int idEscuelaParaBD = mapaEscuelas.get(escuelaProcedencia);
+
+            // Llamada al Main
+            int codigoResultado = Main.registrarDocente(
+                    nombreCompleto,
+                    usuarioNuevo,
+                    passwordIngresado,
+                    fechaParaBD,
+                    idEscuelaParaBD,
+                    sexo,
+                    especialidad
+            );
+
+            // Evaluar resultado
+            switch (codigoResultado) {
+                case 1: // ÉXITO
+                    mostrarAlertaExito("Éxito", "Registro Completado", "Se le redirecionara al Inicio de Sesion");
+
+                    // Cerrar ventana actual y abrir login
+                    Node source = (Node) event.getSource();
+                    Stage stageActual = (Stage) source.getScene().getWindow();
+                    stageActual.close();
+
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
+                    Parent root = loader.load();
+                    Stage stageNuevo = new Stage();
+                    stageNuevo.setScene(new Scene(root));
+                    stageNuevo.setTitle("Inicio de Sesion");
+                    stageNuevo.setResizable(false);
+                    stageNuevo.show();
+                    break;
+
+                case 0: // DUPLICADO (Ojo: en tu BD a veces retorna 0 o -1 para esto, ajusta según tu SP)
+                    mostrarAlertaError("Registro Fallido", "Usuario Duplicado", "Ese usuario ya existe en el sistema.");
+                    break;
+
+                case -1:
+                    mostrarAlertaError("Registro Fallido", "Edad Insuficiente", "El docente debe ser mayor de edad (18 años) para registrarse.");
+                    break;
+
+                case -2:
+                default:
+                    mostrarAlertaError("Error", "Fallo del Sistema", "Hubo un error al intentar guardar en la BD.");
+                    break;
+            }
+        } else {
+            mostrarAlertaError("Error", "Escuela Inválida", "La escuela seleccionada no es válida.");
+        }
+    }
+
+
+
+    private void limpiarCampos() {
+        txt_nombrecompleto.setText("");
+        txt_usuario.setText("");
+        txt_contra_oculta.setText("");
+        txt_contra.setText("");
+        txt_especialidad.setText("");
+        fecha_nacimiento_date.setValue(null);
+        EscuelaProcedenciaComboBox.setValue(null);
+        sexoComboBox.setValue(null);
+        txt_nombrecompleto.requestFocus();
+    }
+
+    public void mostrarAlertaError(String titulo, String encabezado, String contenido) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(encabezado);
+        alert.setContentText(contenido);
+        alert.showAndWait(); // Muestra la alerta y espera a que el usuario la cierre
+    }
+
+    public void mostrarAlertaExito(String titulo, String encabezado, String contenido) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(encabezado);
+        alert.setContentText(contenido);
+        alert.showAndWait();
+    }
+}
