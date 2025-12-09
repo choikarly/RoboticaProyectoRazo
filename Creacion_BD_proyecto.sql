@@ -10,20 +10,20 @@ create schema concurso_robotica;
 use concurso_robotica;
 
 create table categoria(
-	id_categoria    int primary key auto_increment,
-    nombre          varchar(20) not null
+                          id_categoria    int primary key auto_increment,
+                          nombre          varchar(20) not null
 );
 
 create table ciudad(
-	id_ciudad       int primary key auto_increment,
-    nombre          varchar(80) not null
+                       id_ciudad       int primary key auto_increment,
+                       nombre          varchar(80) not null
 );
 
 create table sede(
-	id_sede     int primary key auto_increment,
-    nombre      varchar(80) not null,
-    fk_ciudad   int not null,
-    foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE
+                     id_sede     int primary key auto_increment,
+                     nombre      varchar(80) not null,
+                     fk_ciudad   int not null,
+                     foreign key (fk_ciudad) references ciudad(id_ciudad) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 create table escuela(
@@ -211,15 +211,15 @@ delimiter //
 create function grado_admin(
     f_id_usuario int
 ) returns int
-reads sql data
+    reads sql data
 begin
     declare v_nivel int;
     if exists (select * from administrador where id_administrador = f_id_usuario) then
-        select grado into v_nivel from administrador where id_administrador = f_id_usuario;
-    else
+select grado into v_nivel from administrador where id_administrador = f_id_usuario;
+else
         set v_nivel = -1;
-    end if;
-    return v_nivel;
+end if;
+return v_nivel;
 end
 // delimiter ;
 
@@ -235,20 +235,20 @@ create procedure inicio_sesion(
 )
 begin
     if exists (select * from usuario where nombre_usuario = p_nombre_usuario and clave = p_clave) then
-        select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
-        select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
-        select nombre_usuario into p_nombre_completo from usuario where id_usuario = p_id_usuario;
-        
-        -- Intentar obtener nombre real si es docente
-        select nombre into @temp_nombre from docente where id_docente = p_id_usuario;
-        if @temp_nombre is not null then
+select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
+select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
+select nombre_usuario into p_nombre_completo from usuario where id_usuario = p_id_usuario;
+
+-- Intentar obtener nombre real si es docente
+select nombre into @temp_nombre from docente where id_docente = p_id_usuario;
+if @temp_nombre is not null then
             set p_nombre_completo = @temp_nombre;
-        end if;
-    else
+end if;
+else
         set p_grado = -2;
         set p_id_usuario = -1;
         set p_nombre_completo = null;
-    end if;
+end if;
 end
 // delimiter ;
 
@@ -261,12 +261,13 @@ create procedure ingresar_sede (
     out aviso tinyint
 )
 begin
+    -- validamos que no exista esa sede EN ESA MISMA ciudad
     if exists (select * from sede where nombre = p_nombre and fk_ciudad = p_fk_ciudad) then
-        set aviso = -1; -- Nombre de sede existente en esa ciudad
-    else
+        set aviso = -1; -- duplicado
+else
         insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
-        set aviso = 1; 
-    end if;
+        set aviso = 1;  -- éxito
+end if;
 end
 // delimiter ;
 
@@ -283,11 +284,11 @@ begin
     if exists (select * from escuela join sede on id_escuela = id_sede
     where nombre = p_nombre and fk_ciudad = p_fk_ciudad and fk_nivel = p_fk_nivel) then
         set aviso = -1;
-    else
+else
         insert into sede (nombre, fk_ciudad) values (p_nombre, p_fk_ciudad);
-        insert into escuela (id_escuela, fk_nivel) values (last_insert_id(), p_fk_nivel);
-        set aviso = 1;
-    end if;
+insert into escuela (id_escuela, fk_nivel) values (last_insert_id(), p_fk_nivel);
+set aviso = 1;
+end if;
 end
 // delimiter ;
 
@@ -303,22 +304,22 @@ create procedure registrar_competidor(
     in p_semestre tinyint,
     in p_num_control int,
     out aviso tinyint
-)
+        )
 begin
     declare v_nivel int;
     declare v_edad int;
     declare v_edad_minima int;
 
-    select fk_nivel into v_nivel from escuela where id_escuela = p_escuela;
+select fk_nivel into v_nivel from escuela where id_escuela = p_escuela;
 
-    -- Definir edad mínima según nivel
-    case v_nivel
+-- Definir edad mínima según nivel
+case v_nivel
         when 1 then set v_edad_minima = 6;  -- Primaria
-        when 2 then set v_edad_minima = 12; -- Secundaria
-        when 3 then set v_edad_minima = 15; -- Bachillerato
-        when 4 then set v_edad_minima = 17; -- Universidad
-        else set v_edad_minima = 0;
-    end case;
+when 2 then set v_edad_minima = 12; -- Secundaria
+when 3 then set v_edad_minima = 15; -- Bachillerato
+when 4 then set v_edad_minima = 17; -- Universidad
+else set v_edad_minima = 0;
+end case;
 
     set v_edad = timestampdiff(year, p_fecha_nacimiento, curdate());
 
@@ -326,11 +327,11 @@ begin
         set aviso = -3; -- Error: Muy joven
     elseif exists (select * from participante where num_control = p_num_control and fk_escuela = p_escuela) then
         set aviso = -1; -- Error: Duplicado
-    else
+else
         insert into participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
         values (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_carrera, p_semestre, p_num_control);
         set aviso = 1;
-    end if;
+end if;
 end
 // delimiter ;
 
@@ -346,23 +347,23 @@ create procedure registrar_docente(
     p_sexo enum("H","M"),
     p_especialidad varchar(40),
     out aviso tinyint
-)
+        )
 begin
     declare v_edad int;
     set v_edad = timestampdiff(year, p_fecha_nacimiento, curdate());
-    
+
     if v_edad >= 18 then
         if exists (select * from usuario where nombre_usuario = p_usuario) then
             set aviso = 0; -- Usuario existente
-        else
+else
             insert into usuario (nombre_usuario, clave) values (p_usuario, p_clave);
-            insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
-            values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
-            set aviso = 1;
-        end if;
-    else
+insert into docente (id_docente, nombre, fecha_nacimiento, fk_escuela, sexo, especialidad)
+values (last_insert_id(), p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_especialidad);
+set aviso = 1;
+end if;
+else
         set aviso = -1; -- Menor de edad
-    end if;
+end if;
 end
 // delimiter ;
 
@@ -380,11 +381,11 @@ begin
         set aviso = -1; -- Evento existente en esa sede y fecha
     elseif exists (select * from evento where nombre like p_nombre_evento) then
         set aviso = 0; -- Nombre duplicado
-    else
+else
         insert into evento (nombre, fecha, fk_sede) values (p_nombre_evento, p_fecha, p_fk_sede);
-        insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
-        set aviso = 1;
-    end if;
+insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
+set aviso = 1;
+end if;
 end
 // delimiter ;
 
@@ -399,10 +400,10 @@ create procedure crear_equipo(
 begin
     if exists (select * from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela) then
         set p_id_equipo = (select id_equipo from equipo where nombre = p_nombre and fk_escuela = p_fk_escuela);
-    else
+else
         insert into equipo (nombre, fk_escuela) values (p_nombre, p_fk_escuela);
         set p_id_equipo = last_insert_id();
-    end if;
+end if;
 end
 // delimiter ;
 
@@ -422,15 +423,15 @@ create procedure registrar_equipo(
 begin
     if exists (select * from inscripcion_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
         set aviso = -1; -- Equipo ya registrado en este evento
-    else
-        insert into inscripcion_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) 
+else
+        insert into inscripcion_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria)
         values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
-        
-        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
-        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
-        insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
-        set aviso = 1;
-    end if;
+
+insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
+insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
+insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
+set aviso = 1;
+end if;
 end
 // delimiter ;
 
@@ -440,15 +441,16 @@ drop procedure if exists retornar_categorias;
 delimiter //
 create procedure retornar_categorias()
 begin
-    select * from categoria;
+select * from categoria;
 end
 // delimiter ;
 
+-- 1. procedimiento para llenar el combobox de ciudades
 drop procedure if exists retornar_ciudades_combo;
 delimiter //
 create procedure retornar_ciudades_combo()
 begin
-    select id_ciudad, nombre from ciudad order by nombre asc;
+select id_ciudad, nombre from ciudad order by nombre asc;
 end
 // delimiter ;
 
@@ -456,7 +458,7 @@ drop procedure if exists retornar_escuelas;
 delimiter //
 create procedure retornar_escuelas()
 begin
-    select id_escuela, nombre, fk_ciudad, fk_nivel from sede join escuela on id_escuela = id_sede;
+select id_escuela, nombre, fk_ciudad, fk_nivel from sede join escuela on id_escuela = id_sede;
 end
 // delimiter ;
 
@@ -464,10 +466,10 @@ drop procedure if exists retornar_docentes;
 delimiter //
 create procedure retornar_docentes()
 begin
-    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
-    from docente
-    join escuela on id_escuela = fk_escuela
-    join sede on id_escuela = id_sede;
+select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad
+from docente
+         join escuela on id_escuela = fk_escuela
+         join sede on id_escuela = id_sede;
 end
 // delimiter ;
 
@@ -475,11 +477,11 @@ drop procedure if exists retornar_coach;
 delimiter //
 create procedure retornar_coach()
 begin
-    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
-    from docente
-    join inscripcion_equipo on id_docente = fk_coach
-    join escuela on id_escuela = fk_escuela
-    join sede on id_escuela = id_sede;
+select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad
+from docente
+         join inscripcion_equipo on id_docente = fk_coach
+         join escuela on id_escuela = fk_escuela
+         join sede on id_escuela = id_sede;
 end
 // delimiter ;
 
@@ -487,11 +489,11 @@ drop procedure if exists retornar_juez;
 delimiter //
 create procedure retornar_juez()
 begin
-    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
-    from docente
-    join asignacion_juez on id_docente = fk_juez
-    join escuela on id_escuela = fk_escuela
-    join sede on id_escuela = id_sede;
+select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad
+from docente
+         join asignacion_juez on id_docente = fk_juez
+         join escuela on id_escuela = fk_escuela
+         join sede on id_escuela = id_sede;
 end
 // delimiter ;
 
@@ -499,12 +501,12 @@ drop procedure if exists retornar_coach_juez;
 delimiter //
 create procedure retornar_coach_juez()
 begin
-    select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad 
-    from docente
-    join asignacion_juez on id_docente = fk_juez
-    join inscripcion_equipo on id_docente = fk_coach
-    join escuela on id_escuela = fk_escuela
-    join sede on id_escuela = id_sede;
+select distinct id_docente, docente.nombre, sede.nombre as escuela, especialidad
+from docente
+         join asignacion_juez on id_docente = fk_juez
+         join inscripcion_equipo on id_docente = fk_coach
+         join escuela on id_escuela = fk_escuela
+         join sede on id_escuela = id_sede;
 end
 // delimiter ;
 
@@ -512,9 +514,9 @@ drop procedure if exists retornar_eventos;
 delimiter //
 create procedure retornar_eventos()
 begin
-    select evento.id_evento, evento.nombre, sede.nombre as sede, fecha 
-    from evento
-    join sede on fk_sede = id_sede;
+select evento.id_evento, evento.nombre, sede.nombre as sede, fecha
+from evento
+         join sede on fk_sede = id_sede;
 end
 // delimiter ;
 
@@ -524,14 +526,14 @@ create procedure retornar_equipos_coach(
     p_id_coach int
 )
 begin
-    select equipo.nombre as equipo, sede.nombre as escuela, evento.nombre as evento, categoria.nombre as categoria
-    from inscripcion_equipo
-    join equipo on id_equipo = fk_equipo
-    join escuela on fk_escuela = id_escuela
-    join sede on id_escuela = id_sede
-    join evento on fk_evento = id_evento
-    join categoria on fk_categoria = id_categoria
-    where fk_coach = p_id_coach;
+select equipo.nombre as equipo, sede.nombre as escuela, evento.nombre as evento, categoria.nombre as categoria
+from inscripcion_equipo
+         join equipo on id_equipo = fk_equipo
+         join escuela on fk_escuela = id_escuela
+         join sede on id_escuela = id_sede
+         join evento on fk_evento = id_evento
+         join categoria on fk_categoria = id_categoria
+where fk_coach = p_id_coach;
 end
 // delimiter ;
 
@@ -545,12 +547,12 @@ create procedure retornar_participante(
 )
 begin
     if exists (select * from participante where num_control = p_num_control and fk_escuela = p_fk_escuela) then
-        select id_participante, nombre into p_id_participante, p_nombre 
-        from participante where num_control = p_num_control and fk_escuela = p_fk_escuela;
-    else
+select id_participante, nombre into p_id_participante, p_nombre
+from participante where num_control = p_num_control and fk_escuela = p_fk_escuela;
+else
         set p_id_participante = -1;
         set p_nombre = "";
-    end if;
+end if;
 end
 // delimiter ;
 
@@ -561,34 +563,34 @@ create procedure retornar_eventos_participados(
     in p_id_usuario int
 )
 begin
-    select 
-        t.id_evento,
-        t.nombre,
-        t.fecha,
-        t.sede,
-        -- lógica para resolver roles múltiples:
-        case 
-            when count(distinct t.mi_rol) > 1 then 'ambos' -- si es coach y juez
-            else max(t.mi_rol) -- coach o juez
+select
+    t.id_evento,
+    t.nombre,
+    t.fecha,
+    t.sede,
+    -- lógica para resolver roles múltiples:
+    case
+        when count(distinct t.mi_rol) > 1 then 'ambos' -- si es coach y juez
+        else max(t.mi_rol) -- coach o juez
         end as mi_rol
-    from (
-        -- 1. buscar donde es coach
-        select e.id_evento, e.nombre, e.fecha, s.nombre as sede, 'coach' as mi_rol
-        from evento e
-        join sede s on e.fk_sede = s.id_sede
-        join inscripcion_equipo ie on ie.fk_evento = e.id_evento
-        where ie.fk_coach = p_id_usuario
+from (
+         -- 1. buscar donde es coach
+         select e.id_evento, e.nombre, e.fecha, s.nombre as sede, 'coach' as mi_rol
+         from evento e
+                  join sede s on e.fk_sede = s.id_sede
+                  join inscripcion_equipo ie on ie.fk_evento = e.id_evento
+         where ie.fk_coach = p_id_usuario
 
-        union all 
+         union all
 
-        -- 2. buscar donde es juez
-        select e.id_evento, e.nombre, e.fecha, s.nombre as sede, 'juez' as mi_rol
-        from evento e
-        join sede s on e.fk_sede = s.id_sede
-        join asignacion_juez aj on aj.fk_evento = e.id_evento
-        where aj.fk_juez = p_id_usuario
-    ) as t
-    group by t.id_evento, t.nombre, t.fecha, t.sede;
+         -- 2. buscar donde es juez
+         select e.id_evento, e.nombre, e.fecha, s.nombre as sede, 'juez' as mi_rol
+         from evento e
+                  join sede s on e.fk_sede = s.id_sede
+                  join asignacion_juez aj on aj.fk_evento = e.id_evento
+         where aj.fk_juez = p_id_usuario
+     ) as t
+group by t.id_evento, t.nombre, t.fecha, t.sede;
 end
 //
 delimiter ;
@@ -601,7 +603,7 @@ create procedure obtener_id_escuela_docente(
     out p_id_escuela int
 )
 begin
-    select fk_escuela into p_id_escuela from docente where id_docente = p_id_docente;
+select fk_escuela into p_id_escuela from docente where id_docente = p_id_docente;
 end
 // delimiter ;
 
@@ -613,11 +615,11 @@ create procedure obtener_nombre_escuela_docente(
     out p_nombre_escuela varchar(100)
 )
 begin
-    select sede.nombre into p_nombre_escuela
-    from docente
-    join escuela on docente.fk_escuela = escuela.id_escuela
-    join sede on escuela.id_escuela = sede.id_sede
-    where docente.id_docente = p_id_docente;
+select sede.nombre into p_nombre_escuela
+from docente
+         join escuela on docente.fk_escuela = escuela.id_escuela
+         join sede on escuela.id_escuela = sede.id_sede
+where docente.id_docente = p_id_docente;
 end
 // delimiter ;
 
@@ -628,10 +630,10 @@ create procedure retornar_alumnos_por_escuela(
     in p_id_escuela int
 )
 begin
-    select id_participante, nombre
-    from participante
-    where fk_escuela = p_id_escuela
-    order by nombre asc;
+select id_participante, nombre
+from participante
+where fk_escuela = p_id_escuela
+order by nombre asc;
 end
 // delimiter ;
 
@@ -643,9 +645,9 @@ create procedure obtener_escuela_equipo(
     out p_id_escuela int
 )
 begin
-    select fk_escuela into p_id_escuela
-    from equipo
-    where id_equipo = p_id_equipo;
+select fk_escuela into p_id_escuela
+from equipo
+where id_equipo = p_id_equipo;
 end
 // delimiter ;
 
@@ -654,19 +656,19 @@ drop procedure if exists retornar_docentes_con_roles;
 delimiter //
 create procedure retornar_docentes_con_roles()
 begin
-    select
-        docente.id_docente,
-        docente.nombre,
-        sede.nombre as escuela,
-        docente.especialidad,
-        -- Es Coach?
-        (case when exists (select 1 from inscripcion_equipo where fk_coach = docente.id_docente) then 1 else 0 end) as es_coach,
-        -- Es Juez?
-        (case when exists (select 1 from asignacion_juez where fk_juez = docente.id_docente) then 1 else 0 end) as es_juez
-    from docente
-    join escuela on docente.fk_escuela = escuela.id_escuela
-    join sede on escuela.id_escuela = sede.id_sede
-    order by docente.nombre asc;
+select
+    docente.id_docente,
+    docente.nombre,
+    sede.nombre as escuela,
+    docente.especialidad,
+    -- Es Coach?
+    (case when exists (select 1 from inscripcion_equipo where fk_coach = docente.id_docente) then 1 else 0 end) as es_coach,
+    -- Es Juez?
+    (case when exists (select 1 from asignacion_juez where fk_juez = docente.id_docente) then 1 else 0 end) as es_juez
+from docente
+         join escuela on docente.fk_escuela = escuela.id_escuela
+         join sede on escuela.id_escuela = sede.id_sede
+order by docente.nombre asc;
 end
 // delimiter ;
 
@@ -678,24 +680,24 @@ create procedure retornar_equipos_admin_filtro(
     in p_id_categoria int  -- -1 para todas
 )
 begin
-    select
-        equipo.id_equipo,
-        evento.id_evento,
-        equipo.nombre as equipo,
-        sede.nombre as escuela,
-        evento.nombre as evento,
-        categoria.nombre as categoria
-    from inscripcion_equipo
-    join equipo on inscripcion_equipo.fk_equipo = equipo.id_equipo
-    join escuela on equipo.fk_escuela = escuela.id_escuela
-    join sede on escuela.id_escuela = sede.id_sede
-    join evento on inscripcion_equipo.fk_evento = evento.id_evento
-    join categoria on inscripcion_equipo.fk_categoria = categoria.id_categoria
-    where
-        (p_id_evento = -1 or inscripcion_equipo.fk_evento = p_id_evento)
-    and
-        (p_id_categoria = -1 or inscripcion_equipo.fk_categoria = p_id_categoria)
-    order by evento.fecha desc, equipo.nombre asc;
+select
+    equipo.id_equipo,
+    evento.id_evento,
+    equipo.nombre as equipo,
+    sede.nombre as escuela,
+    evento.nombre as evento,
+    categoria.nombre as categoria
+from inscripcion_equipo
+         join equipo on inscripcion_equipo.fk_equipo = equipo.id_equipo
+         join escuela on equipo.fk_escuela = escuela.id_escuela
+         join sede on escuela.id_escuela = sede.id_sede
+         join evento on inscripcion_equipo.fk_evento = evento.id_evento
+         join categoria on inscripcion_equipo.fk_categoria = categoria.id_categoria
+where
+    (p_id_evento = -1 or inscripcion_equipo.fk_evento = p_id_evento)
+  and
+    (p_id_categoria = -1 or inscripcion_equipo.fk_categoria = p_id_categoria)
+order by evento.fecha desc, equipo.nombre asc;
 end
 // delimiter ;
 
@@ -706,10 +708,10 @@ create procedure retornar_equipos_docente(
     in p_id_docente int
 )
 begin
-    select equipo.id_equipo, equipo.nombre
-    from equipo
-    join docente on equipo.fk_escuela = docente.fk_escuela
-    where docente.id_docente = p_id_docente;
+select equipo.id_equipo, equipo.nombre
+from equipo
+         join docente on equipo.fk_escuela = docente.fk_escuela
+where docente.id_docente = p_id_docente;
 end
 // delimiter ;
 
@@ -721,7 +723,7 @@ create procedure obtener_nivel_escuela(
     out p_nivel int
 )
 begin
-    select fk_nivel into p_nivel from escuela where id_escuela = p_id_escuela;
+select fk_nivel into p_nivel from escuela where id_escuela = p_id_escuela;
 end
 // delimiter ;
 
@@ -730,7 +732,7 @@ drop procedure if exists retornar_sedes_combo;
 delimiter //
 create procedure retornar_sedes_combo()
 begin
-    select id_sede, nombre from sede order by nombre asc;
+select id_sede, nombre from sede order by nombre asc;
 end
 // delimiter ;
 
@@ -741,24 +743,24 @@ create procedure retornar_categorias_por_evento(
     in p_id_evento int
 )
 begin
-    select c.id_categoria, c.nombre 
-    from categoria c
-    join categoria_evento ce on c.id_categoria = ce.fk_categoria
-    where ce.fk_evento = p_id_evento
-    
-    -- 1. filtro: menos de 3 jueces
-    and (
-        select count(*) from asignacion_juez aj
-        where aj.fk_evento = p_id_evento and aj.fk_categoria = c.id_categoria
-    ) < 3 
-    
-    -- 2. filtro: que tenga equipos inscritos
-    and exists (
-        select 1 from inscripcion_equipo ie
-        where ie.fk_evento = p_id_evento
-        and ie.fk_categoria = c.id_categoria
-    )
-    order by c.nombre;
+select c.id_categoria, c.nombre
+from categoria c
+         join categoria_evento ce on c.id_categoria = ce.fk_categoria
+where ce.fk_evento = p_id_evento
+
+  -- 1. filtro: menos de 3 jueces
+  and (
+          select count(*) from asignacion_juez aj
+          where aj.fk_evento = p_id_evento and aj.fk_categoria = c.id_categoria
+      ) < 3
+
+  -- 2. filtro: que tenga equipos inscritos
+  and exists (
+    select 1 from inscripcion_equipo ie
+    where ie.fk_evento = p_id_evento
+      and ie.fk_categoria = c.id_categoria
+)
+order by c.nombre;
 end
 // delimiter ;
 
@@ -769,20 +771,20 @@ create procedure obtener_info_docente(
     in p_id_docente int
 )
 begin
-    select 
-        docente.nombre,
-        usuario.nombre_usuario,
-        docente.fecha_nacimiento,
-        docente.sexo,
-        docente.especialidad,
-        sede.nombre as nombre_escuela,
-        categoria.nombre as nivel_academico
-    from docente
-    join usuario on docente.id_docente = usuario.id_usuario
-    join escuela on docente.fk_escuela = escuela.id_escuela
-    join sede on escuela.id_escuela = sede.id_sede 
-    join categoria on escuela.fk_nivel = categoria.id_categoria
-    where docente.id_docente = p_id_docente;
+select
+    docente.nombre,
+    usuario.nombre_usuario,
+    docente.fecha_nacimiento,
+    docente.sexo,
+    docente.especialidad,
+    sede.nombre as nombre_escuela,
+    categoria.nombre as nivel_academico
+from docente
+         join usuario on docente.id_docente = usuario.id_usuario
+         join escuela on docente.fk_escuela = escuela.id_escuela
+         join sede on escuela.id_escuela = sede.id_sede
+         join categoria on escuela.fk_nivel = categoria.id_categoria
+where docente.id_docente = p_id_docente;
 end
 // delimiter ;
 
@@ -814,14 +816,14 @@ begin
     ) then
         set aviso = 0; -- Error: Ya asignados
 
-    else
+else
         -- 3. Si no hay errores, procedemos a insertar los 3 registros
         insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez1, p_id_evento, p_id_categoria);
-        insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez2, p_id_evento, p_id_categoria);
-        insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez3, p_id_evento, p_id_categoria);
-        
-        set aviso = 1; -- Éxito
-    end if;
+insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez2, p_id_evento, p_id_categoria);
+insert into asignacion_juez(fk_juez, fk_evento, fk_categoria) values (p_juez3, p_id_evento, p_id_categoria);
+
+set aviso = 1; -- Éxito
+end if;
 end
 // delimiter ;
 
@@ -832,20 +834,20 @@ create procedure retornar_equipos_coach(
     in p_id_coach int
 )
 begin
-    select 
-        equipo.id_equipo,       
-        evento.id_evento,       
-        equipo.nombre as equipo, 
-        sede.nombre as escuela, 
-        evento.nombre as evento, 
-        categoria.nombre as categoria
-    from inscripcion_equipo
-    join equipo on id_equipo = fk_equipo
-    join escuela on fk_escuela = id_escuela
-    join sede on id_escuela = id_sede
-    join evento on fk_evento = id_evento
-    join categoria on fk_categoria = id_categoria
-    where fk_coach = p_id_coach;
+select
+    equipo.id_equipo,
+    evento.id_evento,
+    equipo.nombre as equipo,
+    sede.nombre as escuela,
+    evento.nombre as evento,
+    categoria.nombre as categoria
+from inscripcion_equipo
+         join equipo on id_equipo = fk_equipo
+         join escuela on fk_escuela = id_escuela
+         join sede on id_escuela = id_sede
+         join evento on fk_evento = id_evento
+         join categoria on fk_categoria = id_categoria
+where fk_coach = p_id_coach;
 end
 // delimiter ;
 
@@ -857,10 +859,10 @@ create procedure retornar_miembros_equipo(
     in p_id_evento int
 )
 begin
-    select participante.nombre, participante.num_control
-    from participante
-    join integrante_inscripcion on participante.id_participante = integrante_inscripcion.fk_participante
-    where integrante_inscripcion.fk_equipo = p_id_equipo and integrante_inscripcion.fk_evento = p_id_evento;
+select participante.nombre, participante.num_control
+from participante
+         join integrante_inscripcion on participante.id_participante = integrante_inscripcion.fk_participante
+where integrante_inscripcion.fk_equipo = p_id_equipo and integrante_inscripcion.fk_evento = p_id_evento;
 end
 // delimiter ;
 
@@ -873,14 +875,14 @@ create procedure obtener_puntaje_equipo(
     out p_puntos int
 )
 begin
-    select puntos_totales into p_puntos 
-    from criterios_evaluacion 
-    where fk_equipo = p_id_equipo and fk_evento = p_id_evento;
-    
-    -- Si no hay registro, asignamos -2 para indicar que no ha sido evaluado
-    if p_puntos is null then
-        set p_puntos = -2; 
-    end if;
+select puntos_totales into p_puntos
+from criterios_evaluacion
+where fk_equipo = p_id_equipo and fk_evento = p_id_evento;
+
+-- Si no hay registro, asignamos -2 para indicar que no ha sido evaluado
+if p_puntos is null then
+        set p_puntos = -2;
+end if;
 end
 // delimiter ;
 
@@ -927,27 +929,27 @@ begin
     declare v_categoria int;
     
     -- 1. obtener la categoría de la inscripción para poder crear el registro padre
-    select fk_categoria into v_categoria 
-    from inscripcion_equipo 
-    where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
+select fk_categoria into v_categoria
+from inscripcion_equipo
+where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
 
-    -- 2. asegurar que existe el registro padre en 'criterios_evaluacion'
-    insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales) 
+-- 2. asegurar que existe el registro padre en 'criterios_evaluacion'
+insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales)
     values (p_equipo, p_evento, v_categoria, 0);
 
     -- 3. guardar o actualizar diseño
-    insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento, 
-    diagramas_imagenes) -- ¡nueva columna en insert!
-    values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones, 
-    p_diagramas) -- ¡nuevo valor!
+insert into criterio_dis (fk_equipo, fk_evento, registro_fechas, justificacion_cambios_prototipos, ortografia_redacción, presentación, video_animación, diseno_modelado_software, analisis_elementos, ensamble_prototipo, modelo_acorde_robot, acorde_simulacion_calculos, restricciones_movimiento,
+                          diagramas_imagenes) -- ¡nueva columna en insert!
+values (p_equipo, p_evento, p_reg_fechas, p_justif, p_ortografia, p_presentacion, p_video, p_software, p_analisis, p_ensamble, p_modelo, p_simulacion, p_restricciones,
+        p_diagramas) -- ¡nuevo valor!
     on duplicate key update
-    registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
-    diagramas_imagenes=p_diagramas; -- ¡nueva columna en update!
-    
-    -- actualización del puntaje total
-    update criterios_evaluacion 
-    set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
-    where fk_equipo = p_equipo and fk_evento = p_evento;
+                         registro_fechas=p_reg_fechas, justificacion_cambios_prototipos=p_justif, ortografia_redacción=p_ortografia, presentación=p_presentacion, video_animación=p_video, diseno_modelado_software=p_software, analisis_elementos=p_analisis, ensamble_prototipo=p_ensamble, modelo_acorde_robot=p_modelo, acorde_simulacion_calculos=p_simulacion, restricciones_movimiento=p_restricciones,
+                         diagramas_imagenes=p_diagramas; -- ¡nueva columna en update!
+
+-- actualización del puntaje total
+update criterios_evaluacion
+set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
+where fk_equipo = p_equipo and fk_evento = p_evento;
 end //
 delimiter ;
 
@@ -955,7 +957,7 @@ drop procedure if exists obtener_evaluacion_diseno;
 delimiter //
 create procedure obtener_evaluacion_diseno(in p_equipo int, in p_evento int)
 begin
-    select * from criterio_dis where fk_equipo = p_equipo and fk_evento = p_evento;
+select * from criterio_dis where fk_equipo = p_equipo and fk_evento = p_evento;
 end
 // delimiter ;
 
@@ -972,23 +974,23 @@ create procedure gestionar_evaluacion_prog(
 )
 begin
     declare v_categoria int;
-    
-    select fk_categoria into v_categoria 
-    from inscripcion_equipo 
-    where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
 
-    insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales) 
+select fk_categoria into v_categoria
+from inscripcion_equipo
+where fk_equipo = p_equipo and fk_evento = p_evento limit 1;
+
+insert ignore into criterios_evaluacion (fk_equipo, fk_evento, fk_categoria, puntos_totales)
     values (p_equipo, p_evento, v_categoria, 0);
 
-    insert into criterio_prog (fk_equipo, fk_evento, soft_prog, uso_func, complejidad, just_prog, conocimiento_estr_func, depuracion, codigo_modular_efi, documentacion, vinculación_acciones, sensores, vinculo_jostick, calibración, respuesta_dispositivo, documentación_codigo, demostración_15min, no_inconvenientes, demostracion_objetivo, explicacion_rutina)
-    values (p_equipo, p_evento, p_soft, p_uso_func, p_complejidad, p_justif, p_conocimiento, p_depuracion, p_modular, p_doc, p_vinc_acc, p_sensores, p_vinc_joy, p_calib, p_resp, p_doc_cod, p_demo15, p_no_inc, p_demo_obj, p_explicacion)
+insert into criterio_prog (fk_equipo, fk_evento, soft_prog, uso_func, complejidad, just_prog, conocimiento_estr_func, depuracion, codigo_modular_efi, documentacion, vinculación_acciones, sensores, vinculo_jostick, calibración, respuesta_dispositivo, documentación_codigo, demostración_15min, no_inconvenientes, demostracion_objetivo, explicacion_rutina)
+values (p_equipo, p_evento, p_soft, p_uso_func, p_complejidad, p_justif, p_conocimiento, p_depuracion, p_modular, p_doc, p_vinc_acc, p_sensores, p_vinc_joy, p_calib, p_resp, p_doc_cod, p_demo15, p_no_inc, p_demo_obj, p_explicacion)
     on duplicate key update
-    soft_prog=p_soft, uso_func=p_uso_func, complejidad=p_complejidad, just_prog=p_justif, conocimiento_estr_func=p_conocimiento, depuracion=p_depuracion, codigo_modular_efi=p_modular, documentacion=p_doc, vinculación_acciones=p_vinc_acc, sensores=p_sensores, vinculo_jostick=p_vinc_joy, calibración=p_calib, respuesta_dispositivo=p_resp, documentación_codigo=p_doc_cod, demostración_15min=p_demo15, no_inconvenientes=p_no_inc, demostracion_objetivo=p_demo_obj, explicacion_rutina=p_explicacion;
+                         soft_prog=p_soft, uso_func=p_uso_func, complejidad=p_complejidad, just_prog=p_justif, conocimiento_estr_func=p_conocimiento, depuracion=p_depuracion, codigo_modular_efi=p_modular, documentacion=p_doc, vinculación_acciones=p_vinc_acc, sensores=p_sensores, vinculo_jostick=p_vinc_joy, calibración=p_calib, respuesta_dispositivo=p_resp, documentación_codigo=p_doc_cod, demostración_15min=p_demo15, no_inconvenientes=p_no_inc, demostracion_objetivo=p_demo_obj, explicacion_rutina=p_explicacion;
 
-    -- actualización del puntaje total
-    update criterios_evaluacion 
-    set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
-    where fk_equipo = p_equipo and fk_evento = p_evento;
+-- actualización del puntaje total
+update criterios_evaluacion
+set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
+where fk_equipo = p_equipo and fk_evento = p_evento;
 end //
 delimiter ;
 
@@ -996,15 +998,15 @@ drop procedure if exists obtener_evaluacion_prog;
 delimiter //
 create procedure obtener_evaluacion_prog(in p_equipo int, in p_evento int)
 begin
-    select * from criterio_prog where fk_equipo = p_equipo and fk_evento = p_evento;
+select * from criterio_prog where fk_equipo = p_equipo and fk_evento = p_evento;
 end
 // delimiter ;
 
 drop function if exists calcular_puntaje_total;
 delimiter //
-create function calcular_puntaje_total(p_equipo int, p_evento int) 
-returns int
-reads sql data
+create function calcular_puntaje_total(p_equipo int, p_evento int)
+    returns int
+    reads sql data
 begin
     declare v_puntos int default 0;
     
@@ -1019,45 +1021,45 @@ begin
     declare v_score_const int default 0;
 
     -- 1. calcular diseño (12 ítems)
-    select ifnull(
-        (registro_fechas + justificacion_cambios_prototipos + ortografia_redacción + presentación + 
-         video_animación + diseno_modelado_software + analisis_elementos + ensamble_prototipo + 
-         modelo_acorde_robot + acorde_simulacion_calculos + restricciones_movimiento + diagramas_imagenes), 0)
-    into v_raw_diseno
-    from criterio_dis where fk_equipo = p_equipo and fk_evento = p_evento;
-    
-    -- escalar a 10 puntos: (suma / 12) * 10
-    -- usamos round para redondear al entero más cercano
-    set v_score_diseno = round((v_raw_diseno / 12.0) * 10);
+select ifnull(
+               (registro_fechas + justificacion_cambios_prototipos + ortografia_redacción + presentación +
+                video_animación + diseno_modelado_software + analisis_elementos + ensamble_prototipo +
+                modelo_acorde_robot + acorde_simulacion_calculos + restricciones_movimiento + diagramas_imagenes), 0)
+into v_raw_diseno
+from criterio_dis where fk_equipo = p_equipo and fk_evento = p_evento;
+
+-- escalar a 10 puntos: (suma / 12) * 10
+-- usamos round para redondear al entero más cercano
+set v_score_diseno = round((v_raw_diseno / 12.0) * 10);
 
     -- 2. calcular programación (18 ítems)
-    select ifnull(
-        (soft_prog + uso_func + complejidad + just_prog + conocimiento_estr_func + depuracion + 
-         codigo_modular_efi + documentacion + vinculación_acciones + sensores + vinculo_jostick + 
-         calibración + respuesta_dispositivo + documentación_codigo + demostración_15min + 
-         no_inconvenientes + demostracion_objetivo + explicacion_rutina), 0)
-    into v_raw_prog
-    from criterio_prog where fk_equipo = p_equipo and fk_evento = p_evento;
+select ifnull(
+               (soft_prog + uso_func + complejidad + just_prog + conocimiento_estr_func + depuracion +
+                codigo_modular_efi + documentacion + vinculación_acciones + sensores + vinculo_jostick +
+                calibración + respuesta_dispositivo + documentación_codigo + demostración_15min +
+                no_inconvenientes + demostracion_objetivo + explicacion_rutina), 0)
+into v_raw_prog
+from criterio_prog where fk_equipo = p_equipo and fk_evento = p_evento;
 
-    -- escalar a 10 puntos: (suma / 18) * 10
-    set v_score_prog = round((v_raw_prog / 18.0) * 10);
+-- escalar a 10 puntos: (suma / 18) * 10
+set v_score_prog = round((v_raw_prog / 18.0) * 10);
 
     -- 3. calcular construcción (17 ítems)
-    select ifnull(
-        (prototipo_estetico + estructuras_estables + uso_sistemas_transmision + uso_sensores + 
-         cableado_adecuado + calculo_implementacion_sistema_neumático + conocimiento_alcance + 
-         implementación_marca_vex + uso_procesador_cortexm3 + analisis_estruc + relacion_velocidades + 
-         tren_engranes + centro_gravedad + sis_transmicion + potencia + torque + velocidad), 0)
-    into v_raw_const
-    from criterio_const where fk_equipo = p_equipo and fk_evento = p_evento;
+select ifnull(
+               (prototipo_estetico + estructuras_estables + uso_sistemas_transmision + uso_sensores +
+                cableado_adecuado + calculo_implementacion_sistema_neumático + conocimiento_alcance +
+                implementación_marca_vex + uso_procesador_cortexm3 + analisis_estruc + relacion_velocidades +
+                tren_engranes + centro_gravedad + sis_transmicion + potencia + torque + velocidad), 0)
+into v_raw_const
+from criterio_const where fk_equipo = p_equipo and fk_evento = p_evento;
 
-    -- escalar a 10 puntos: (suma / 17) * 10
-    set v_score_const = round((v_raw_const / 17.0) * 10);
+-- escalar a 10 puntos: (suma / 17) * 10
+set v_score_const = round((v_raw_const / 17.0) * 10);
 
     -- 4. sumar total (máximo 30)
     set v_puntos = v_score_diseno + v_score_prog + v_score_const;
-    
-    return v_puntos;
+
+return v_puntos;
 end //
 delimiter ;
 
@@ -1072,15 +1074,15 @@ create procedure gestionar_evaluacion_const(
 )
 begin
     -- 1. insertar/actualizar construcción
-    insert into criterio_const (fk_equipo, fk_evento, prototipo_estetico, estructuras_estables, uso_sistemas_transmision, uso_sensores, cableado_adecuado, calculo_implementacion_sistema_neumático, conocimiento_alcance, implementación_marca_vex, uso_procesador_cortexm3, analisis_estruc, relacion_velocidades, tren_engranes, centro_gravedad, sis_transmicion, potencia, torque, velocidad)
-    values (p_equipo, p_evento, p_proto, p_estruc, p_sis_trans, p_sensores, p_cableado, p_neumatico, p_alcance, p_vex, p_cortex, p_analisis, p_rel_vel, p_tren, p_centro, p_transmision, p_potencia, p_torque, p_velocidad)
+insert into criterio_const (fk_equipo, fk_evento, prototipo_estetico, estructuras_estables, uso_sistemas_transmision, uso_sensores, cableado_adecuado, calculo_implementacion_sistema_neumático, conocimiento_alcance, implementación_marca_vex, uso_procesador_cortexm3, analisis_estruc, relacion_velocidades, tren_engranes, centro_gravedad, sis_transmicion, potencia, torque, velocidad)
+values (p_equipo, p_evento, p_proto, p_estruc, p_sis_trans, p_sensores, p_cableado, p_neumatico, p_alcance, p_vex, p_cortex, p_analisis, p_rel_vel, p_tren, p_centro, p_transmision, p_potencia, p_torque, p_velocidad)
     on duplicate key update
-    prototipo_estetico=p_proto, estructuras_estables=p_estruc, uso_sistemas_transmision=p_sis_trans, uso_sensores=p_sensores, cableado_adecuado=p_cableado, calculo_implementacion_sistema_neumático=p_neumatico, conocimiento_alcance=p_alcance, implementación_marca_vex=p_vex, uso_procesador_cortexm3=p_cortex, analisis_estruc=p_analisis, relacion_velocidades=p_rel_vel, tren_engranes=p_tren, centro_gravedad=p_centro, sis_transmicion=p_transmision, potencia=p_potencia, torque=p_torque, velocidad=p_velocidad;
+                         prototipo_estetico=p_proto, estructuras_estables=p_estruc, uso_sistemas_transmision=p_sis_trans, uso_sensores=p_sensores, cableado_adecuado=p_cableado, calculo_implementacion_sistema_neumático=p_neumatico, conocimiento_alcance=p_alcance, implementación_marca_vex=p_vex, uso_procesador_cortexm3=p_cortex, analisis_estruc=p_analisis, relacion_velocidades=p_rel_vel, tren_engranes=p_tren, centro_gravedad=p_centro, sis_transmicion=p_transmision, potencia=p_potencia, torque=p_torque, velocidad=p_velocidad;
 
-    -- 2. calcular puntaje real usando la función
-    update criterios_evaluacion 
-    set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
-    where fk_equipo = p_equipo and fk_evento = p_evento;
+-- 2. calcular puntaje real usando la función
+update criterios_evaluacion
+set puntos_totales = calcular_puntaje_total(p_equipo, p_evento)
+where fk_equipo = p_equipo and fk_evento = p_evento;
 end //
 delimiter ;
 
@@ -1088,7 +1090,7 @@ drop procedure if exists obtener_evaluacion_const;
 delimiter //
 create procedure obtener_evaluacion_const(in p_equipo int, in p_evento int)
 begin
-    select * from criterio_const where fk_equipo = p_equipo and fk_evento = p_evento;
+select * from criterio_const where fk_equipo = p_equipo and fk_evento = p_evento;
 end
 // delimiter ;
 
@@ -1178,7 +1180,7 @@ call registrar_equipo(2, 1, 1, 4, 1, 2, 3, @aviso);
 
 -- Arañas Tecnológicas
 -- (Coach ID 3, Equipo ID 2, Evento ID 2, Categ 3, Partic 4,5,6)
-call registrar_equipo(3, 2, 2, 3, 4, 5, 6, @aviso); 
+call registrar_equipo(3, 2, 2, 3, 4, 5, 6, @aviso);
 
 -- Vengadores ITCM
 -- (Coach ID 4, Equipo ID 3, Evento ID 2, Categ 4, Partic 7,8,9)
