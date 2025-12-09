@@ -285,23 +285,23 @@ CREATE PROCEDURE registrar_competidor(
     IN p_semestre TINYINT,
     IN p_num_control INT,
     OUT aviso TINYINT
-)
+        )
 BEGIN
     DECLARE v_nivel INT;
     DECLARE v_edad INT;
     DECLARE v_edad_minima INT;
 
     -- 1. Obtener el nivel de la escuela (1=Primaria, 2=Secundaria, etc.)
-    SELECT fk_nivel INTO v_nivel FROM escuela WHERE id_escuela = p_escuela;
+SELECT fk_nivel INTO v_nivel FROM escuela WHERE id_escuela = p_escuela;
 
-    -- 2. Definir la edad mínima según el nivel
-    CASE v_nivel
+-- 2. Definir la edad mínima según el nivel
+CASE v_nivel
         WHEN 1 THEN SET v_edad_minima = 6;  -- Primaria
-        WHEN 2 THEN SET v_edad_minima = 12; -- Secundaria
-        WHEN 3 THEN SET v_edad_minima = 15; -- Bachillerato
-        WHEN 4 THEN SET v_edad_minima = 17; -- Universidad
-        ELSE SET v_edad_minima = 0;
-    END CASE;
+WHEN 2 THEN SET v_edad_minima = 12; -- Secundaria
+WHEN 3 THEN SET v_edad_minima = 15; -- Bachillerato
+WHEN 4 THEN SET v_edad_minima = 17; -- Universidad
+ELSE SET v_edad_minima = 0;
+END CASE;
 
     -- 3. Calcular la edad actual
     SET v_edad = TIMESTAMPDIFF(YEAR, p_fecha_nacimiento, CURDATE());
@@ -311,12 +311,12 @@ BEGIN
         SET aviso = -3; -- ERROR: Muy joven
     ELSEIF EXISTS (SELECT * FROM participante WHERE num_control = p_num_control AND fk_escuela = p_escuela) THEN
         SET aviso = -1; -- ERROR: Duplicado
-    ELSE
+ELSE
         -- Insertar si cumple la edad
         INSERT INTO participante (nombre, fecha_nacimiento, fk_escuela, sexo, carrera, semestre, num_control)
         VALUES (p_nombre, p_fecha_nacimiento, p_escuela, p_sexo, p_carrera, p_semestre, p_num_control);
         SET aviso = 1; -- ÉXITO
-    END IF;
+END IF;
 END
 // DELIMITER ;
 
@@ -357,6 +357,8 @@ end
 set @mensaje = "0";
 call registrar_docente("Jorge Herrera Hipolito", "Herrera220", "1234", "1980-08-21", 2, "H", "Redes de computadoras", @mensaje);
 call registrar_docente("Mauro", "Mau", "12345678", "2005-06-24", 4, "H", "Calador", @mensaje);
+call registrar_docente("Carlos Santillan", "Santi", "12345678", "2005-10-15", 4, "H", "Procrasti", @mensaje);
+call registrar_docente("Jose Esteban", "Tobi", "12345678", "2005-01-13", 4, "H", "Pokemon", @mensaje);
 
 drop procedure if exists crear_evento;
 delimiter //
@@ -373,8 +375,8 @@ begin
 		set aviso = 0; -- Ya existe un evento con ese mismo nombre
 else
 		insert into evento (nombre, fecha, fk_sede) values (p_nombre_evento, p_fecha, p_fk_sede);
-        insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
-        set aviso = 1; -- Se creo correctamente el equipo
+insert into categoria_evento (fk_evento, fk_categoria) select last_insert_id(), id_categoria from categoria;
+set aviso = 1; -- Se creo correctamente el equipo
 end if;
 end
 // delimiter ;
@@ -410,18 +412,18 @@ create procedure inicio_sesion(
 )
 begin
 	if exists (select * from usuario where nombre_usuario = p_nombre_usuario and clave = p_clave) then
-		select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
-		select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
-		SELECT nombre_usuario INTO p_nombre_completo FROM usuario WHERE id_usuario = p_id_usuario;
-        SELECT nombre INTO @temp_nombre FROM docente WHERE id_docente = p_id_usuario;
-        IF @temp_nombre IS NOT NULL THEN
+select id_usuario into p_id_usuario from usuario where nombre_usuario = p_nombre_usuario;
+select concurso_robotica.grado_admin(p_id_usuario) into p_grado;
+SELECT nombre_usuario INTO p_nombre_completo FROM usuario WHERE id_usuario = p_id_usuario;
+SELECT nombre INTO @temp_nombre FROM docente WHERE id_docente = p_id_usuario;
+IF @temp_nombre IS NOT NULL THEN
             SET p_nombre_completo = @temp_nombre;
-        END IF;
-	else
+END IF;
+else
 		set p_grado = -2;
 		set p_id_usuario = -1;
         set p_nombre_completo = null;
-	end if;
+end if;
 end
 // delimiter ;
 
@@ -554,13 +556,13 @@ create procedure registrar_equipo(
 begin
 	if exists (select * from inscripcion_equipo where fk_equipo = p_fk_equipo and fk_evento = p_fk_evento) then
 		set aviso = -1; -- El equipo ya esta registrado en este evento
-	else
+else
 		insert into inscripcion_equipo(fk_coach, fk_equipo, fk_evento, fk_categoria) values (p_fk_coach, p_fk_equipo, p_fk_evento, p_fk_categoria);
-		insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
-		insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
-		insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
-		set aviso = 1;
-	end if;
+insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante1, p_fk_evento, p_fk_equipo);
+insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante2, p_fk_evento, p_fk_equipo);
+insert into integrante_inscripcion(fk_participante, fk_evento, fk_equipo) values (p_fk_participante3, p_fk_evento, p_fk_equipo);
+set aviso = 1;
+end if;
 end
 // delimiter ;
 
@@ -724,10 +726,10 @@ CREATE PROCEDURE retornar_equipos_docente(
     IN p_id_docente INT
 )
 BEGIN
-    SELECT e.id_equipo, e.nombre 
-    FROM equipo e
-    JOIN docente d ON e.fk_escuela = d.fk_escuela
-    WHERE d.id_docente = p_id_docente;
+SELECT e.id_equipo, e.nombre
+FROM equipo e
+         JOIN docente d ON e.fk_escuela = d.fk_escuela
+WHERE d.id_docente = p_id_docente;
 END
 // DELIMITER ;
 
@@ -738,6 +740,75 @@ CREATE PROCEDURE obtener_nivel_escuela(
     OUT p_nivel INT
 )
 BEGIN
-    SELECT fk_nivel INTO p_nivel FROM escuela WHERE id_escuela = p_id_escuela;
+SELECT fk_nivel INTO p_nivel FROM escuela WHERE id_escuela = p_id_escuela;
+END
+// DELIMITER ;
+
+-- *************************** 08/12/25 7.44pm karla
+
+DROP PROCEDURE IF EXISTS retornar_sedes_combo;
+DELIMITER //
+CREATE PROCEDURE retornar_sedes_combo()
+BEGIN
+SELECT id_sede, nombre
+FROM sede
+ORDER BY nombre ASC;
+END
+// DELIMITER ;
+
+DROP PROCEDURE IF EXISTS retornar_categorias_por_evento;
+DELIMITER //
+CREATE PROCEDURE retornar_categorias_por_evento(
+    IN p_id_evento INT
+)
+BEGIN
+SELECT c.id_categoria, c.nombre
+FROM categoria c
+         JOIN categoria_evento ce ON c.id_categoria = ce.fk_categoria
+WHERE ce.fk_evento = p_id_evento
+  -- AQUÍ ESTÁ EL FILTRO MÁGICO:
+  AND (
+          SELECT COUNT(*)
+          FROM asignacion_juez aj
+          WHERE aj.fk_evento = p_id_evento
+            AND aj.fk_categoria = c.id_categoria
+      ) < 3 -- Solo si hay menos de 3 jueces asignados
+ORDER BY c.nombre;
+END
+// DELIMITER ;
+
+DROP PROCEDURE IF EXISTS asignar_terna_jueces;
+DELIMITER //
+CREATE PROCEDURE asignar_terna_jueces(
+    IN p_id_evento INT,
+    IN p_id_categoria INT,
+    IN p_juez1 INT,
+    IN p_juez2 INT,
+    IN p_juez3 INT,
+    OUT aviso TINYINT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+        -- Si pasa algo malo, deshacer todo
+ROLLBACK;
+SET aviso = -1;
+END;
+
+START TRANSACTION;
+
+-- Validar si alguno de los 3 ya existe en esa categoría y evento
+IF EXISTS (SELECT * FROM asignacion_juez WHERE fk_evento = p_id_evento AND fk_categoria = p_id_categoria AND fk_juez IN (p_juez1, p_juez2, p_juez3)) THEN
+        SET aviso = 0; -- Al menos uno ya estaba asignado, cancelamos todo.
+ROLLBACK;
+ELSE
+        -- Insertamos los 3 de golpe
+        INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez1, p_id_evento, p_id_categoria);
+INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez2, p_id_evento, p_id_categoria);
+INSERT INTO asignacion_juez(fk_juez, fk_evento, fk_categoria) VALUES (p_juez3, p_id_evento, p_id_categoria);
+
+SET aviso = 1; -- Éxito total
+COMMIT;
+END IF;
 END
 // DELIMITER ;
