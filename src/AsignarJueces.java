@@ -82,37 +82,36 @@ public class AsignarJueces implements Initializable {
             int idJ3 = mapaJueces.get(j3);
 
             // LLAMADA ÚNICA: TODO O NADA
-            int resultado = Main.registrarTernaEnBD(this.idEventoActual, idCat, idJ1, idJ2, idJ3);
+            String resultado = Main.registrarTernaEnBD(this.idEventoActual, idCat, idJ1, idJ2, idJ3);
 
-            if (resultado == 1) {
-                mostrarAlertaExito("Éxito",
-                        "Los 3 jueces se asignaron correctamente.",
-                        "");
+            if (resultado.equals("1")) {
+                mostrarAlertaExito("Éxito", "Asignación Correcta", "Los 3 jueces se asignaron correctamente.");
 
-                // Actualizar interfaz
                 cbCategoriaJuez.setValue(null);
                 cbJuezUno.setValue(null); cbJuezDos.setValue(null); cbJuezTres.setValue(null);
                 cargarListas();
 
-            } else if (resultado == 0) {
-                mostrarAlertaError("Error",
-                        "Uno o más de los jueces seleccionados YA estaban asignados a esta categoría anteriormente.",
-                        "");
-            }else if (resultado == -2) {
+            } else if (resultado.equals("0")) {
+                mostrarAlertaError("Error", "Jueces Repetidos", "Uno o más jueces ya estaban asignados a esta categoría.");
+
+            } else if (resultado.startsWith("CONFLICTO|")) {
+
+                // Separamos el texto: "CONFLICTO|Juan Perez" -> ["CONFLICTO", "Juan Perez"]
+                String[] partes = resultado.split("\\|");
+                String nombreDocente = (partes.length > 1) ? partes[1] : "Desconocido";
+
                 mostrarAlertaError("Conflicto de Interés",
                         "Acción No Permitida",
-                        "Uno de los docentes seleccionados es COACH de un equipo inscrito en esta categoría.\n\nNo puede ser Juez y Coach al mismo tiempo.");
-            }else {
-                mostrarAlertaError("Error",
-                        "Ocurrió un error en la base de datos.",
-                        "");
+                        "El docente '" + nombreDocente + "' es COACH de un equipo inscrito en esta categoría.\n\n" +
+                                "No puede ser Juez y Coach al mismo tiempo.");
+
+            } else {
+                mostrarAlertaError("Error", "Error Base de Datos", "Código: " + resultado);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlertaError("Error Crítico",
-                    "",
-                    "");
+            mostrarAlertaError("Error Crítico", "Excepción", e.getMessage());
         }
     }
 
@@ -128,15 +127,28 @@ public class AsignarJueces implements Initializable {
             mapaCategorias.put(nombre, id);
         }
 
-        // B. Cargar Docentes (USANDO TU PROCESO REUTILIZADO)
-        List<Map<String, Object>> profes = Main.retornarDocentes();
-        cbJuezUno.getItems().clear(); cbJuezDos.getItems().clear(); cbJuezTres.getItems().clear();
+        List<Map<String, Object>> profes = Main.retornarJuecesDisponibles(this.idEventoActual);
+
+        // Limpiamos los combos
+        cbJuezUno.getItems().clear();
+        cbJuezDos.getItems().clear();
+        cbJuezTres.getItems().clear();
         mapaJueces.clear();
-        for (Map<String, Object> fila : profes) {
-            String nombre = (String) fila.get("nombre");
-            int id = (int) fila.get("id");
-            cbJuezUno.getItems().add(nombre); cbJuezDos.getItems().add(nombre); cbJuezTres.getItems().add(nombre);
-            mapaJueces.put(nombre, id);
+
+        if (profes.isEmpty()) {
+            // Opcional: Avisar si ya no queda nadie disponible
+            cbJuezUno.setPromptText("No hay docentes disponibles");
+        } else {
+            for (Map<String, Object> fila : profes) {
+                String nombre = (String) fila.get("nombre");
+                int id = (int) fila.get("id");
+
+                cbJuezUno.getItems().add(nombre);
+                cbJuezDos.getItems().add(nombre);
+                cbJuezTres.getItems().add(nombre);
+
+                mapaJueces.put(nombre, id);
+            }
         }
 
         if (cats.isEmpty()) {

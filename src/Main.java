@@ -560,26 +560,42 @@ public class Main extends Application {
         return lista;
     }
 
-    public static int registrarTernaEnBD(int idEvento, int idCategoria, int j1, int j2, int j3) {
-        int aviso = -1;
+    // En Main.java
+
+    public static String registrarTernaEnBD(int idEvento, int idCategoria, int j1, int j2, int j3) {
+        String respuesta = "-99";
+
         try (Connection conn = getConexion();
-             CallableStatement cs = conn.prepareCall("{CALL asignar_terna_jueces(?, ?, ?, ?, ?, ?)}")) {
+             CallableStatement cs = conn.prepareCall("{CALL asignar_terna_jueces(?, ?, ?, ?, ?, ?, ?)}")) {
 
             cs.setInt(1, idEvento);
             cs.setInt(2, idCategoria);
             cs.setInt(3, j1);
             cs.setInt(4, j2);
             cs.setInt(5, j3);
-            cs.registerOutParameter(6, java.sql.Types.TINYINT);
+
+            cs.registerOutParameter(6, java.sql.Types.INTEGER);
+            cs.registerOutParameter(7, java.sql.Types.VARCHAR);
 
             cs.execute();
-            aviso = cs.getInt(6);
+
+            int aviso = cs.getInt(6);
+            String nombreConflicto = cs.getString(7);
+
+            if (aviso == 1) {
+                respuesta = "1"; // Éxito
+            } else if (aviso == 0) {
+                respuesta = "0"; // Duplicado
+            } else if (aviso == -2) {
+                respuesta = "CONFLICTO|" + nombreConflicto;
+            } else {
+                respuesta = String.valueOf(aviso);
+            }
 
         } catch (SQLException e) {
-            System.err.println("Error al registrar terna de jueces: " + e.getMessage());
             e.printStackTrace();
         }
-        return aviso;
+        return respuesta;
     }
 
     public static Map<String, String> obtenerInfoPersonalDocente(int idDocente) {
@@ -696,6 +712,30 @@ public class Main extends Application {
         return aviso;
     }
 
+    public static List<Map<String, Object>> retornarJuecesDisponibles(int idEvento) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_jueces_disponibles(?)}")) {
+
+            cs.setInt(1, idEvento);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+                    fila.put("id", rs.getInt("id_docente"));
+                    fila.put("nombre", rs.getString("nombre"));
+                    lista.add(fila);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+
+    // EVALUACION
     public static List<Map<String, Object>> retornarEquiposAEvaluar(int idEvento, int idJuez) {
         List<Map<String, Object>> lista = new ArrayList<>();
         try (Connection conn = getConexion();
