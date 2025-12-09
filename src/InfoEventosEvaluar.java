@@ -13,23 +13,19 @@ import javafx.stage.StageStyle;
 
 public class InfoEventosEvaluar {
 
-    // --- ESTAS VARIABLES FALTABAN O NO ESTABAN VINCULADAS ---
     @FXML
-    private ComboBox<String> cbEquipos; // Debe coincidir con fx:id="cbEquipos"
+    private ComboBox<String> cbEquipos;
 
     private Map<String, Integer> mapaEquipos = new HashMap<>();
     private int idEventoActual;
 
-    // Método que llama la ventana anterior para cargar los datos
     public void inicializarDatos(int idEvento) {
         this.idEventoActual = idEvento;
         int idJuez = Main.usuaioActual;
 
-        // Llamamos al Main para traer solo equipos que este juez puede evaluar
-        // (Asegúrate de que este método exista en Main.java)
+
         List<Map<String, Object>> lista = Main.retornarEquiposAEvaluar(idEvento, idJuez);
 
-        // Limpiamos y llenamos el combo
         if (cbEquipos != null) {
             cbEquipos.getItems().clear();
             mapaEquipos.clear();
@@ -53,20 +49,15 @@ public class InfoEventosEvaluar {
 
             int idEquipo = mapaEquipos.get(nombreEquipo);
 
-            // Cargar la PRIMERA ventana: DISEÑO
-            // Asegúrate que el nombre del recurso sea exacto (mayúsculas/minúsculas)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("EvaluarCriterioDiseno.fxml"));
             Parent root = loader.load();
 
-            // Pasar datos al controlador de Diseño
             EvaluarDisenoController controller = loader.getController();
             controller.iniciarEvaluacion(this.idEventoActual, idEquipo, nombreEquipo);
 
-            // Cerrar la ventana actual
             Stage stageActual = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stageActual.close();
 
-            // Abrimos la evaluación
             Stage stage = new Stage();
 
             stage.initStyle(StageStyle.UNDECORATED);

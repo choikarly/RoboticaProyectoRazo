@@ -45,30 +45,26 @@ public class AsignarJueces implements Initializable {
     @FXML
     void btnAsignarJueces(ActionEvent event) {
         try {
-            // 1. Obtener valores de los ComboBox
             String catTxt = cbCategoriaJuez.getValue();
             String j1 = cbJuezUno.getValue();
             String j2 = cbJuezDos.getValue();
             String j3 = cbJuezTres.getValue();
 
-            // 2. Validar que no haya campos vacíos
             if (catTxt == null || j1 == null || j2 == null || j3 == null) {
                 mostrarAlertaError("ERROR",
                         "Faltan datos",
                         "Por favor selecciona una categoría y los 3 jueces.");
-                return; // Detiene la ejecución
+                return;
             }
 
-            // 3. Validar que no se repitan los jueces
             if (j1.equals(j2) || j1.equals(j3) || j2.equals(j3)) {
                 mostrarAlertaError("ERROR",
                         "Jueces Duplicados",
                         "No puedes asignar al mismo juez dos veces en la misma categoría.");
-                return; // Detiene la ejecución
+                return;
             }
 
-            // 4. Validación de Integridad (Verificar que los IDs existan en los mapas)
-            // Esto evita un NullPointerException si por alguna razón el nombre no tiene ID asociado
+
             if (!mapaCategorias.containsKey(catTxt) ||
                     !mapaJueces.containsKey(j1) ||
                     !mapaJueces.containsKey(j2) ||

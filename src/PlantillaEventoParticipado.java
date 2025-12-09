@@ -62,7 +62,6 @@ public class PlantillaEventoParticipado {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventosEvaluar.fxml"));
             Parent root = loader.load();
 
-            // Pasamos el ID del evento a la ventana de selección de equipos
             InfoEventosEvaluar controller = loader.getController();
             controller.inicializarDatos(this.idEventoGuardado);
 
@@ -84,17 +83,14 @@ public class PlantillaEventoParticipado {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventosMasInfo.fxml"));
             Parent root = loader.load();
 
-            // --- NUEVO: Pasar datos al controlador del ranking ---
             InfoEventosMasInfo controller = loader.getController();
 
-            // Usamos los datos que ya tenemos guardados en la tarjeta (etiquetas)
             controller.cargarDatosRanking(
                     this.idEventoGuardado,
                     lblNombreEvento.getText(),
                     lblFecha.getText(),
                     lblSede.getText()
             );
-            // ---------------------------------------------------
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
