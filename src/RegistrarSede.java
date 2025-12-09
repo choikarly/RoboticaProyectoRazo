@@ -51,6 +51,10 @@ public class RegistrarSede implements Initializable {
             mostrarAlerta("Atención", "Escribe el nombre de la sede.");
             return;
         }
+        if (nombre.length() > 80) {
+            mostrarAlerta("Error", "El nombre de la sede es demasiado largo (Max 80).");
+            return;
+        }
         if (nombreCiudad == null) {
             mostrarAlerta("Atención", "Debes seleccionar una ciudad.");
             return;

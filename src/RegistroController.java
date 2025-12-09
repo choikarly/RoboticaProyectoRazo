@@ -121,7 +121,7 @@ public class RegistroController implements Initializable {
          (?=.*[@#$%^&+=!._-]) -> Debe contener al menos un carácter especial (puedes agregar más si quieres)
          .{6,}             -> Debe tener al menos 6 caracteres de longitud
         */
-        String patronContrasena = "^(?=.[0-9])(?=.[A-Z])(?=.*[@#$%^&+=!._-]).{6,}$";
+        String patronContrasena = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@#$%^&+=!._-]).{6,}$";
 
         if (!passwordIngresado.matches(patronContrasena)) {
             mostrarAlertaError("Seguridad", "Contraseña Débil",

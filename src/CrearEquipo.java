@@ -40,10 +40,21 @@ public class CrearEquipo implements Initializable{
         try {
             String nombreEquipo = txtNombreEquipo.getText().trim();
             if (nombreEquipo.isEmpty()) {
-                mostrarAlertaError(
-                        "Error",
-                        "CAMPOS VACIOS",
-                        "Escribe el nombre de tu equipo.");
+                mostrarAlertaError("Error", "Campo Vacío", "Escribe el nombre del equipo.");
+                return;
+            }
+
+            // NUEVA: VALIDACIÓN CARACTERES ESPECIALES Y LONGITUD
+            // Evita que pongan emojis o nombres kilométricos que rompan la BD
+            if (nombreEquipo.length() > 80) {
+                mostrarAlertaError("Nombre muy largo", "Límite excedido", "El nombre debe tener máximo 80 caracteres.");
+                return;
+            }
+
+            if (!nombreEquipo.matches("^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s\\-]+$")) {
+                mostrarAlertaError("Caracteres Inválidos", "Nombre de Equipo",
+                        "Usa solo letras, números y guiones.");
+                return;
             } else {
                 // 2. Obtener el ID del Coach que está logueado
                 int idCoach = Main.usuaioActual;

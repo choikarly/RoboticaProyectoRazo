@@ -52,23 +52,22 @@ public class CrearEvento implements Initializable {
             LocalDate fechaLocal = dateEvento.getValue();
             String nombreSede = cbSede.getValue();
 
-            // 2. Validaciones básicas (Aquí detenemos si falta algo)
-            if (nombre.isEmpty()) {
-                mostrarAlerta("Error de Validación",
-                        "El nombre del evento es obligatorio.");
-                return; // <--- DETIENE EL CÓDIGO AQUÍ
+            // 1. Validaciones básicas
+            if (nombre.isEmpty() || fechaLocal == null || nombreSede == null) {
+                mostrarAlerta("Error", "Faltan datos obligatorios.");
+                return;
             }
 
-            if (fechaLocal == null) {
-                mostrarAlerta("Error de Validación",
-                        "Debes seleccionar una fecha.");
-                return; // <--- DETIENE EL CÓDIGO AQUÍ
+            // 2. NUEVA: VALIDACIÓN DE FECHA (Eventos deben ser HOY o FUTURO)
+            if (fechaLocal.isBefore(LocalDate.now())) {
+                mostrarAlerta("Fecha Inválida", "No puedes crear eventos en el pasado.");
+                return;
             }
 
-            if (nombreSede == null || nombreSede.isEmpty()) {
-                mostrarAlerta("Error de Validación",
-                        "Debes seleccionar una sede de la lista.");
-                return; // <--- DETIENE EL CÓDIGO AQUÍ
+            // 3. NUEVA: LONGITUD DE NOMBRE (Tu BD dice VARCHAR(40))
+            if (nombre.length() > 40) {
+                mostrarAlerta("Texto muy largo", "El nombre del evento no puede superar los 40 caracteres.");
+                return;
             }
 
             // Validación de seguridad: Verificar que la sede existe en el mapa

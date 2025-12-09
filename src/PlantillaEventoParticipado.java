@@ -89,10 +89,20 @@ public class PlantillaEventoParticipado {
     }
 
     @FXML
-    void btnMasInfoEvento(ActionEvent event){
+    void btnMasInfoEvento(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("InfoEventosMasInfo.fxml"));
             Parent root = loader.load();
+
+            // OBTENER DATOS DE LA ETIQUETAS ACTUALES
+            String nombre = lblNombreEvento.getText();
+            String fecha = lblFecha.getText();
+            String sede = lblSede.getText();
+
+            // PASAR DATOS AL CONTROLADOR
+            InfoEventosMasInfo controller = loader.getController();
+            controller.setDatos(nombre, fecha, sede);
+
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Más Información");

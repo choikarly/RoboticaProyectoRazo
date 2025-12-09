@@ -1,22 +1,26 @@
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import java.io.IOException;
-import java.util.Optional;
 
 public class InfoEventosMasInfo {
+
+    @FXML private Label lblNombreEvento;
+    @FXML private Label lblFecha;
+    @FXML private Label lblSede;
+
+    // Método para recibir los datos desde la tarjeta
+    public void setDatos(String nombre, String fecha, String sede) {
+        lblNombreEvento.setText(nombre);
+        lblFecha.setText(fecha);
+        lblSede.setText(sede);
+    }
+
     @FXML
-    void btnCerrar (ActionEvent event){
+    void btnCerrar(ActionEvent event) {
         Node source = (Node) event.getSource();
         Stage stageActual = (Stage) source.getScene().getWindow();
         stageActual.close();
     }
-
 }

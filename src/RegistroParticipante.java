@@ -48,29 +48,48 @@ public class RegistroParticipante implements Initializable {
 
     @FXML
     void btnGuardar(ActionEvent event) {
-        // 1. Validaciones Básicas (Siempre requeridas)
-        if (txtIntegrante.getText().isEmpty() || txtNumCtrl.getText().isEmpty() ||
+        // 1. VALIDACIÓN CAMPOS VACÍOS (Ya la tienes, la mantenemos)
+        if (txtIntegrante.getText().trim().isEmpty() || txtNumCtrl.getText().trim().isEmpty() ||
                 dateNacimiento.getValue() == null) {
             mostrarAlertaError("Error", "Campos Vacíos", "Llena el nombre, número de control y fecha.");
             return;
         }
 
-        // 2. Validaciones Condicionales (Solo si son visibles)
-        if (txtCarrera.isVisible() && txtCarrera.getText().isEmpty()) {
-            mostrarAlertaError("Error", "Falta Carrera", "Escribe la carrera o especialidad.");
-            return;
-        }
-        if (semestreComboBox.isVisible() && semestreComboBox.getValue() == null) {
-            mostrarAlertaError("Error", "Falta Semestre", "Selecciona un semestre.");
+        String nombre = txtIntegrante.getText().trim();
+        String numCtrlTexto = txtNumCtrl.getText().trim();
+
+        // 2. NUEVA: VALIDACIÓN DE NOMBRE (Solo letras y espacios)
+        if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")) {
+            mostrarAlertaError("Formato Inválido", "Nombre Incorrecto",
+                    "El nombre del integrante solo puede contener letras.");
             return;
         }
 
+        // 3. NUEVA: VALIDACIÓN NÚMERO DE CONTROL (Solo dígitos y longitud exacta)
+        // Ajusta {8} al tamaño real de tus números de control (ej. 8 dígitos)
+        if (!numCtrlTexto.matches("^\\d{1,10}$")) {
+            mostrarAlertaError("Formato Inválido", "Número de Control",
+                    "El número de control debe contener solo dígitos numéricos (Máximo 10).");
+            return;
+        }
+
+        // 4. NUEVA: FECHA LÓGICA (No puede nacer hoy o en el futuro)
+        if (dateNacimiento.getValue().isAfter(java.time.LocalDate.now().minusYears(3))) {
+            mostrarAlertaError("Fecha Inválida", "Edad Incorrecta",
+                    "La fecha de nacimiento es demasiado reciente.");
+            return;
+        }
+
+        // --- CONTINÚA TU LÓGICA DE GUARDADO ---
         try {
+            // Ahora es seguro convertir a entero
+            int numCtrl = Integer.parseInt(numCtrlTexto);
+            // ... resto del código ...
             // 3. Preparar Datos
-            String nombre = txtIntegrante.getText();
+            nombre = txtIntegrante.getText();
             java.sql.Date fecha = java.sql.Date.valueOf(dateNacimiento.getValue());
             String sexo = sexoComboBox.getValue();
-            int numCtrl = Integer.parseInt(txtNumCtrl.getText());
+            numCtrl = Integer.parseInt(txtNumCtrl.getText());
 
             // Datos variables según nivel
             String carrera;
