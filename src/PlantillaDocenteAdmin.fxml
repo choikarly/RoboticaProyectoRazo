@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaDocenteAdmin">
+<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaDocenteAdmin" stylesheets="@estilos.css">
    <children>
       <Label fx:id="lblNombre" layoutX="23.0" layoutY="10.0" prefHeight="43.0" prefWidth="508.0" text="NOMBRE DEL DOCENTE" textFill="WHITE">
          <font>
@@ -29,11 +29,6 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Button fx:id="btnAsignarComoJuez" layoutX="512.0" layoutY="70.0" mnemonicParsing="false" onAction="#btnAsignarComoJuez" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Asig. Juez" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Button>
       <Button fx:id="btnMasInfoDocentesMain" layoutX="512.0" layoutY="11.0" mnemonicParsing="false" onAction="#btnMasInfoDocentesMain" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Más Info." textFill="WHITE">
          <font>
             <Font name="System Bold" size="18.0" />

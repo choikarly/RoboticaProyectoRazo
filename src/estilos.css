@@ -1,0 +1,13 @@
+/* ESTILOS.CSS */
+
+/* Aplica a todos los TextField y PasswordField cuando tienen el foco */
+.text-field:focused, .password-field:focused {
+    /* Mantenemos el color gris del prompt.
+       Puedes cambiar #808080 por un gris más claro u oscuro si prefieres */
+    -fx-prompt-text-fill: #808080;
+}
+
+/* Opcional: Asegurarnos de que el color base también sea gris */
+.text-field, .password-field {
+    -fx-prompt-text-fill: #808080;
+}

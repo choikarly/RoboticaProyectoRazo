@@ -38,6 +38,16 @@ public class MainDocentesAdmin implements Initializable {
         boolean filtrarCoach = chbMostrarCoach.isSelected();
         boolean filtrarJuez = chbMostrarJueces.isSelected();
 
+        if (listaMaestra.isEmpty()) {
+            vboxContenedorDocentesAdmin.setVisible(false);
+            vboxContenedorDocentesAdmin.setManaged(false);
+
+        } else {
+            vboxContenedorDocentesAdmin.setVisible(true);
+            vboxContenedorDocentesAdmin.setManaged(true);
+            vboxContenedorDocentesAdmin.setSpacing(10);
+        }
+
         for (Map<String, Object> docente : listaMaestra) {
 
             // Extraer datos
@@ -84,17 +94,12 @@ public class MainDocentesAdmin implements Initializable {
 
     private void crearTarjetaDocente(String nombre, String escuela, boolean esCoach, boolean esJuez) {
         try {
-            // Cargar tu plantilla (asegúrate de tener PlantillaDocente.fxml)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaDocenteAdmin.fxml"));
             AnchorPane tarjeta = loader.load();
 
-            // Obtener el controlador de la tarjeta
             PlantillaDocenteAdmin controller = loader.getController();
-
-            // Pasamos los datos
             controller.setDatosDocentesAdmin(nombre, escuela, esCoach, esJuez);
 
-            // Agregamos al VBox
             vboxContenedorDocentesAdmin.getChildren().add(tarjeta);
 
         } catch (IOException e) {

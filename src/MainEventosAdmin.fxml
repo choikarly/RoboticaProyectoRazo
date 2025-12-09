@@ -7,14 +7,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainEventosAdmin">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="734.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainEventosAdmin" stylesheets="@estilos.css">
    <children>
       <Label layoutX="43.0" layoutY="44.0" prefHeight="36.0" prefWidth="253.0" text="Eventos Activos">
          <font>
             <Font size="25.0" />
          </font>
       </Label>
-      <Button layoutX="526.0" layoutY="44.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="184.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="AGREGAR EVENTO" textFill="WHITE">
+      <Button fx:id="btnCrearEvento" layoutX="526.0" layoutY="44.0" mnemonicParsing="false" onAction="#btnAgregarEvento" prefHeight="48.0" prefWidth="184.0" style="-fx-background-color: #274C77; -fx-background-radius: 15;" text="AGREGAR EVENTO" textFill="WHITE">
          <font>
             <Font name="System Bold" size="17.0" />
          </font>

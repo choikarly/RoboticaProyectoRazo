@@ -61,29 +61,31 @@ public class MainEquiposAdmin implements Initializable {
         List<Map<String, Object>> lista = Main.retornarEquiposAdminFiltro(idEvento, idCategoria);
 
         if (lista.isEmpty()) {
-            System.out.println("La consulta no devolvió equipos. ¿Hay inscripciones en la BD?");
-        }
+            vboxContenedorEquiposFiltradosAdmin.setVisible(false);
+            vboxContenedorEquiposFiltradosAdmin.setManaged(false);
 
-        for (Map<String, Object> fila : lista) {
-            try {
-                // 2. Cargamos la PLANTILLA DE EQUIPO
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaMisEquipos.fxml"));
-                AnchorPane tarjeta = loader.load();
+        } else {
+            vboxContenedorEquiposFiltradosAdmin.setVisible(true);
+            vboxContenedorEquiposFiltradosAdmin.setManaged(true);
+            vboxContenedorEquiposFiltradosAdmin.setSpacing(10);
 
-                // 3. Obtenemos el controlador de la tarjeta de EQUIPO
-                PlantillaMisEquipos cardCtrl = loader.getController();
+            try{
+                for (Map<String, Object> fila : lista) {
+                    String equipo = (String) fila.get("equipo");
+                    String evento = (String) fila.get("evento");
+                    String escuela = (String) fila.get("escuela");
+                    String categoria = (String) fila.get("categoria");
 
-                String equipo = (String) fila.get("equipo");
-                String evento = (String) fila.get("evento");
-                String escuela = (String) fila.get("escuela");
-                String categoria = (String) fila.get("categoria");
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaMisEquipos.fxml"));
+                    AnchorPane tarjeta = loader.load();
 
-                // 4. Llenamos los datos
-                cardCtrl.setDatosMisEquipos(equipo, evento, escuela, categoria);
+                    PlantillaMisEquipos cardCtrl = loader.getController();
+                    cardCtrl.setDatosMisEquipos(equipo, evento, escuela, categoria);
 
-                vboxContenedorEquiposFiltradosAdmin.getChildren().add(tarjeta);
+                    vboxContenedorEquiposFiltradosAdmin.getChildren().add(tarjeta);
 
-            } catch (IOException e) {
+                }
+            }catch (IOException e) {
                 e.printStackTrace();
             }
         }

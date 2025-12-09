@@ -8,7 +8,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -17,8 +16,7 @@ import java.util.ResourceBundle;
 
 public class MainEventosAdmin implements Initializable {
 
-    @FXML private VBox vboxContenedorEventosActvosAdmin; // Donde van las tarjetas
-
+    @FXML private VBox vboxContenedorEventosActvosAdmin;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         cargarEventos();
@@ -48,26 +46,39 @@ public class MainEventosAdmin implements Initializable {
 
     private void cargarEventos() {
         vboxContenedorEventosActvosAdmin.getChildren().clear();
-
-        // Reutilizamos el método que ya tienes en Main
+        // En el método cargarEventos() de MainEventosAdmin.java:
         List<Map<String, Object>> lista = Main.retornarEventos();
 
-        for (Map<String, Object> fila : lista) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEventoAdmin.fxml"));
-                AnchorPane tarjeta = loader.load();
+        if (lista.isEmpty()) {
+            vboxContenedorEventosActvosAdmin.setVisible(false);
+            vboxContenedorEventosActvosAdmin.setManaged(false);
 
-                PlantillaEventoAdmin controller = loader.getController();
+        } else {
+            vboxContenedorEventosActvosAdmin.setVisible(true);
+            vboxContenedorEventosActvosAdmin.setManaged(true);
+            vboxContenedorEventosActvosAdmin.setSpacing(10);
 
-                String nombre = (String) fila.get("nombre");
-                String sede = (String) fila.get("sede");
-                String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Sin fecha";
+            try{
+                for (Map<String, Object> fila : lista) {
+                    // Extraer datos del mapa
+                    int idEvento = (int) fila.get("id_evento"); // <--- AQUI SACAMOS EL ID
+                    String nombre = (String) fila.get("nombre");
+                    String sede = (String) fila.get("sede");
+                    String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Sin fecha";
 
-                controller.setDatosEventoAdmin(nombre, fecha, sede);
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEventosAdmin.fxml"));
+                    AnchorPane tarjeta = loader.load();
 
-                vboxContenedorEventosActvosAdmin.getChildren().add(tarjeta);
+                    PlantillaEventosAdmin controller = loader.getController();
 
-            } catch (IOException e) {
+
+                    // Pasamos los 4 datos (incluyendo el ID)
+                    controller.setDatosEventoAdmin(idEvento, nombre, fecha, sede);
+
+                    vboxContenedorEventosActvosAdmin.getChildren().add(tarjeta);
+
+                }
+            }catch (IOException e) {
                 e.printStackTrace();
             }
         }

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEvento">
+<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEvento" stylesheets="@estilos.css">
    <children>
       <Label fx:id="lblNombreEvento" layoutX="23.0" layoutY="10.0" prefHeight="43.0" prefWidth="508.0" text="Nombre del Evento" textFill="WHITE">
          <font>

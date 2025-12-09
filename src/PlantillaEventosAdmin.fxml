@@ -6,25 +6,20 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEventoAdmin">
+<AnchorPane fx:id="panelEvento" prefHeight="135.0" prefWidth="635.0" style="-fx-background-radius: 15; -fx-background-color: #A3CEF1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PlantillaEventosAdmin" stylesheets="@estilos.css">
    <children>
       <Label fx:id="lblNombreEvento" layoutX="23.0" layoutY="10.0" prefHeight="43.0" prefWidth="482.0" text="Nombre del Evento" textFill="WHITE">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>
       </Label>
-      <Button fx:id="btnAsignarJueces" layoutX="509.0" layoutY="34.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Asig. Juez" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Button>
       <Separator layoutX="19.0" layoutY="53.0" prefHeight="2.0" prefWidth="482.0" style="-fx-background-color: #FFFFFF;" />
       <Label layoutX="23.0" layoutY="66.0" text="SEDE:" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblSede" layoutX="76.0" layoutY="62.0" prefHeight="36.0" prefWidth="426.0" text="Label" textFill="WHITE">
+      <Label fx:id="lblSede" layoutX="76.0" layoutY="62.0" prefHeight="36.0" prefWidth="551.0" text="Label" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>
@@ -39,5 +34,10 @@
             <Font size="18.0" />
          </font>
       </Label>
+      <Button fx:id="btnIrAsignarJueces" layoutX="505.0" layoutY="8.0" mnemonicParsing="false" onAction="#btnIrAsignarJuecesEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Asig. Juez" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

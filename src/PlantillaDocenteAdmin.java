@@ -9,7 +9,6 @@ public class PlantillaDocenteAdmin {
     @FXML private Label lblEscuela;
     @FXML private Label lblRol; // Un label extra para decir "COACH", "JUEZ" o "AMBOS"
 
-    @FXML private Button btnAsignarComoJuez;
 
     public void setDatosDocentesAdmin(String nombre, String escuela, boolean esCoach, boolean esJuez) {
         lblNombre.setText(nombre);
@@ -29,22 +28,7 @@ public class PlantillaDocenteAdmin {
             lblRol.setText("SIN ROL EN EVENTOS");
             lblRol.setStyle("-fx-text-fill: grey;");
         }
-
-        if (esJuez) {
-            btnAsignarComoJuez.setVisible(false);
-            btnAsignarComoJuez.setManaged(false); // No ocupa espacio
-        } else {
-            // Si NO es juez, mostramos el botón para permitir asignarlo
-            btnAsignarComoJuez.setVisible(true);
-            btnAsignarComoJuez.setManaged(true);
-        }
-
     }
-    @FXML
-    void btnAsignarComoJuez(ActionEvent event) {
-        System.out.println("boton desplegado");
-    }
-
     @FXML
     void btnMasInfoDocentesMain(ActionEvent event) {
         System.out.println("info desplegado");

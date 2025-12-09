@@ -124,23 +124,34 @@ public class Main extends Application {
     }
 
 
-    public static boolean organizarEvento(String nombre, Date fecha, int escuela) {
+    // Función para crear un evento llamando al SP crear_evento
+    public static int crearEvento(String nombre, java.sql.Date fecha, int idSede) {
+        int aviso = -2; // Valor por defecto si falla la conexión
+
+        String sql = "{CALL crear_evento(?, ?, ?, ?)}";
+
         try (Connection conn = getConexion();
-             CallableStatement cs = conn.prepareCall("{CALL crear_evento(?, ?, ?, ?)}")) {
+             CallableStatement cs = conn.prepareCall(sql)) {
+
+            // 1. Parámetros de Entrada (IN)
             cs.setString(1, nombre);
             cs.setDate(2, fecha);
-            cs.setInt(3, escuela);
-            cs.registerOutParameter(4, Types.VARCHAR);
+            cs.setInt(3, idSede);
+
+            // 2. Parámetro de Salida (OUT) - El aviso
+            cs.registerOutParameter(4, java.sql.Types.TINYINT);
+
+            // 3. Ejecutar
             cs.execute();
-            String mensaje = cs.getString(4);
-            System.out.println(mensaje);
-            if (!mensaje.equals("Alta exitosa"))
-                return false;
+
+            // 4. Recuperar el resultado
+            aviso = cs.getInt(4);
+
         } catch (SQLException e) {
-            System.err.println("\nError en la comunicación con la base de datos: " + e.getMessage());
-            return false;
+            System.err.println("Error al crear evento: " + e.getMessage());
+            e.printStackTrace();
         }
-        return true;
+        return aviso;
     }
 
 
@@ -529,6 +540,99 @@ public class Main extends Application {
             e.printStackTrace();
         }
         return nivel;
+    }
+
+    public static List<Map<String, Object>> retornarSedes() {
+        List<Map<String, Object>> lista = new ArrayList<>();
+
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_sedes_combo()}");
+             ResultSet rs = cs.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> fila = new HashMap<>();
+
+                // Guardamos ID y Nombre
+                fila.put("id", rs.getInt("id_sede"));
+                fila.put("nombre", rs.getString("nombre"));
+
+                lista.add(fila);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cargar sedes: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    public static List<Map<String, Object>> retornarCategoriasEvento(int idEvento) {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_categorias_por_evento(?)}")) {
+
+            cs.setInt(1, idEvento);
+
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> fila = new HashMap<>();
+                    fila.put("id", rs.getInt("id_categoria"));
+                    fila.put("nombre", rs.getString("nombre"));
+                    lista.add(fila);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
+
+    public static List<Map<String, Object>> retornarDocentes() {
+        List<Map<String, Object>> lista = new ArrayList<>();
+
+        // Llamamos a TU procedimiento existente
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL retornar_docentes()}");
+             ResultSet rs = cs.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> fila = new HashMap<>();
+
+                fila.put("id", rs.getInt("id_docente"));
+                fila.put("nombre", rs.getString("nombre"));
+
+                // Estos vienen extra, los guardamos por si acaso
+                fila.put("escuela", rs.getString("escuela"));
+                fila.put("especialidad", rs.getString("especialidad"));
+
+                lista.add(fila);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // En Main.java
+
+    public static int registrarTernaEnBD(int idEvento, int idCategoria, int j1, int j2, int j3) {
+        int aviso = -1;
+        // Nota: Como ya estamos dentro de Main, llamamos a getConexion() directamente
+        try (Connection conn = getConexion();
+             CallableStatement cs = conn.prepareCall("{CALL asignar_terna_jueces(?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setInt(1, idEvento);
+            cs.setInt(2, idCategoria);
+            cs.setInt(3, j1);
+            cs.setInt(4, j2);
+            cs.setInt(5, j3);
+            cs.registerOutParameter(6, java.sql.Types.TINYINT);
+
+            cs.execute();
+            aviso = cs.getInt(6);
+
+        } catch (SQLException e) {
+            System.err.println("Error al registrar terna de jueces: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return aviso;
     }
 
 }

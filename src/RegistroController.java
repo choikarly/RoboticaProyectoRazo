@@ -84,14 +84,16 @@ public class RegistroController implements Initializable {
     @FXML
     void btnRegistrarse(ActionEvent event) throws IOException {
         // 1. Extraer los datos de texto
-        String nombreCompleto = txt_nombrecompleto.getText();
-        String usuarioNuevo = txt_usuario.getText();
+        String nombreCompleto = txt_nombrecompleto.getText().trim(); // .trim() elimina espacios extra al inicio/final
+        String usuarioNuevo = txt_usuario.getText().trim();
+
+        // Obtenemos la contraseña del campo visible u oculto según corresponda
         String passwordIngresado = txt_contra_oculta.getText();
+
         String especialidad = txt_especialidad.getText();
-        String sexo = sexoComboBox.getSelectionModel().getSelectedItem();
         String escuelaProcedencia = EscuelaProcedenciaComboBox.getValue();
 
-        // VALIDACIÓN
+        // --- VALIDACIÓN 1: CAMPOS VACÍOS ---
         if (fecha_nacimiento_date.getValue() == null ||
                 EscuelaProcedenciaComboBox.getValue() == null ||
                 sexoComboBox.getValue() == null ||
@@ -101,66 +103,98 @@ public class RegistroController implements Initializable {
                 especialidad.isEmpty()) {
 
             mostrarAlertaError("ERROR", "Campos Vacíos", "Por favor llena todos los campos de texto.");
+            return; // Detenemos la ejecución aquí
+        }
 
-        } else {
-            // Conversión de datos
-            java.sql.Date fechaParaBD = java.sql.Date.valueOf(fecha_nacimiento_date.getValue());
+         /*VALIDACIÓN 2: NOMBRE SIN NÚMEROS NI SÍMBOLOS ---
+        Explicación Regex: ^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$
+        Permite letras mayúsculas, minúsculas, vocales con acento, ñ y espacios.*/
 
-            // --- AQUÍ ES DONDE OCURRÍA EL ERROR ---
-            // Ahora es seguro porque 'mapaEscuelas' ya se llenó en el initialize
-            if (mapaEscuelas.containsKey(escuelaProcedencia)) {
+        if (!nombreCompleto.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")) {
+            mostrarAlertaError("Error de Formato", "Nombre Inválido",
+                    "El nombre solo puede contener letras y espacios (no números ni símbolos).");
+            return;
+        }
+        /*VALIDACIÓN 3: CONTRASEÑA SEGURA (Mayúscula, Número, Especial, Min 6) ---
+         (?=.*[0-9])       -> Debe contener al menos un número
+         (?=.*[A-Z])       -> Debe contener al menos una letra mayúscula
+         (?=.*[@#$%^&+=!._-]) -> Debe contener al menos un carácter especial (puedes agregar más si quieres)
+         .{6,}             -> Debe tener al menos 6 caracteres de longitud
+        */
+        String patronContrasena = "^(?=.[0-9])(?=.[A-Z])(?=.*[@#$%^&+=!._-]).{6,}$";
 
-                int idEscuelaParaBD = mapaEscuelas.get(escuelaProcedencia);
+        if (!passwordIngresado.matches(patronContrasena)) {
+            mostrarAlertaError("Seguridad", "Contraseña Débil",
+                    "La contraseña debe cumplir con:\n" +
+                            "- Mínimo 6 caracteres\n" +
+                            "- Al menos una mayúscula (A-Z)\n" +
+                            "- Al menos un número (0-9)\n" +
+                            "- Al menos un símbolo especial (@ # $ % ^ & + = ! . _ -)");
+            return;
+        }
 
-                // Llamada al Main
-                int codigoResultado = Main.registrarDocente(
-                        nombreCompleto,
-                        usuarioNuevo,
-                        passwordIngresado,
-                        fechaParaBD,
-                        idEscuelaParaBD,
-                        sexo,
-                        especialidad
-                );
+        // --- SI PASA LAS VALIDACIONES, CONTINUAMOS CON LA LÓGICA DE BD ---
 
-                // Evaluar resultado
-                switch (codigoResultado) {
-                    case 1: // ÉXITO
-                        mostrarAlertaExito("Éxito", "Registro Completado", "Se le redirecionara al Inicio de Sesion");
-                        // Cerrar ventana actual y abrir login
-                        Node source = (Node) event.getSource();
-                        Stage stageActual = (Stage) source.getScene().getWindow();
-                        stageActual.close();
+        java.sql.Date fechaParaBD = java.sql.Date.valueOf(fecha_nacimiento_date.getValue());
+        String sexo = sexoComboBox.getSelectionModel().getSelectedItem();
 
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
-                        Parent root = loader.load();
-                        Stage stageNuevo = new Stage();
-                        stageNuevo.setScene(new Scene(root));
-                        stageNuevo.setTitle("Inicio de Sesion");
-                        stageNuevo.setResizable(false);
-                        stageNuevo.show();
-                        break;
+        if (mapaEscuelas.containsKey(escuelaProcedencia)) {
 
-                    case -0: // DUPLICADO
-                        mostrarAlertaError("Registro Fallido", "Usuario Duplicado", "Ese usuario ya existe en el sistema.");
-                        break;
+            int idEscuelaParaBD = mapaEscuelas.get(escuelaProcedencia);
 
-                    case -1:
-                        mostrarAlertaError("Registro Fallido", "Edad Insuficiente", "El docente debe ser mayor de edad (18 años) para registrarse.");
-                        break;
+            // Llamada al Main
+            int codigoResultado = Main.registrarDocente(
+                    nombreCompleto,
+                    usuarioNuevo,
+                    passwordIngresado,
+                    fechaParaBD,
+                    idEscuelaParaBD,
+                    sexo,
+                    especialidad
+            );
+            switch (codigoResultado) {
+                case 1: // ÉXITO
+                    mostrarAlertaExito("Éxito", "Registro Completado", "Se le redirecionara al Inicio de Sesion");
+                    Node source = (Node) event.getSource();
+                    Stage stageActual = (Stage) source.getScene().getWindow();
+                    stageActual.close();
 
-                    case -2:
-                    default: // ERROR
-                        mostrarAlertaError("Error", "Fallo del Sistema", "Hubo un error al intentar guardar en la BD.");
-                        break;
-                }
-            } else {
-                // Caso rarísimo donde seleccionó algo que no tiene ID
-                mostrarAlertaError("Error", "Escuela Inválida", "La escuela seleccionada no es válida.");
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("InicioSesion.fxml"));
+                    Parent root = loader.load();
+                    Stage stageNuevo = new Stage();
+                    stageNuevo.setScene(new Scene(root));
+                    stageNuevo.setTitle("Inicio de Sesion");
+                    stageNuevo.setResizable(false);
+                    stageNuevo.show();
+                    break;
+
+                case 0:
+                    mostrarAlertaError("Registro Fallido",
+                            "Usuario Duplicado",
+                            "Ese usuario ya existe en el sistema.");
+                    limpiarCampos();
+                    break;
+
+                case -1:
+                    mostrarAlertaError("Registro Fallido",
+                            "Edad Insuficiente",
+                            "El docente debe ser mayor de edad (18 años) para registrarse.");
+                    break;
+
+                case -2:
+                default:
+                    mostrarAlertaError("Error",
+                            "Fallo del Sistema",
+                            "Hubo un error al intentar guardar en la BD.");
+                    limpiarCampos();
+                    break;
             }
+        } else {
+            mostrarAlertaError("Error",
+                    "Escuela Inválida",
+                    "La escuela seleccionada no es válida.");
         }
     }
-
 
 
     private void limpiarCampos() {
