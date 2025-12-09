@@ -29,22 +29,28 @@ public class PlantillaEventoParticipado {
         lblRol.setText(rol);
 
         // --- LÓGICA DE VISIBILIDAD DE BOTONES ---
-        if ("COACH".equalsIgnoreCase(rol)) {
-            // MODO COACH: Ver Mas Info, Ocultar Evaluar
+        if("AMBOS".equalsIgnoreCase(rol)) {
+            // MOSTRAR LOS DOS BOTONES
+            btnMasInfoEvento.setVisible(true);
+            btnMasInfoEvento.setManaged(true);
+
+            btnEvaluarEvento.setVisible(true);
+            btnEvaluarEvento.setManaged(true);
+
+            if(lblRol != null) lblRol.setText("Rol: Coach y Juez");
+        } else if ("COACH".equalsIgnoreCase(rol)) {
             btnMasInfoEvento.setVisible(true);
             btnMasInfoEvento.setManaged(true);
 
             btnEvaluarEvento.setVisible(false);
             btnEvaluarEvento.setManaged(false);
         } else if ("JUEZ".equalsIgnoreCase(rol)) {
-            // MODO JUEZ: Ocultar Mas Info, Ver Evaluar
             btnMasInfoEvento.setVisible(false);
             btnMasInfoEvento.setManaged(false);
 
             btnEvaluarEvento.setVisible(true);
             btnEvaluarEvento.setManaged(true);
         }
-
     }
 
     @FXML

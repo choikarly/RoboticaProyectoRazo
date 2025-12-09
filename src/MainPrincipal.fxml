@@ -8,7 +8,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="MainPrincipalController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="942.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainPrincipalController" stylesheets="@estilos.css">
+<AnchorPane fx:id="MainPrincipalController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="589.0" prefWidth="942.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainPrincipalController">
    <children>
       <Pane layoutX="-6.0" layoutY="-5.0" prefHeight="598.0" prefWidth="216.0" style="-fx-background-color: #274C77;">
          <children>
@@ -27,40 +27,31 @@
                   </Label>
                </children>
             </StackPane>
-            <Label fx:id="lblNombreCompleto" alignment="CENTER" layoutX="10.0" layoutY="190.0"
-                               prefHeight="30.0" prefWidth="200.0" text="Nombre Usuario" textFill="WHITE" wrapText="true">
+            <Label fx:id="lblNombreCompleto" alignment="CENTER" layoutX="10.0" layoutY="190.0" prefHeight="30.0" prefWidth="200.0" text="Nombre Usuario" textFill="WHITE" wrapText="true">
             <font>
                <Font size="16.0" />
             </font>
          </Label>
-            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="220.0" prefHeight="260.0" prefWidth="201.0">
+            <AnchorPane fx:id="DocenteOptionsContainer" layoutX="9.0" layoutY="220.0" prefHeight="203.0" prefWidth="201.0" visible="false">
                <children>
-                  <Button fx:id="btnInfoPersonal" layoutX="1.0" layoutY="5.0" mnemonicParsing="false" onAction="#btnInfoPersonalDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Info. Personal" textFill="WHITE">
+                  <Button fx:id="btn_eventos_Docente" layoutY="144.0" mnemonicParsing="false" onAction="#btnEventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-
                   <Button fx:id="btnMisEquiposDocente" layoutX="1.0" layoutY="70.0" mnemonicParsing="false" onAction="#btnMisEquiposDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Mis Equipos" textFill="WHITE">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Button>
-
-                  <Button fx:id="btn_eventos_Docente" layoutY="135.0" mnemonicParsing="false" onAction="#btnEventosDocente" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Eventos" textFill="WHITE">
-                     <font>
-                        <Font size="22.0" />
-                     </font>
-                  </Button>
-
-                  <Label fx:id="lbl_rol" layoutX="60.0" layoutY="200.0" text="Docente" textFill="WHITE">
+                  <Label fx:id="lbl_rol" layoutX="64.0" layoutY="5.0" text="Docente" textFill="WHITE">
                      <font>
                         <Font name="System Bold Italic" size="19.0" />
                      </font>
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="224.0" prefHeight="325.0" prefWidth="206.0" visible="false">
+            <AnchorPane fx:id="AdminOptionsContainer" layoutX="7.0" layoutY="224.0" prefHeight="261.0" prefWidth="206.0">
                <children>
                   <Button fx:id="btnMainDocentesAdmin" layoutY="38.0" mnemonicParsing="false" onAction="#btnMainDocentesAdmin" prefHeight="46.0" prefWidth="200.0" style="-fx-background-color: #274C77;" text="Docentes" textFill="WHITE">
                      <font>

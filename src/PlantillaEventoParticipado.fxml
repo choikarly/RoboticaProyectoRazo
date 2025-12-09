@@ -48,12 +48,12 @@
          </font>
       </Label>
 
-      <Button fx:id="btnMasInfoEvento" layoutX="520.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnMasInfoEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Más Info." textFill="WHITE" visible="false">
+      <Button fx:id="btnMasInfoEvento" layoutX="520.0" layoutY="22.0" mnemonicParsing="false" onAction="#btnMasInfoEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Más Info." textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Button>
-      <Button fx:id="btnEvaluarEvento" layoutX="520.0" layoutY="30.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#btnEvaluarEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Evaluar" textFill="WHITE" visible="false">
+      <Button fx:id="btnEvaluarEvento" layoutX="520.0" layoutY="85.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#btnEvaluarEvento" prefHeight="46.0" prefWidth="120.0" style="-fx-background-color: #274c77; -fx-background-radius: 15;" text="Evaluar" textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
