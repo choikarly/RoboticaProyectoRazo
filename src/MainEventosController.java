@@ -24,13 +24,6 @@ public class MainEventosController {
     @FXML
     private Label lblMensajeEventiParticipado;
 
-    // Estos botones parecen ser para uso global o referencia,
-    // pero recuerda que cada plantilla tiene sus propios botones.
-    @FXML
-    private Button btnEvaluarEvento;
-    @FXML
-    private Button btnMasInfoEvento;
-
     @FXML
     public void initialize() {
         cargarEventos();
@@ -40,18 +33,21 @@ public class MainEventosController {
     private void cargarEventosDelDocente() {
         vboxContenedorEventosParticipados.getChildren().clear();
         int idUsuario = Main.usuaioActual;
-        System.out.println("Cargando eventos para el usuario ID " + idUsuario);
+
+        System.out.println("Buscando eventos para usuario ID: " + idUsuario);
 
         List<Map<String, Object>> lista = Main.retornarEventosParticipados(idUsuario);
 
         if (lista.isEmpty()) {
+            System.out.println("La lista de eventos participados llegó VACÍA.");
             vboxContenedorEventosParticipados.setVisible(false);
             vboxContenedorEventosParticipados.setManaged(false);
 
             lblMensajeEventiParticipado.setVisible(true);
             lblMensajeEventiParticipado.setManaged(true);
-            lblMensajeEventiParticipado.setText("No estás asignado a ningún evento aún.");
         } else {
+            System.out.println("Se encontraron " + lista.size() + " eventos participados.");
+
             vboxContenedorEventosParticipados.setVisible(true);
             vboxContenedorEventosParticipados.setManaged(true);
             vboxContenedorEventosParticipados.setSpacing(10);
@@ -59,34 +55,34 @@ public class MainEventosController {
             lblMensajeEventiParticipado.setVisible(false);
             lblMensajeEventiParticipado.setManaged(false);
 
-            try {
-                for (Map<String, Object> fila : lista) {
-                    String nombre = (String) fila.get("nombre");
-                    String sede = (String) fila.get("sede");
-                    String rol = (String) fila.get("mi_rol");
-                    String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Pendiente";
-
-                    // --- CORRECCIÓN AQUÍ ---
-                    // Antes tenías "PlantillaEvento.fxml", debe ser "PlantillaEventoParticipado.fxml"
+            for (Map<String, Object> fila : lista) {
+                try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("PlantillaEventoParticipado.fxml"));
                     AnchorPane panelEventoParticipado = loader.load();
 
-                    // Ahora sí coincide el FXML con su clase controladora
                     PlantillaEventoParticipado controller = loader.getController();
-                    controller.setDatosEventoParticipado(nombre, sede, fecha);
 
-                    // Lógica visual según el rol (Opcional: Esto lo podrías mover adentro de la plantilla si prefieres)
-                    /* Nota: Como btnEvaluarEvento es parte de ESTE controlador principal y no de la plantilla,
-                       estas líneas de abajo no ocultarán los botones DENTRO de la tarjeta.
-                       Si quieres ocultar los botones de la tarjeta, debes crear un método en
-                       PlantillaEventoParticipado.java, ej: controller.configurarBotones(rol);
-                    */
+                    // 1. OBTENER DATOS (Incluyendo el ID que faltaba)
+                    // Validamos si viene nulo para evitar NullPointerException
+                    int idEvento = (fila.get("id_evento") != null) ? (int) fila.get("id_evento") : 0;
+                    String nombre = (String) fila.get("nombre");
+                    String sede = (String) fila.get("sede");
+                    String rol = (String) fila.get("mi_rol"); // Asegúrate que en Main.java la clave sea "mi_rol"
+                    String fecha = (fila.get("fecha") != null) ? fila.get("fecha").toString() : "Pendiente";
 
-                    // Agregar al contenedor
+                    // 2. PASAR DATOS A LA PLANTILLA
+                    // Nota: Debemos actualizar este método en la plantilla para recibir el ID
+                    controller.setDatosEventoParticipado(idEvento, nombre, sede, fecha, rol);
+
                     vboxContenedorEventosParticipados.getChildren().add(panelEventoParticipado);
+
+                } catch (IOException e) {
+                    System.err.println("Error al cargar FXML de plantilla participada:");
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    System.err.println("Error general al procesar fila de evento:");
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }

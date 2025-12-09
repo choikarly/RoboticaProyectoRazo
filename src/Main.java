@@ -285,9 +285,10 @@ public class Main extends Application {
         return listaEquipos;
     }
 
+// En Main.java
+
     public static List<Map<String, Object>> retornarEventosParticipados(int idUsuario) {
         List<Map<String, Object>> lista = new ArrayList<>();
-
         try (Connection conn = getConexion();
              CallableStatement cs = conn.prepareCall("{CALL retornar_eventos_participados(?)}")) {
 
@@ -297,8 +298,10 @@ public class Main extends Application {
                 while (rs.next()) {
                     Map<String, Object> fila = new HashMap<>();
 
+                    // Leemos el ID y lo guardamos con la clave "id_evento"
+                    fila.put("id_evento", rs.getInt("id_evento"));
                     fila.put("nombre", rs.getString("nombre"));
-                    fila.put("fecha", rs.getDate("fecha")); // Ojo: SQL Date
+                    fila.put("fecha", rs.getDate("fecha")); // O getString, según prefieras
                     fila.put("sede", rs.getString("sede"));
                     fila.put("mi_rol", rs.getString("mi_rol")); // "COACH" o "JUEZ"
 
@@ -306,7 +309,6 @@ public class Main extends Application {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener eventos participados: " + e.getMessage());
             e.printStackTrace();
         }
         return lista;
@@ -609,8 +611,6 @@ public class Main extends Application {
         }
         return lista;
     }
-
-    // En Main.java
 
     public static int registrarTernaEnBD(int idEvento, int idCategoria, int j1, int j2, int j3) {
         int aviso = -1;

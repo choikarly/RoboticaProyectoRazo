@@ -1,15 +1,11 @@
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import java.io.IOException;
-import java.util.Optional;
 
 public class PlantillaEventoParticipado {
     @FXML
@@ -21,10 +17,34 @@ public class PlantillaEventoParticipado {
     @FXML
     private Label lblRol;
 
-    public void setDatosEventoParticipado(String nombre,String sede, String fecha) {
+    private int idEventoActual;
+    @FXML private Button btnMasInfoEvento; // Para el Coach
+    @FXML private Button btnEvaluarEvento; // Para el Juez
+
+    public void setDatosEventoParticipado(int idEvento,String nombre,String sede, String fecha, String rol) {
+        this.idEventoActual = idEvento;
         lblNombreEvento.setText(nombre);
         lblSede.setText(sede);
         lblFecha.setText(fecha);
+        lblRol.setText(rol);
+
+        // --- LÓGICA DE VISIBILIDAD DE BOTONES ---
+        if ("COACH".equalsIgnoreCase(rol)) {
+            // MODO COACH: Ver Mas Info, Ocultar Evaluar
+            btnMasInfoEvento.setVisible(true);
+            btnMasInfoEvento.setManaged(true);
+
+            btnEvaluarEvento.setVisible(false);
+            btnEvaluarEvento.setManaged(false);
+        } else if ("JUEZ".equalsIgnoreCase(rol)) {
+            // MODO JUEZ: Ocultar Mas Info, Ver Evaluar
+            btnMasInfoEvento.setVisible(false);
+            btnMasInfoEvento.setManaged(false);
+
+            btnEvaluarEvento.setVisible(true);
+            btnEvaluarEvento.setManaged(true);
+        }
+
     }
 
     @FXML
