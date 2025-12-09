@@ -127,4 +127,9 @@ public class MainPrincipalController {
             Platform.exit();
         }
     }
+
+    @FXML
+    void btnInfoPersonalDocente(ActionEvent event) throws IOException {
+        cambiarVista("MainInfoPersonal.fxml");
+    }
 }
